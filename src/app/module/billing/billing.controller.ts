@@ -49,11 +49,25 @@ const paymentReturn = catchAsync(async (_req: Request, res: Response) => {
 
 // Zoho calls this; it is what actually updates the database.
 const webhook = catchAsync(async (req: Request, res: Response) => {
+    // Logged before anything else, so a delivery that fails the secret check is still
+    // visible in the terminal.
+    console.log('\n──────── ZOHO WEBHOOK RECEIVED ────────')
+    console.log('time      :', new Date().toISOString())
+    console.log('from      :', req.ip)
+    console.log('query     :', {
+        ...req.query,
+        secret: req.query.secret ? '<provided>' : undefined,
+    })
+    console.log('body      :', JSON.stringify(req.body, null, 2))
+
     // Zoho does not sign these callbacks, so the URL carries a shared secret.
     if (config.zoho.webhook_secret) {
         const provided = req.query.secret ?? req.headers['x-zoho-webhook-secret']
 
         if (provided !== config.zoho.webhook_secret) {
+            console.log('result    : REJECTED — secret did not match ZOHO_WEBHOOK_SECRET')
+            console.log('───────────────────────────────────────\n')
+
             sendResponse(res, {
                 statusCode: httpStatus.UNAUTHORIZED,
                 success: false,
@@ -64,17 +78,31 @@ const webhook = catchAsync(async (req: Request, res: Response) => {
         }
     }
 
-    const result = await handleZohoBillingWebhook(
-        req.body,
-        typeof req.query.event_type === 'string' ? req.query.event_type : undefined,
-    )
+    try {
+        const result = await handleZohoBillingWebhook(
+            req.body,
+            typeof req.query.event_type === 'string' ? req.query.event_type : undefined,
+        )
 
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: result.duplicate ? 'Event already processed' : 'Webhook processed',
-        data: result,
-    })
+        console.log(
+            'result    :',
+            result.duplicate
+                ? `DUPLICATE — "${result.eventType}" was already processed`
+                : `OK — handled "${result.eventType}"`,
+        )
+        console.log('───────────────────────────────────────\n')
+
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: result.duplicate ? 'Event already processed' : 'Webhook processed',
+            data: result,
+        })
+    } catch (error) {
+        console.log('result    : FAILED —', (error as Error).message)
+        console.log('───────────────────────────────────────\n')
+        throw error
+    }
 })
 
 // Served from the local mirror, so you can see what the webhook stored.
