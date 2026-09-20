@@ -1,0 +1,2615 @@
+openapi: 3.0.0
+info:
+  title: Quotes
+  description: 'A quote is an approximation, of the prices, which a seller projects to a buyer. There can be different quotes to different buyers.<br><br><b>Possible error codes: </b><br><table><thead><tr><th>Error Code</th><th>Message</th></tr></thead><tbody><tr><td><span style="color:#FF0000;"> 1001</span></td><td>Quote Number already exist</td></tr><tr><td><span style="color:#FF0000;"> 1002</span></td><td>Quote does not exist</td></tr><td><span style="color:#FF0000;"> 2007</span></td><td>Quote cannot be raised for items that have been deleted or marked as inactive</td></tr><tr><td><span style="color:#FF0000;"> 4041</span></td><td>Quote status cannot be changed to Draft</td></tr><tr><td><span style="color:#FF0000;"> 9526</span></td><td>Please enter a valid retainer percentage. It should be greater than 0 and less than or equal to 100</td></tr></tbody></table>'
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: quotes
+    description: Quotes Module
+paths:
+  /estimates:
+    x-mcp-group:
+      - Quotes / Estimates
+    post:
+      tags:
+        - estimates
+      operationId: Create_a_Quote
+      summary: Create a Quote
+      description: Create a quote for your customer.
+      parameters:
+        - name: send
+          in: query
+          description: 'Send the quote to the contact person(s) associated with the quote.Allowed Values: <code>true</code> and <code>false</code>'
+          required: false
+          schema:
+            type: boolean
+        - name: ignore_auto_number_generation
+          in: query
+          description: Ignore auto quote number generation for this quote. This mandates the quote number to be entered manually.
+          required: false
+          schema:
+            type: boolean
+          example: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-an-estimate-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create-an-estimate-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.CREATE
+    get:
+      tags:
+        - estimates
+      operationId: List_all_Quotes
+      summary: List Quotes
+      description: List all quotes with pagination.
+      parameters:
+        - name: zcrm_potential_id
+          in: query
+          description: Potential ID of a Deal in CRM.
+          required: false
+          schema:
+            type: string
+          example: 460000000026049
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+        - name: filter_by
+          in: query
+          description: 'Return only quotes of a specific type. Allowed Values: <code>Type.Invoice</code>, <code>Type.NewSubscription</code> and <code>Type.UpdateSubscription</code>. Omit this to return all quotes.'
+          required: false
+          schema:
+            type: string
+            enum:
+              - Type.Invoice
+              - Type.NewSubscription
+              - Type.UpdateSubscription
+          example: Type.Invoice
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-estimates-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/{estimate_id}:
+    x-mcp-group:
+      - Quotes / Estimates
+    put:
+      tags:
+        - estimates
+      operationId: Update_a_Quote
+      summary: Update a Quote
+      description: Update an existing quote.
+      parameters:
+        - name: ignore_auto_number_generation
+          in: query
+          description: Ignore auto quote number generation for this quote. This mandates the quote number to be entered manually.
+          required: false
+          schema:
+            type: boolean
+          example: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-an-estimate-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-an-estimate-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.UPDATE
+    get:
+      tags:
+        - estimates
+      operationId: Get_a_Quote
+      summary: Retrieve a Quote
+      description: Fetch the details of a quote.
+      parameters:
+        - name: print
+          in: query
+          description: 'Print the exported pdf. Allowed Values: <code>true</code> and <code>false</code>'
+          required: false
+          schema:
+            type: boolean
+          example: ' '
+        - name: accept
+          in: query
+          description: 'Get the details of a particular quote in formats such as json/ pdf/ html. Default format is json.Allowed Values: <code>json</code>, <code>pdf</code> and <code>html</code>'
+          required: false
+          schema:
+            type: string
+          example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get-an-estimate-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.READ
+    delete:
+      tags:
+        - estimates
+      operationId: Delete_a_Quote
+      summary: Delete a Quote
+      description: Delete an existing quote.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-an-estimate-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.DELETE
+    parameters:
+      - name: estimate_id
+        in: path
+        required: true
+        description: Unique identifier of the estimate.
+        schema:
+          type: string
+        example: 982000000567011
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/{estimate_id}/status/sent:
+    x-mcp-group:
+      - Quotes / Estimates
+    post:
+      tags:
+        - estimates
+      operationId: Mark_a_Quote_as_Sent
+      summary: Mark a Quote as sent
+      description: Mark a draft quote as sent.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mark-an-estimate-as-sent-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.CREATE
+    parameters:
+      - name: estimate_id
+        in: path
+        required: true
+        description: Unique identifier of the estimate.
+        schema:
+          type: string
+        example: 982000000567011
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/{estimate_id}/status/accepted:
+    x-mcp-group:
+      - Quotes / Estimates
+    post:
+      tags:
+        - estimates
+      operationId: Mark_a_Quote_as_Accepted
+      summary: Mark a Quote as accepted
+      description: Mark a sent quote as accepted if the customer has accepted it.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mark-an-estimate-as-accepted-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.CREATE
+    parameters:
+      - name: estimate_id
+        in: path
+        required: true
+        description: Unique identifier of the estimate.
+        schema:
+          type: string
+        example: 982000000567011
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/{estimate_id}/status/declined:
+    x-mcp-group:
+      - Quotes / Estimates
+    post:
+      tags:
+        - estimates
+      operationId: Mark_a_Quote_as_Declined
+      summary: Mark a Quote as declined
+      description: Mark a sent quote as declined if the customer has rejected it.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mark-an-estimate-as-declined-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.CREATE
+    parameters:
+      - name: estimate_id
+        in: path
+        required: true
+        description: Unique identifier of the estimate.
+        schema:
+          type: string
+        example: 982000000567011
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/{estimate_id}/email:
+    x-mcp-group:
+      - Quotes / Estimates
+    post:
+      tags:
+        - estimates
+      operationId: Email_a_Quote
+      summary: Email a quote
+      description: Email a quote to the customer. Input json string is not mandatory. If input json string is empty, mail will be send with default mail content.
+      parameters:
+        - name: attachments
+          in: query
+          description: Files to be attached to the email
+          required: false
+          schema:
+            type: string
+            format: binary
+          example: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/email-an-estimate-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/email-an-estimate-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.CREATE
+    get:
+      tags:
+        - estimates
+      operationId: Get_Email_Content_of_a_Quote
+      summary: Get quote email content
+      description: Get the email content of a Quote.
+      parameters:
+        - name: email_template_id
+          in: query
+          description: Get the email content based on a specific email template. If this param is not inputted, then the content will be based on the email template associated with the customer. If no template is associated with the customer, then default template will be used.
+          required: true
+          schema:
+            type: string
+          example: 982000000000079
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get-estimate-email-content-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.READ
+    parameters:
+      - name: estimate_id
+        in: path
+        required: true
+        description: Unique identifier of the estimate.
+        schema:
+          type: string
+        example: 982000000567011
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/email:
+    x-mcp-group:
+      - Quotes / Estimates
+    post:
+      tags:
+        - estimates
+      operationId: Email_Multiple_Quotes
+      summary: Email multiple quotes
+      description: Send quotes to your customers by email. Maximum of 10 quotes can be sent at once.
+      parameters:
+        - name: estimate_ids
+          in: query
+          description: Comma separated quote ids which are to be emailed.
+          required: true
+          schema:
+            type: string
+          example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/email-multiple-estimates-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.CREATE
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/pdf:
+    x-mcp-group:
+      - Quotes / Estimates
+    get:
+      tags:
+        - estimates
+      operationId: Export_Quotes_as_PDF
+      summary: Bulk export quotes
+      description: Maximum of 25 quotes can be exported in a single pdf.
+      parameters:
+        - name: estimate_ids
+          in: query
+          description: Comma separated quote ids which are to be emailed.
+          required: true
+          schema:
+            type: string
+          example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulk-export-estimates-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/print:
+    x-mcp-group:
+      - Quotes / Estimates
+    get:
+      tags:
+        - estimates
+      operationId: Export_and_Print_Quotes
+      summary: Bulk print Quotes
+      description: Export Quotes as pdf and print them. Maximum of 25 quotes can be printed.
+      parameters:
+        - name: estimate_ids
+          in: query
+          description: Comma separated quote ids which are to be emailed.
+          required: true
+          schema:
+            type: string
+          example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulk-print-estimates-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/templates:
+    x-mcp-group:
+      - Quotes / Estimates
+    get:
+      tags:
+        - estimates
+      operationId: List_all_Quote_Templates
+      summary: List quote templates
+      description: Get all quote pdf templates.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-estimate-templates-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/{estimate_id}/templates/{template_id}:
+    x-mcp-group:
+      - Quotes / Estimates
+    put:
+      tags:
+        - estimates
+      operationId: Update_a_Quote_Template
+      summary: Update quote template
+      description: Update the pdf template associated with the quote.
+      parameters:
+        - name: template_id
+          in: path
+          required: true
+          description: Unique identifier of the estimate template.
+          schema:
+            type: string
+          example: 982000000000143
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-estimate-template-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.UPDATE
+    parameters:
+      - name: estimate_id
+        in: path
+        required: true
+        description: Unique identifier of the estimate.
+        schema:
+          type: string
+        example: 982000000567011
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/{estimate_id}/comments:
+    x-mcp-group:
+      - Quotes / Estimates
+    get:
+      tags:
+        - estimates
+      operationId: List_all_Comments_of_a_Quote
+      summary: List quote comments & history
+      description: Get the complete history and comments of a quote.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-estimate-comments-and-history-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.READ
+    post:
+      tags:
+        - estimates
+      operationId: Add_a_Comment_to_a_Quote
+      summary: Add Comments
+      description: Add a comment for a quote.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/add-comments-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/add-comments-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.CREATE
+    parameters:
+      - name: estimate_id
+        in: path
+        required: true
+        description: Unique identifier of the estimate.
+        schema:
+          type: string
+        example: 982000000567011
+      - $ref: '#/components/parameters/organization_id'
+  /estimates/{estimate_id}/comments/{comment_id}:
+    x-mcp-group:
+      - Quotes / Estimates
+    put:
+      tags:
+        - estimates
+      operationId: Update_a_Comment_of_a_Quote
+      summary: Update comment
+      description: Update an existing comment of a quote.
+      parameters:
+        - name: comment_id
+          in: path
+          required: true
+          description: Unique identifier of the comment.
+          schema:
+            type: string
+          example: 982000000567019
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-comment-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-comment-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.UPDATE
+    delete:
+      tags:
+        - estimates
+      operationId: Delete_a_Comment_of_a_Quote
+      summary: Delete a comment
+      description: Delete a quote comment.
+      parameters:
+        - name: comment_id
+          in: path
+          required: true
+          description: Unique identifier of the comment.
+          schema:
+            type: string
+          example: 982000000567019
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-a-comment-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.quotes.DELETE
+    parameters:
+      - name: estimate_id
+        in: path
+        required: true
+        description: Unique identifier of the estimate.
+        schema:
+          type: string
+        example: 982000000567011
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/estimate-response'
+    estimate-response:
+      description: quote to be created
+      type: object
+      properties:
+        estimate_id:
+          $ref: '#/components/schemas/estimate_id'
+        estimate_number:
+          $ref: '#/components/schemas/estimate_number'
+        date:
+          $ref: '#/components/schemas/date'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        is_pre_gst:
+          $ref: '#/components/schemas/is_pre_gst'
+        place_of_supply:
+          $ref: '#/components/schemas/place_of_supply'
+        gst_no:
+          $ref: '#/components/schemas/gst_no'
+        gst_treatment:
+          $ref: '#/components/schemas/gst_treatment'
+        tax_treatment:
+          $ref: '#/components/schemas/tax_treatment'
+        status:
+          $ref: '#/components/schemas/status'
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        customer_name:
+          $ref: '#/components/schemas/customer_name'
+        contact_persons_associated:
+          $ref: '#/components/schemas/contact_persons_associated'
+        currency_id:
+          $ref: '#/components/schemas/currency_id'
+        currency_code:
+          $ref: '#/components/schemas/currency_code'
+        exchange_rate:
+          $ref: '#/components/schemas/exchange_rate'
+        expiry_date:
+          $ref: '#/components/schemas/expiry_date'
+        discount:
+          $ref: '#/components/schemas/discount'
+        is_discount_before_tax:
+          $ref: '#/components/schemas/is_discount_before_tax'
+        discount_type:
+          $ref: '#/components/schemas/discount_type'
+        is_inclusive_tax:
+          $ref: '#/components/schemas/is_inclusive_tax'
+        line_items:
+          $ref: '#/components/schemas/line_items'
+        shipping_charge:
+          $ref: '#/components/schemas/shipping_charge'
+        adjustment:
+          $ref: '#/components/schemas/adjustment'
+        adjustment_description:
+          $ref: '#/components/schemas/adjustment_description'
+        sub_total:
+          $ref: '#/components/schemas/sub_total'
+        total:
+          $ref: '#/components/schemas/total'
+        tax_total:
+          $ref: '#/components/schemas/tax_total'
+        price_precision:
+          $ref: '#/components/schemas/price_precision'
+        taxes:
+          $ref: '#/components/schemas/taxes'
+        billing_address:
+          $ref: '#/components/schemas/billing_address'
+        shipping_address:
+          $ref: '#/components/schemas/shipping_address'
+        notes:
+          $ref: '#/components/schemas/notes'
+        terms:
+          $ref: '#/components/schemas/terms'
+        custom_fields:
+          $ref: '#/components/schemas/custom_fields'
+        template_id:
+          $ref: '#/components/schemas/template_id'
+        template_name:
+          $ref: '#/components/schemas/template_name'
+        created_time:
+          $ref: '#/components/schemas/created_time'
+        last_modified_time:
+          $ref: '#/components/schemas/last_modified_time'
+        salesperson_id:
+          $ref: '#/components/schemas/salesperson_id'
+        salesperson_name:
+          $ref: '#/components/schemas/salesperson_name'
+        project:
+          $ref: '#/components/schemas/project'
+        estimate_type:
+          $ref: '#/components/schemas/estimate_type'
+        subscription_ids:
+          $ref: '#/components/schemas/subscription_ids'
+        subscription_id:
+          $ref: '#/components/schemas/subscription_id'
+        subscription_number:
+          $ref: '#/components/schemas/subscription_number'
+        coupon:
+          $ref: '#/components/schemas/coupon'
+        billing_cycles:
+          $ref: '#/components/schemas/billing_cycles'
+        trial_days:
+          $ref: '#/components/schemas/trial_days'
+        can_charge_setup_fee_immediately:
+          $ref: '#/components/schemas/can_charge_setup_fee_immediately'
+        auto_collect:
+          $ref: '#/components/schemas/auto_collect'
+        end_of_term:
+          $ref: '#/components/schemas/end_of_term'
+    show_comment_to_clients:
+      description: Boolean to show the comments to contacts in portal.
+      type: boolean
+      example: true
+    commented_by_id:
+      description: Comment by comment ID
+      type: string
+      example: 982000000554041
+    comment_type:
+      description: Type of comment made
+      type: string
+      example: system
+    commented_by:
+      description: Name of the person who has commented
+      type: string
+      example: David John
+    place_of_supply:
+      description: Place where the goods/services are supplied to. (If not given, <code>place of contact</code> given for the contact will be taken)
+      type: string
+      example: TN
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    gst_treatment:
+      description: Choose whether the contact is GST registered/unregistered/consumer/overseas. Allowed values are <code> business_gst </code> , <code> business_none </code> , <code> overseas </code> , <code> consumer </code>.
+      type: string
+      example: business_gst
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    gst_no:
+      description: 15 digit GST identification number of the customer.
+      type: string
+      example: 22AAAAA0000A1Z5
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    product_type:
+      description: Enter goods/services
+      type: string
+      example: goods
+    project_id:
+      description: ID of the project
+      type: string
+      example: 90300000087378
+    project_name:
+      description: Name of the project.
+      type: string
+      example: Sample Project
+    hsn_or_sac:
+      description: Add HSN/SAC code for your goods/services
+      type: string
+      example: 80540
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    sat_item_key_code:
+      description: Add SAT Item Key Code for your goods/services. Download the <a href= http://omawww.sat.gob.mx/tramitesyservicios/Paginas/documentos/catCFDI_V_4_07122022.xls  >CFDI Catalogs.</a>
+      type: string
+      example: 71121206
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    unitkey_code:
+      description: Add SAT Unit Key Code for your goods/services. Download the <a href= http://omawww.sat.gob.mx/tramitesyservicios/Paginas/documentos/catCFDI_V_4_07122022.xls  >CFDI Catalogs.</a>
+      type: string
+      example: E48
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    is_pre_gst:
+      description: Applicable for transactions that fall before july 1, 2017
+      type: boolean
+      example: false
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    date_description:
+      description: Number of days since the comment has been made
+      type: string
+      example: yesterday
+    salutation:
+      description: Salutation for the contact
+      type: string
+      example: ':Mr'
+    contact_person_id:
+      description: Unique ID of the contact person
+      type: string
+      example: 982000000567003
+    first_name:
+      description: First name of the contact person
+      type: string
+      example: David
+    last_name:
+      description: Last name of the contact person
+      type: string
+      example: John
+    email:
+      description: Email ID of the contact
+      type: string
+    phone:
+      description: phone number of the contact person
+      type: string
+      example: '1234'
+    mobile:
+      description: mobile number of the contact person
+      type: string
+      example: '1234'
+    is_primary_contact:
+      description: To mark contact person as primary for contact
+      type: boolean
+    time:
+      description: time when quote was created
+      type: string
+      example: 2:02 AM
+    operation_type:
+      description: Type of operation on quote
+      type: string
+      example: Added
+    transaction_id:
+      description: ID of the transaction
+      type: string
+      example: ' '
+    transaction_type:
+      description: Type of the transaction performed
+      type: string
+      example: estimate
+    last_modified_time:
+      description: Last date of modification in quote
+      type: string
+      example: 2013-12-18T04:46:45-0500
+    has_attachment:
+      description: To check for any attachment
+      type: boolean
+      example: false
+    is_viewed_by_client:
+      description: To see view status, if viewed by client the quote from the portal or not
+      type: boolean
+      example: true
+    client_viewed_time:
+      description: Time when the client viewed the quote
+      type: string
+      example: 2016-06-19T05:49:12-0500
+    comment_id:
+      description: The ID of the comment
+      type: string
+      example: 982000000567019
+    template_type:
+      description: The type of template used
+      type: string
+      example: classic
+    file_name:
+      description: The name of the file to be attached
+      type: string
+      example: EST-00001.pdf
+    from_emails:
+      description: The list of from email Addresses
+      type: array
+      items:
+        type: object
+        properties:
+          user_name:
+            $ref: '#/components/schemas/user_name'
+          selected:
+            $ref: '#/components/schemas/selected'
+          email:
+            $ref: '#/components/schemas/email'
+    user_name:
+      description: Name of the sender of email
+      type: string
+      example: John Smith
+    to_contacts:
+      description: The list of contacts the mail to be sent
+      type: array
+      items:
+        type: object
+        properties:
+          first_name:
+            $ref: '#/components/schemas/first_name'
+          selected:
+            $ref: '#/components/schemas/selected'
+          phone:
+            $ref: '#/components/schemas/phone'
+          email:
+            $ref: '#/components/schemas/email'
+          last_name:
+            $ref: '#/components/schemas/last_name'
+          salutation:
+            $ref: '#/components/schemas/salutation'
+          contact_person_id:
+            $ref: '#/components/schemas/contact_person_id'
+          mobile:
+            $ref: '#/components/schemas/mobile'
+    email_template_id:
+      description: Get the email content based on a specific email template. If this param is not inputted, then the content will be based on the email template associated with the customer. If no template is associated with the customer, then default template will be used.
+      type: string
+      example: 982000000000079
+    error_list:
+      description: Error list
+      type: array
+      items:
+        type: string
+      example: []
+    emailtemplates:
+      description: The email template information
+      type: array
+      items:
+        type: object
+        properties:
+          selected:
+            $ref: '#/components/schemas/selected'
+          name:
+            $ref: '#/components/schemas/name'
+          email_template_id:
+            $ref: '#/components/schemas/email_template_id'
+    selected:
+      description: Boolean check for the email template. Whether selected or not
+      type: boolean
+      example: true
+    estimate_ids:
+      description: Comma separated quote ids which are to be emailed.
+      type: string
+    body:
+      description: Body/content of an email has to be sent.
+      type: string
+      example: 'Dear Customer,   Thanks for your business enquiry.         The quote EST-000002 is attached with this email.        We can get started if you send us your consent. For any assistance you can reach us via email or phone.         Looking forward to hearing back from you. Here''s an overview of the quote for your reference.        Quote Overview:        Estimate  : EST-000002         Date : 03 Oct 2013        Amount : $36.47 Regards<br>\nZillium Inc<br>\n""'
+    subject:
+      description: Subject of an email has to be sent.
+      type: string
+      example: Statement of transactions with Zillium Inc
+    cc_mail_ids:
+      description: Array of email addresses of the recipients to be CC'd.
+      type: array
+      items:
+        type: string
+      example:
+        - test@zylker.org
+    to_mail_ids:
+      description: Array of email addresses of the recipients.
+      type: array
+      items:
+        type: string
+      example:
+        - test@zylker.org
+    send_from_org_email_id:
+      description: Boolean to trigger the email from the organization's email address
+      type: boolean
+      example: false
+    attachments:
+      description: Files to be attached to the email
+      type: string
+      format: binary
+    ignore_auto_number_generation:
+      description: Ignore auto quote number generation for this quote. This mandates the quote number to be entered manually.
+      type: boolean
+      example: false
+    custom_subject:
+      description: Subjet for the email to be sent
+      type: string
+      example: ' '
+    custom_body:
+      description: Custom content of the email
+      type: string
+      example: ' '
+    tax_id:
+      description: ID of the tax or tax group applied to the quote
+      type: string
+      example: 982000000557028
+    tds_tax_id:
+      description: ID of the TDS tax.
+      type: string
+      example: '982000000557012'
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    tax_authority_id:
+      description: ID of the tax authority. Tax authority depends on the location of the customer. For example, if the customer is located in NY, then the tax authority is NY tax authority.
+      type: string
+      example: 11149000000061052
+      x-node_available_in:
+        - us
+        - ca
+      x-node_unavailable_in: []
+    tax_exemption_id:
+      description: ID of the tax exemption.
+      type: string
+      example: 11149000000061054
+      x-node_available_in:
+        - in
+        - us
+        - ca
+      x-node_unavailable_in: []
+    avatax_tax_code:
+      description: A tax code is a unique label used to group Items (products, services, or charges) together. <code>Maximum length [25]</code>
+      type: string
+      x-node_available_in:
+        - Avalara Integration
+      x-node_unavailable_in: []
+    avatax_use_code:
+      description: Used to group like customers for exemption purposes. It is a custom value that links customers to a tax rule. Select from Avalara [standard codes][1] or enter a custom code.
+      type: string
+      x-node_available_in:
+        - Avalara Integration
+      x-node_unavailable_in: []
+    avatax_exempt_no:
+      description: Exemption certificate number of the customer.
+      type: string
+      x-node_available_in:
+        - Avalara Integration
+      x-node_unavailable_in: []
+    vat_treatment:
+      description: (Optional) VAT treatment for the quotes. VAT treatment denotes the location of the customer, if the customer resides in UK then the VAT treatment is <code>uk</code>. If the customer is in an EU country & VAT registered, you are resides in Northen Ireland and selling Goods then his VAT treatment is <code>eu_vat_registered</code>, if he resides outside of the UK then his VAT treatment is <code>overseas</code> (For Pre Brexit, this can be split as <code>eu_vat_registered</code>, <code>eu_vat_not_registered</code> and <code>non_eu</code>).
+      type: string
+      x-node_available_in:
+        - uk
+      x-node_unavailable_in: []
+    tax_treatment:
+      description: VAT treatment for the quote.Allowed Values:</br><code>home_country_mexico</code>,<code>border_region_mexico</code>,<code>non_mexico</code> supported only for <b>MX</b>.
+      type: string
+      example: vat_registered
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    send:
+      description: 'Send the quote to the contact person(s) associated with the quote.Allowed Values: <code>true</code> and <code>false</code>'
+      type: boolean
+    template_id:
+      description: ID of the template used for the quote
+      type: string
+      example: 982000000000143
+    template_name:
+      description: Name of the template used
+      type: string
+      example: Service - Classic
+    print:
+      description: Print the exported pdf.
+      type: boolean
+      example: ' '
+    accept:
+      description: 'Get the details of a particular quote in formats such as json/ pdf/ html. Default format is json.Allowed Values: <code>json</code>, <code>pdf</code> and <code>html</code>'
+      type: string
+      example: ' '
+    notes:
+      description: The notes added below expressing gratitude or for conveying some information.
+      type: string
+      example: Looking forward for your business.
+    terms:
+      description: Enlist the terms & conditions for quote
+      type: string
+      example: Terms & Conditions apply
+    index:
+      description: An index for the custom field.
+      type: integer
+      example: 1
+    show_on_pdf:
+      description: Show exported file in PDF format
+      type: boolean
+      example: false
+    value:
+      description: Value for the custom field
+      type: string
+      example: 15 Dec 2013
+    label:
+      description: Label for the quote
+      type: string
+      example: Delivery Date
+    billing_address:
+      description: The billing address of the customer
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/address'
+        city:
+          $ref: '#/components/schemas/city'
+        state:
+          $ref: '#/components/schemas/state'
+        zip:
+          $ref: '#/components/schemas/zip'
+        country:
+          $ref: '#/components/schemas/country'
+        fax:
+          $ref: '#/components/schemas/fax'
+    shipping_address:
+      description: The shipping address of the customer
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/address'
+        city:
+          $ref: '#/components/schemas/city'
+        state:
+          $ref: '#/components/schemas/state'
+        zip:
+          $ref: '#/components/schemas/zip'
+        country:
+          $ref: '#/components/schemas/country'
+        fax:
+          $ref: '#/components/schemas/fax'
+    address:
+      description: Billing address for the quote
+      type: string
+      example: 4900 Hopyard Rd, Suite 310
+    city:
+      description: City of the customer's billing address.
+      type: string
+      example: Pleasanton
+    state:
+      description: State of the customer's billing address.
+      type: string
+      example: CA
+    zip:
+      description: Zip code of the customer's billing address.
+      type: string
+      example: 94588
+    country:
+      description: Country of the customer's billing address.
+      type: string
+      example: U.S.A
+    fax:
+      description: Customer's fax number.
+      type: string
+      example: 1234
+    taxes:
+      description: List of the taxes levied
+      type: array
+      items:
+        type: object
+        properties:
+          tax_name:
+            $ref: '#/components/schemas/tax_name'
+          tax_amount:
+            $ref: '#/components/schemas/tax_amount'
+    tax_amount:
+      description: The amount of the tax levied
+      type: number
+      format: float
+      example: 19.13
+    shipping_charge:
+      description: Shipping charges applied to the invoice.
+      type: string
+      example: 0
+    adjustment:
+      description: Adjustments made to the invoice.
+      type: number
+      format: double
+      example: 0
+    adjustment_description:
+      description: Customize the adjustment description. E.g. Rounding off value.
+      type: string
+      example: ' '
+    sub_total:
+      description: The sub total of the all items
+      type: number
+      format: float
+      example: 153
+    tax_total:
+      description: The total amount of the tax levied
+      type: number
+      format: double
+      example: 22.6
+    price_precision:
+      description: The precision value on the price
+      type: integer
+      example: 2
+    exchange_rate:
+      description: Foreign Exchange rate of the currency.
+      type: number
+      format: double
+      example: 1
+    contact_person_name:
+      description: Name of the Contact Person.
+      type: string
+      example: David
+    contact_person_first_name:
+      description: First Name of the Contact Person.
+      type: string
+      example: David
+    contact_person_email:
+      description: Email ID of the Contact Person.
+      type: string
+      example: willsmith@bowmanfurniture.com
+    contact_person_phone:
+      description: Phone Number of the Contact Person.
+      type: string
+      example: +1-925-921-9201
+    contact_person_last_name:
+      description: Last Name of the Contact Person.
+      type: string
+      example: John
+    contact_person_mobile:
+      description: Mobile Number of the Contact Person.
+      type: string
+      example: +1-4054439562
+    is_email_enabled:
+      description: Used to check if Email communication preference is enabled for the contact person at transaction level.
+      type: boolean
+      example: true
+    is_sms_enabled:
+      description: Used to check if SMS communication preference is enabled for the contact person at transaction level.
+      type: boolean
+      example: true
+      x-node_available_in:
+        - SMS integration
+    is_whatsapp_enabled:
+      description: Used to check if WhatsApp communication preference is enabled for the contact person at transaction level.
+      type: boolean
+      example: true
+      x-node_available_in:
+        - WhatsApp integration
+    communication_preference:
+      description: Preferred modes of communication for the contact person at transaction level.
+      type: object
+      properties:
+        is_email_enabled:
+          $ref: '#/components/schemas/is_email_enabled'
+        is_sms_enabled:
+          $ref: '#/components/schemas/is_sms_enabled'
+        is_whatsapp_enabled:
+          $ref: '#/components/schemas/is_whatsapp_enabled'
+    contact_persons_associated:
+      description: Contact persons associated with the transaction.
+      type: array
+      items:
+        type: object
+        properties:
+          contact_person_id:
+            $ref: '#/components/schemas/contact_person_id'
+          contact_person_name:
+            $ref: '#/components/schemas/contact_person_name'
+          first_name:
+            $ref: '#/components/schemas/contact_person_first_name'
+          last_name:
+            $ref: '#/components/schemas/contact_person_last_name'
+          contact_person_email:
+            $ref: '#/components/schemas/contact_person_email'
+          phone:
+            $ref: '#/components/schemas/contact_person_phone'
+          mobile:
+            $ref: '#/components/schemas/contact_person_mobile'
+          communication_preference:
+            $ref: '#/components/schemas/communication_preference'
+    contact_persons_associated_payload:
+      description: Contact persons associated with the transaction.
+      type: array
+      items:
+        type: object
+        properties:
+          contact_person_id:
+            $ref: '#/components/schemas/contact_person_id'
+          communication_preference:
+            $ref: '#/components/schemas/communication_preference'
+    line_items:
+      description: Line items of an quote.
+      type: array
+      items:
+        type: object
+        properties:
+          item_id:
+            $ref: '#/components/schemas/item_id'
+          name:
+            $ref: '#/components/schemas/name'
+          description:
+            $ref: '#/components/schemas/description'
+          item_order:
+            $ref: '#/components/schemas/item_order'
+          bcy_rate:
+            $ref: '#/components/schemas/bcy_rate'
+          rate:
+            $ref: '#/components/schemas/rate'
+          quantity:
+            $ref: '#/components/schemas/quantity'
+          unit:
+            $ref: '#/components/schemas/unit'
+          discount_amount:
+            $ref: '#/components/schemas/discount_amount'
+          discount:
+            $ref: '#/components/schemas/discount'
+          tax_id:
+            $ref: '#/components/schemas/tax_id'
+          tax_name:
+            $ref: '#/components/schemas/tax_name'
+          tax_type:
+            $ref: '#/components/schemas/tax_type'
+          tax_percentage:
+            $ref: '#/components/schemas/tax_percentage'
+          item_total:
+            $ref: '#/components/schemas/item_total'
+    line_item_id:
+      description: The line item id
+      type: string
+      example: 982000000567021
+    name:
+      description: The name of the line item
+      type: string
+      example: Hard Drive
+    description:
+      description: The description of the line items
+      type: string
+      example: 500GB, USB 2.0 interface 1400 rpm, protective hard case.
+    item_order:
+      description: The order of the line item_order
+      type: integer
+      example: 1
+    bcy_rate:
+      description: base currency rate
+      type: number
+      format: double
+      example: 120
+    rate:
+      description: Rate of the line item.
+      type: number
+      format: double
+      example: 120
+    quantity:
+      description: The quantity of line item
+      type: number
+      format: float
+      example: 1
+    unit:
+      description: Unit of measuring the line item e.g. kgs, Nos.
+      type: string
+      example: ' '
+    discount_amount:
+      description: The discount amount on the line item
+      type: number
+      format: float
+      example: 0
+    is_discount_before_tax:
+      description: Used to specify how the discount has to applied. Either before or after the calculation of tax.
+      type: boolean
+      example: true
+    discount_type:
+      description: 'How the discount is specified. Allowed values are entity_level or item_level.Allowed Values: <code>entity_level</code> and <code>item_level</code>'
+      type: string
+      example: item_level
+    is_inclusive_tax:
+      description: Used to specify whether the line item rates are inclusive or exclusive of tax.
+      type: boolean
+      example: false
+      x-node_available_in: []
+      x-node_unavailable_in:
+        - us
+    discount:
+      description: Discount applied to the estimate, which can be either a percentage or a flat amount. For percentage discounts, the value should include the % symbol (e.g., 10%). For example, on Rs.1000, a 10% discount results in Rs.900, while a flat Rs.200 discount results in Rs.800.
+      type: number
+      format: double
+      example: 0
+    tax_name:
+      description: The name of the tax
+      type: string
+      example: VAT
+    tax_type:
+      description: The type of the tax
+      type: string
+      example: tax
+    tax_percentage:
+      description: The  percentage of tax levied
+      type: number
+      format: float
+      example: 12.5
+    item_total:
+      description: The total amount of the line items
+      type: number
+      format: float
+      example: 120
+    salesperson_id:
+      description: Unique ID of the sales person
+      type: string
+      example: 982000000567003
+    salesperson_name:
+      description: Name of the sales person.
+      type: string
+      example: Will smith
+    created_time:
+      description: The time of creation of the quote
+      type: string
+      example: 2013-11-18T02:17:40-0800
+    accepted_date:
+      description: The date of acceptance of the quotes
+      type: string
+      example: ' '
+    declined_date:
+      description: The date of declination of the quotes
+      type: string
+      example: ' '
+    expiry_date:
+      description: The date of expiration of the quotes
+      type: string
+      example: '2013-11-30'
+    estimates:
+      description: The list of all quotes
+      type: array
+      items:
+        type: string
+    page_context:
+      description: The context of a particular page.
+      type: array
+      items:
+        type: object
+        properties:
+          page:
+            $ref: '#/components/schemas/page'
+          per_page:
+            $ref: '#/components/schemas/per_page'
+          has_more_page:
+            $ref: '#/components/schemas/has_more_page'
+          report_name:
+            $ref: '#/components/schemas/report_name'
+          applied_filter:
+            $ref: '#/components/schemas/applied_filter'
+          sort_column:
+            $ref: '#/components/schemas/sort_column'
+          sort_order:
+            $ref: '#/components/schemas/sort_order'
+    page:
+      description: Number of pages
+      type: integer
+      example: 1
+    per_page:
+      description: Per page values
+      type: integer
+      example: 200
+    has_more_page:
+      description: Check if has more pages
+      type: boolean
+      example: false
+    sort_order:
+      description: The order for sorting
+      type: string
+      example: D
+    sort_column:
+      description: Sort quotes. Allowed Values <code>customer_name</code>, <code>estimate_number</code>, <code>date</code>, <code>total</code> and <code>created_time</code>
+      type: string
+      example: created_time
+    estimate_id:
+      description: The  unique id of a particular quote
+      type: string
+      example: 982000000567011
+    estimate_number:
+      description: quote Serial number.
+      type: string
+      example: EST-00002
+    reference_number:
+      description: Transaction reference number.
+      type: string
+      example: QRT-12346
+    customer_name:
+      description: Name of the Customer to whom the quote is sent.
+      type: string
+      example: Bowman & Co
+    total:
+      description: quote total value.
+      type: number
+      format: double
+      example: 40.6
+    customer_id:
+      description: Customer ID on the quote.
+      type: string
+      example: 982000000567001
+    item_id:
+      description: Unique ID of the item.
+      type: string
+      example: ' '
+    item_name:
+      description: item name for which quote is made . Variants <code>item_name_startswith</code> and <code>item_name_contains</code>
+      type: string
+      example: ' '
+    currency_id:
+      description: The Unique ID of the customer
+      type: string
+      example: 982000000000190
+    currency_code:
+      description: Currency code of the currency in which the customer wants to pay. If currency_code is not specified here, the currency chosen in your Zoho Billing organization will be used for billing. currency_id and currency_symbol are set automatically in accordance to the currency_code.
+      type: string
+      example: USD
+    currency_symbol:
+      description: Symbol of the currency of the contact_type
+      type: string
+      example: $
+    applied_filter:
+      description: The filer applied for sorting
+      type: string
+      example: Status.All
+    item_description:
+      description: Description of items on quote. Variants<code>item_description_startswith</code> and <code>item_description_contains</code>
+      type: string
+      example: ' '
+    custom_field:
+      description: Additional fields in the quote. Variants<code>custom_field_startswith</code> and <code>custom_field_contains</code>
+      type: string
+      example: ' '
+    report_name:
+      description: The report name
+      type: string
+      example: Estimates
+    customfield_id:
+      description: Unique ID of the custom field
+      type: string
+      example: 439910000000236000
+    data_type:
+      description: Data type of the custom field
+      type: string
+      example: number
+    show_in_all_pdf:
+      description: Enable/Disable show this custom field on all the pdf
+      example: true
+    custom_fields:
+      description: Custom fields for a quote.
+      type: array
+      items:
+        type: object
+        properties:
+          customfield_id:
+            $ref: '#/components/schemas/customfield_id'
+          data_type:
+            $ref: '#/components/schemas/data_type'
+          index:
+            $ref: '#/components/schemas/index'
+          label:
+            $ref: '#/components/schemas/label'
+          show_on_pdf:
+            $ref: '#/components/schemas/show_on_pdf'
+          show_in_all_pdf:
+            $ref: '#/components/schemas/show_in_all_pdf'
+          value:
+            $ref: '#/components/schemas/value'
+    status:
+      description: Status of the quote. Allowed Values<code>draft</code>, <code>sent</code>,<code> invoiced </code>, <code>accepted</code>, <code>declined</code> and <code>expired</code>
+      type: string
+      example: draft
+    date:
+      description: Date on the quote.
+      type: string
+      example: '2013-11-18'
+    project:
+      type: object
+      properties:
+        project_id:
+          $ref: '#/components/schemas/project_id'
+        project_name:
+          $ref: '#/components/schemas/project_name'
+    filter_by:
+      description: Filter quotes by status.Allowed Values <code>Status.All</code>, <code>Status.Sent</code>, <code>Status.Draft</code>, <code>Status.Invoiced</code>, <code>Status.Accepted</code>, <code>Status.Declined</code> and <code>Status.Expired</code>
+      type: string
+      example: ' '
+    search_text:
+      description: Search quotes by quote number or reference or customer name.
+      type: string
+      example: ' '
+    create-an-estimate-request:
+      required:
+        - customer_id
+        - line_items
+      type: object
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        contact_persons_associated:
+          $ref: '#/components/schemas/contact_persons_associated_payload'
+        template_id:
+          $ref: '#/components/schemas/template_id'
+        place_of_supply:
+          $ref: '#/components/schemas/place_of_supply'
+        gst_treatment:
+          $ref: '#/components/schemas/gst_treatment'
+        tax_treatment:
+          $ref: '#/components/schemas/tax_treatment'
+        gst_no:
+          $ref: '#/components/schemas/gst_no'
+        estimate_number:
+          $ref: '#/components/schemas/estimate_number'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        date:
+          $ref: '#/components/schemas/date'
+        expiry_date:
+          $ref: '#/components/schemas/expiry_date'
+        exchange_rate:
+          $ref: '#/components/schemas/exchange_rate'
+        discount:
+          $ref: '#/components/schemas/discount'
+        is_discount_before_tax:
+          $ref: '#/components/schemas/is_discount_before_tax'
+        discount_type:
+          $ref: '#/components/schemas/discount_type'
+        is_inclusive_tax:
+          $ref: '#/components/schemas/is_inclusive_tax'
+        custom_body:
+          $ref: '#/components/schemas/custom_body'
+        custom_subject:
+          $ref: '#/components/schemas/custom_subject'
+        salesperson_name:
+          $ref: '#/components/schemas/salesperson_name'
+        custom_fields:
+          description: Custom fields for an quote.
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                $ref: '#/components/schemas/label'
+              value:
+                $ref: '#/components/schemas/value'
+        line_items:
+          description: Line items of an quote.
+          type: array
+          items:
+            type: object
+            required:
+              - item_id
+              - rate
+              - quantity
+            properties:
+              item_id:
+                $ref: '#/components/schemas/item_id'
+              name:
+                $ref: '#/components/schemas/name'
+              description:
+                $ref: '#/components/schemas/description'
+              item_order:
+                $ref: '#/components/schemas/item_order'
+              rate:
+                $ref: '#/components/schemas/rate'
+              product_type:
+                $ref: '#/components/schemas/product_type'
+              hsn_or_sac:
+                $ref: '#/components/schemas/hsn_or_sac'
+              sat_item_key_code:
+                $ref: '#/components/schemas/sat_item_key_code'
+              unitkey_code:
+                $ref: '#/components/schemas/unitkey_code'
+              quantity:
+                $ref: '#/components/schemas/quantity'
+              unit:
+                $ref: '#/components/schemas/unit'
+              discount_amount:
+                $ref: '#/components/schemas/discount_amount'
+              discount:
+                $ref: '#/components/schemas/discount'
+              tax_id:
+                $ref: '#/components/schemas/tax_id'
+              tds_tax_id:
+                $ref: '#/components/schemas/tds_tax_id'
+              tax_exemption_id:
+                $ref: '#/components/schemas/tax_exemption_id'
+              avatax_tax_code:
+                $ref: '#/components/schemas/avatax_tax_code'
+              avatax_use_code:
+                $ref: '#/components/schemas/avatax_use_code'
+              tax_name:
+                $ref: '#/components/schemas/tax_name'
+              tax_type:
+                $ref: '#/components/schemas/tax_type'
+              tax_percentage:
+                $ref: '#/components/schemas/tax_percentage'
+              item_total:
+                $ref: '#/components/schemas/item_total'
+        notes:
+          $ref: '#/components/schemas/notes'
+        terms:
+          $ref: '#/components/schemas/terms'
+        shipping_charge:
+          $ref: '#/components/schemas/shipping_charge'
+        adjustment:
+          $ref: '#/components/schemas/adjustment'
+        adjustment_description:
+          $ref: '#/components/schemas/adjustment_description'
+        tax_id:
+          $ref: '#/components/schemas/tax_id'
+        tax_exemption_id:
+          $ref: '#/components/schemas/tax_exemption_id'
+        tax_authority_id:
+          $ref: '#/components/schemas/tax_authority_id'
+        avatax_use_code:
+          $ref: '#/components/schemas/avatax_use_code'
+        avatax_tax_code:
+          $ref: '#/components/schemas/avatax_tax_code'
+        avatax_exempt_no:
+          $ref: '#/components/schemas/avatax_exempt_no'
+        vat_treatment:
+          $ref: '#/components/schemas/vat_treatment'
+        project_id:
+          $ref: '#/components/schemas/project_id'
+        estimate_type:
+          $ref: '#/components/schemas/estimate_type'
+        trial_days:
+          $ref: '#/components/schemas/trial_days'
+        can_charge_setup_fee_immediately:
+          $ref: '#/components/schemas/can_charge_setup_fee_immediately'
+        coupon_code:
+          $ref: '#/components/schemas/coupon_code'
+        billing_cycles:
+          $ref: '#/components/schemas/billing_cycles'
+        auto_collect:
+          $ref: '#/components/schemas/auto_collect'
+        payment_options:
+          $ref: '#/components/schemas/payment_options'
+        subscription_id:
+          $ref: '#/components/schemas/subscription_id'
+        end_of_term:
+          $ref: '#/components/schemas/end_of_term'
+    create-an-estimate-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The quote has been created
+          readOnly: true
+        estimate:
+          $ref: '#/components/schemas/estimate-response'
+    list-estimates-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        estimates:
+          type: array
+          items:
+            type: object
+            properties:
+              estimate_id:
+                $ref: '#/components/schemas/estimate_id'
+              customer_name:
+                $ref: '#/components/schemas/customer_name'
+              customer_id:
+                $ref: '#/components/schemas/customer_id'
+              status:
+                $ref: '#/components/schemas/status'
+              estimate_number:
+                $ref: '#/components/schemas/estimate_number'
+              reference_number:
+                $ref: '#/components/schemas/reference_number'
+              date:
+                $ref: '#/components/schemas/date'
+              currency_id:
+                $ref: '#/components/schemas/currency_id'
+              currency_code:
+                $ref: '#/components/schemas/currency_code'
+              total:
+                $ref: '#/components/schemas/total'
+              created_time:
+                $ref: '#/components/schemas/created_time'
+              last_modified_time:
+                $ref: '#/components/schemas/last_modified_time'
+              accepted_date:
+                $ref: '#/components/schemas/accepted_date'
+              declined_date:
+                $ref: '#/components/schemas/declined_date'
+              expiry_date:
+                $ref: '#/components/schemas/expiry_date'
+              has_attachment:
+                $ref: '#/components/schemas/has_attachment'
+              is_viewed_by_client:
+                $ref: '#/components/schemas/is_viewed_by_client'
+              client_viewed_time:
+                $ref: '#/components/schemas/client_viewed_time'
+    update-an-estimate-request:
+      required:
+        - customer_id
+        - custom_fields
+      type: object
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        contact_persons_associated:
+          $ref: '#/components/schemas/contact_persons_associated_payload'
+        template_id:
+          $ref: '#/components/schemas/template_id'
+        place_of_supply:
+          $ref: '#/components/schemas/place_of_supply'
+        gst_treatment:
+          $ref: '#/components/schemas/gst_treatment'
+        tax_treatment:
+          $ref: '#/components/schemas/tax_treatment'
+        gst_no:
+          $ref: '#/components/schemas/gst_no'
+        estimate_number:
+          $ref: '#/components/schemas/estimate_number'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        date:
+          $ref: '#/components/schemas/date'
+        expiry_date:
+          $ref: '#/components/schemas/expiry_date'
+        exchange_rate:
+          $ref: '#/components/schemas/exchange_rate'
+        discount:
+          $ref: '#/components/schemas/discount'
+        is_discount_before_tax:
+          $ref: '#/components/schemas/is_discount_before_tax'
+        discount_type:
+          $ref: '#/components/schemas/discount_type'
+        is_inclusive_tax:
+          $ref: '#/components/schemas/is_inclusive_tax'
+        custom_body:
+          $ref: '#/components/schemas/custom_body'
+        custom_subject:
+          $ref: '#/components/schemas/custom_subject'
+        salesperson_name:
+          $ref: '#/components/schemas/salesperson_name'
+        custom_fields:
+          description: Custom fields for an estimate.
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                $ref: '#/components/schemas/label'
+              value:
+                $ref: '#/components/schemas/value'
+        line_items:
+          description: Line items of a quote.
+          type: array
+          items:
+            type: object
+            required:
+              - item_id
+              - rate
+              - quantity
+            properties:
+              item_id:
+                $ref: '#/components/schemas/item_id'
+              name:
+                $ref: '#/components/schemas/name'
+              description:
+                $ref: '#/components/schemas/description'
+              item_order:
+                $ref: '#/components/schemas/item_order'
+              rate:
+                $ref: '#/components/schemas/rate'
+              quantity:
+                $ref: '#/components/schemas/quantity'
+              product_type:
+                $ref: '#/components/schemas/product_type'
+              hsn_or_sac:
+                $ref: '#/components/schemas/hsn_or_sac'
+              sat_item_key_code:
+                $ref: '#/components/schemas/sat_item_key_code'
+              unitkey_code:
+                $ref: '#/components/schemas/unitkey_code'
+              unit:
+                $ref: '#/components/schemas/unit'
+              discount_amount:
+                $ref: '#/components/schemas/discount_amount'
+              discount:
+                $ref: '#/components/schemas/discount'
+              tax_id:
+                $ref: '#/components/schemas/tax_id'
+              tds_tax_id:
+                $ref: '#/components/schemas/tds_tax_id'
+              tax_exemption_id:
+                $ref: '#/components/schemas/tax_exemption_id'
+              avatax_tax_code:
+                $ref: '#/components/schemas/avatax_tax_code'
+              avatax_use_code:
+                $ref: '#/components/schemas/avatax_use_code'
+              tax_name:
+                $ref: '#/components/schemas/tax_name'
+              tax_type:
+                $ref: '#/components/schemas/tax_type'
+              tax_percentage:
+                $ref: '#/components/schemas/tax_percentage'
+              item_total:
+                $ref: '#/components/schemas/item_total'
+        notes:
+          $ref: '#/components/schemas/notes'
+        terms:
+          $ref: '#/components/schemas/terms'
+        shipping_charge:
+          $ref: '#/components/schemas/shipping_charge'
+        adjustment:
+          $ref: '#/components/schemas/adjustment'
+        adjustment_description:
+          $ref: '#/components/schemas/adjustment_description'
+        tax_id:
+          $ref: '#/components/schemas/tax_id'
+        tax_exemption_id:
+          $ref: '#/components/schemas/tax_exemption_id'
+        tax_authority_id:
+          $ref: '#/components/schemas/tax_authority_id'
+        avatax_use_code:
+          $ref: '#/components/schemas/avatax_use_code'
+        avatax_tax_code:
+          $ref: '#/components/schemas/avatax_tax_code'
+        avatax_exempt_no:
+          $ref: '#/components/schemas/avatax_exempt_no'
+        vat_treatment:
+          $ref: '#/components/schemas/vat_treatment'
+        project_id:
+          $ref: '#/components/schemas/project_id'
+        trial_days:
+          $ref: '#/components/schemas/trial_days'
+        can_charge_setup_fee_immediately:
+          $ref: '#/components/schemas/can_charge_setup_fee_immediately'
+        coupon_code:
+          $ref: '#/components/schemas/coupon_code'
+        billing_cycles:
+          $ref: '#/components/schemas/billing_cycles'
+        auto_collect:
+          $ref: '#/components/schemas/auto_collect'
+        payment_options:
+          $ref: '#/components/schemas/payment_options'
+        end_of_term:
+          $ref: '#/components/schemas/end_of_term'
+    update-an-estimate-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Estimate information has been updated.
+          readOnly: true
+        estimate:
+          description: Quote to be created
+          type: object
+          properties:
+            estimate_id:
+              $ref: '#/components/schemas/estimate_id'
+            estimate_number:
+              $ref: '#/components/schemas/estimate_number'
+            date:
+              $ref: '#/components/schemas/date'
+            reference_number:
+              $ref: '#/components/schemas/reference_number'
+            is_pre_gst:
+              $ref: '#/components/schemas/is_pre_gst'
+            place_of_supply:
+              $ref: '#/components/schemas/place_of_supply'
+            gst_no:
+              $ref: '#/components/schemas/gst_no'
+            gst_treatment:
+              $ref: '#/components/schemas/gst_treatment'
+            tax_treatment:
+              $ref: '#/components/schemas/tax_treatment'
+            status:
+              $ref: '#/components/schemas/status'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            contact_persons_associated:
+              $ref: '#/components/schemas/contact_persons_associated'
+            currency_id:
+              $ref: '#/components/schemas/currency_id'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            exchange_rate:
+              $ref: '#/components/schemas/exchange_rate'
+            expiry_date:
+              $ref: '#/components/schemas/expiry_date'
+            discount:
+              $ref: '#/components/schemas/discount'
+            is_discount_before_tax:
+              $ref: '#/components/schemas/is_discount_before_tax'
+            discount_type:
+              $ref: '#/components/schemas/discount_type'
+            is_inclusive_tax:
+              $ref: '#/components/schemas/is_inclusive_tax'
+            line_items:
+              $ref: '#/components/schemas/line_items'
+            shipping_charge:
+              $ref: '#/components/schemas/shipping_charge'
+            adjustment:
+              $ref: '#/components/schemas/adjustment'
+            adjustment_description:
+              $ref: '#/components/schemas/adjustment_description'
+            sub_total:
+              $ref: '#/components/schemas/sub_total'
+            total:
+              $ref: '#/components/schemas/total'
+            tax_total:
+              $ref: '#/components/schemas/tax_total'
+            price_precision:
+              $ref: '#/components/schemas/price_precision'
+            taxes:
+              $ref: '#/components/schemas/taxes'
+            billing_address:
+              $ref: '#/components/schemas/billing_address'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+            notes:
+              $ref: '#/components/schemas/notes'
+            terms:
+              $ref: '#/components/schemas/terms'
+            custom_fields:
+              $ref: '#/components/schemas/custom_fields'
+            template_id:
+              $ref: '#/components/schemas/template_id'
+            template_name:
+              $ref: '#/components/schemas/template_name'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            last_modified_time:
+              $ref: '#/components/schemas/last_modified_time'
+            salesperson_id:
+              $ref: '#/components/schemas/salesperson_id'
+            salesperson_name:
+              $ref: '#/components/schemas/salesperson_name'
+            project:
+              $ref: '#/components/schemas/project'
+            estimate_type:
+              $ref: '#/components/schemas/estimate_type'
+            subscription_ids:
+              $ref: '#/components/schemas/subscription_ids'
+            subscription_id:
+              $ref: '#/components/schemas/subscription_id'
+            subscription_number:
+              $ref: '#/components/schemas/subscription_number'
+            coupon:
+              $ref: '#/components/schemas/coupon'
+            billing_cycles:
+              $ref: '#/components/schemas/billing_cycles'
+            trial_days:
+              $ref: '#/components/schemas/trial_days'
+            can_charge_setup_fee_immediately:
+              $ref: '#/components/schemas/can_charge_setup_fee_immediately'
+            auto_collect:
+              $ref: '#/components/schemas/auto_collect'
+            end_of_term:
+              $ref: '#/components/schemas/end_of_term'
+    get-an-estimate-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        estimate:
+          description: Quote to be created
+          type: object
+          properties:
+            estimate_id:
+              $ref: '#/components/schemas/estimate_id'
+            estimate_number:
+              $ref: '#/components/schemas/estimate_number'
+            date:
+              $ref: '#/components/schemas/date'
+            reference_number:
+              $ref: '#/components/schemas/reference_number'
+            is_pre_gst:
+              $ref: '#/components/schemas/is_pre_gst'
+            place_of_supply:
+              $ref: '#/components/schemas/place_of_supply'
+            gst_no:
+              $ref: '#/components/schemas/gst_no'
+            gst_treatment:
+              $ref: '#/components/schemas/gst_treatment'
+            tax_treatment:
+              $ref: '#/components/schemas/tax_treatment'
+            status:
+              $ref: '#/components/schemas/status'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            contact_persons_associated:
+              $ref: '#/components/schemas/contact_persons_associated'
+            currency_id:
+              $ref: '#/components/schemas/currency_id'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            exchange_rate:
+              $ref: '#/components/schemas/exchange_rate'
+            expiry_date:
+              $ref: '#/components/schemas/expiry_date'
+            discount:
+              $ref: '#/components/schemas/discount'
+            is_discount_before_tax:
+              $ref: '#/components/schemas/is_discount_before_tax'
+            discount_type:
+              $ref: '#/components/schemas/discount_type'
+            is_inclusive_tax:
+              $ref: '#/components/schemas/is_inclusive_tax'
+            is_viewed_by_client:
+              $ref: '#/components/schemas/is_viewed_by_client'
+            client_viewed_time:
+              $ref: '#/components/schemas/client_viewed_time'
+            line_items:
+              $ref: '#/components/schemas/line_items'
+            shipping_charge:
+              $ref: '#/components/schemas/shipping_charge'
+            adjustment:
+              $ref: '#/components/schemas/adjustment'
+            adjustment_description:
+              $ref: '#/components/schemas/adjustment_description'
+            sub_total:
+              $ref: '#/components/schemas/sub_total'
+            total:
+              $ref: '#/components/schemas/total'
+            tax_total:
+              $ref: '#/components/schemas/tax_total'
+            price_precision:
+              $ref: '#/components/schemas/price_precision'
+            taxes:
+              $ref: '#/components/schemas/taxes'
+            billing_address:
+              $ref: '#/components/schemas/billing_address'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+            custom_fields:
+              $ref: '#/components/schemas/custom_fields'
+            template_id:
+              $ref: '#/components/schemas/template_id'
+            template_name:
+              $ref: '#/components/schemas/template_name'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            last_modified_time:
+              $ref: '#/components/schemas/last_modified_time'
+            salesperson_id:
+              $ref: '#/components/schemas/salesperson_id'
+            salesperson_name:
+              $ref: '#/components/schemas/salesperson_name'
+            project:
+              $ref: '#/components/schemas/project'
+            estimate_type:
+              $ref: '#/components/schemas/estimate_type'
+            subscription_ids:
+              $ref: '#/components/schemas/subscription_ids'
+            subscription_id:
+              $ref: '#/components/schemas/subscription_id'
+            subscription_number:
+              $ref: '#/components/schemas/subscription_number'
+            coupon:
+              $ref: '#/components/schemas/coupon'
+            billing_cycles:
+              $ref: '#/components/schemas/billing_cycles'
+            trial_days:
+              $ref: '#/components/schemas/trial_days'
+            can_charge_setup_fee_immediately:
+              $ref: '#/components/schemas/can_charge_setup_fee_immediately'
+            auto_collect:
+              $ref: '#/components/schemas/auto_collect'
+            end_of_term:
+              $ref: '#/components/schemas/end_of_term'
+    delete-an-estimate-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The estimate has been deleted.
+          readOnly: true
+    mark-an-estimate-as-sent-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Estimate status has been changed to Sent
+          readOnly: true
+    mark-an-estimate-as-accepted-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Estimate status has been changed to Accepted.
+          readOnly: true
+    mark-an-estimate-as-declined-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Estimate status has been changed to Declined.
+          readOnly: true
+    email-an-estimate-request:
+      required:
+        - to_mail_ids
+      type: object
+      properties:
+        send_from_org_email_id:
+          $ref: '#/components/schemas/send_from_org_email_id'
+        to_mail_ids:
+          $ref: '#/components/schemas/to_mail_ids'
+        cc_mail_ids:
+          $ref: '#/components/schemas/cc_mail_ids'
+        subject:
+          $ref: '#/components/schemas/subject'
+        body:
+          $ref: '#/components/schemas/body'
+    email-an-estimate-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Your Estimate has been sent.
+          readOnly: true
+    get-estimate-email-content-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        body:
+          $ref: '#/components/schemas/body'
+        error_list:
+          $ref: '#/components/schemas/error_list'
+        subject:
+          $ref: '#/components/schemas/subject'
+        emailtemplates:
+          description: Email template used in the quote
+          type: array
+          items:
+            type: object
+            properties:
+              selected:
+                description: Selected email context
+                type: boolean
+                example: true
+              name:
+                description: Name of the email receiver
+                type: string
+                example: Default
+              email_template_id:
+                description: ID of the Email Template used
+                type: string
+                example: 982000000000079
+        to_contacts:
+          description: Email recepients
+          type: array
+          items:
+            type: object
+            properties:
+              first_name:
+                $ref: '#/components/schemas/first_name'
+              selected:
+                $ref: '#/components/schemas/selected'
+              phone:
+                $ref: '#/components/schemas/phone'
+              email:
+                $ref: '#/components/schemas/email'
+              last_name:
+                $ref: '#/components/schemas/last_name'
+              salutation:
+                $ref: '#/components/schemas/salutation'
+              contact_person_id:
+                $ref: '#/components/schemas/contact_person_id'
+              mobile:
+                $ref: '#/components/schemas/mobile'
+        file_name:
+          $ref: '#/components/schemas/file_name'
+        from_emails:
+          description: Emails received
+          type: array
+          items:
+            type: object
+            properties:
+              user_name:
+                description: Name of the user
+                type: string
+                example: John Smith
+              selected:
+                description: Selected email recepients
+                type: boolean
+                example: true
+              email:
+                $ref: '#/components/schemas/email'
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+    email-multiple-estimates-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Mission accomplished! We've sent all the quotes.
+          readOnly: true
+    bulk-export-estimates-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+    bulk-print-estimates-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+    list-estimate-templates-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        templates:
+          description: Template used for the quote
+          type: object
+          properties:
+            template_name:
+              $ref: '#/components/schemas/template_name'
+            template_id:
+              $ref: '#/components/schemas/template_id'
+            template_type:
+              $ref: '#/components/schemas/template_type'
+    update-estimate-template-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Estimate information has been updated.
+          readOnly: true
+    list-estimate-comments-and-history-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        comments:
+          type: array
+          items:
+            type: object
+            properties:
+              comment_id:
+                $ref: '#/components/schemas/comment_id'
+              estimate_id:
+                $ref: '#/components/schemas/estimate_id'
+              description:
+                description: A short note on the estimate comments
+                type: string
+                example: Estimate created
+              commented_by_id:
+                $ref: '#/components/schemas/commented_by_id'
+              commented_by:
+                $ref: '#/components/schemas/commented_by'
+              comment_type:
+                $ref: '#/components/schemas/comment_type'
+              date:
+                $ref: '#/components/schemas/date'
+              date_description:
+                $ref: '#/components/schemas/date_description'
+              time:
+                $ref: '#/components/schemas/time'
+              operation_type:
+                $ref: '#/components/schemas/operation_type'
+              transaction_id:
+                $ref: '#/components/schemas/transaction_id'
+              transaction_type:
+                $ref: '#/components/schemas/transaction_type'
+    add-comments-request:
+      type: object
+      properties:
+        description:
+          description: A short note on the quote
+          type: string
+          example: Estimate marked as sent
+        show_comment_to_clients:
+          $ref: '#/components/schemas/show_comment_to_clients'
+    add-comments-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Comments added
+          readOnly: true
+    update-comment-request:
+      type: object
+      properties:
+        description:
+          description: A short note on the quote
+          type: string
+          example: Estimate created
+        show_comment_to_clients:
+          description: Boolean to show the comments to contacts in portal.
+          type: boolean
+          example: ' '
+    update-comment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Comment has been updated successfully.
+          readOnly: true
+        comment:
+          description: Comment on the quote
+          type: object
+          properties:
+            comment_id:
+              $ref: '#/components/schemas/comment_id'
+            estimate_id:
+              $ref: '#/components/schemas/estimate_id'
+            description:
+              $ref: '#/components/schemas/description'
+            commented_by_id:
+              $ref: '#/components/schemas/commented_by_id'
+            commented_by:
+              $ref: '#/components/schemas/commented_by'
+            date:
+              $ref: '#/components/schemas/date'
+            date_description:
+              $ref: '#/components/schemas/date_description'
+            time:
+              $ref: '#/components/schemas/time'
+            comment_type:
+              $ref: '#/components/schemas/comment_type'
+    delete-a-comment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The comment has been deleted.
+          readOnly: true
+    coupon_code:
+      description: The code of the coupon which is to be applied to the subscription.
+      type: string
+      example: WELCOME15
+    payment_options:
+      description: Payment methods and gateways configured for collecting payments against the associated subscription. Defines how and through which channels payments will be processed.
+      type: object
+      properties:
+        payment_gateways:
+          description: List of payment gateways associated with the associated subscription. Each entry represents a configured gateway through which payments can be collected.
+          type: array
+          items:
+            type: object
+            properties:
+              gateway_name:
+                description: 'Identifier of the payment gateway. Allowed Values: <code>paypal</code>, <code>authorize_net</code>, <code>payflow_pro</code>, <code>stripe</code>, <code>2checkout</code> and <code>braintree</code>. This determines which payment processor handles the transaction.'
+                type: string
+                example: stripe
+              additional_field1:
+                description: 'Paypal payment method. Allowed Values: <code>standard</code> and <code>adaptive</code>'
+                type: string
+                example: standard
+    estimate_type:
+      description: 'Defines the purpose of the quote, whether it covers a new subscription or modifications to an existing one. For a new subscription quote, set this to new_subscription. For an update subscription quote, set this to update_subscription. Allowed Values: <code>new_subscription</code> and <code>update_subscription</code>'
+      type: string
+      example: new_subscription
+    subscription_ids:
+      description: List of unique IDs of subscriptions associated with the quote.
+      type: array
+      items:
+        type: string
+      example:
+        - '90300000079200'
+    subscription_id:
+      description: Unique identifier of the existing subscription for which the quote is being generated. The quote will reflect the pricing changes based on the modifications applied to this subscription.
+      type: string
+      example: '90300000079201'
+    subscription_number:
+      description: Unique number of the existing subscription for which the quote is being generated. The quote will reflect the pricing changes based on the modifications applied to this subscription.
+      type: string
+      example: SUB-000001
+    coupon:
+      description: The coupon currently applied to the subscription quote, if any. Contains details about the coupon and the resulting price adjustment. <code>coupon_code</code>, <code>coupon_name</code>, <code>discount_amount</code> and <code>coupon_amount</code> applied to the invoice total.
+      type: object
+      properties:
+        coupon_code:
+          description: The unique code used to apply the coupon.
+          type: string
+          example: WELCOME15
+        coupon_name:
+          description: Display name of the coupon as configured in the product. This is the label shown in the UI and on invoices, different from the coupon code.
+          type: string
+          example: Welcome Offer
+        discount_amount:
+          description: The amount deducted from the quote's invoice total as a result of applying this coupon which will be applied to the subscription, if accepted.
+          type: number
+          format: double
+          example: 15
+        coupon_amount:
+          description: 'The original value of the coupon as configured. '
+          type: number
+          format: double
+          example: 15
+    billing_cycles:
+      description: Number of billing cycles for which the subscription should run. The plan's billing cycle value is used by default. Pass a different value here to override it. Set to -1 for unlimited billing cycles.
+      type: integer
+      example: -1
+    trial_days:
+      description: Number of free trial days provided to a customer subscribed to this plan. This value will override the trial period configured at the plan level.
+      type: string
+      example: '0'
+    can_charge_setup_fee_immediately:
+      description: Determines when the setup fee is invoiced. When true, the setup fee is invoiced separately as soon as the trial begins. When false or not mentioned, the setup fee is included in the first invoice after the trial ends.
+      type: boolean
+      example: false
+    auto_collect:
+      description: Indicates whether payments for the subscription should be collected automatically. When true, the customer's saved payment method is charged automatically at each renewal. When false, payment must be made manually through offline methods.
+      type: boolean
+      example: true
+    end_of_term:
+      description: Determines when the quoted subscription changes should take effect. When false, changes take effect as soon as the quote is accepted. When true, changes are queued and applied only at the next renewal. Default is false.
+      type: boolean
+      example: false
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.quotes.CREATE: Create Quotes
+            ZohoSubscriptions.quotes.UPDATE: Update Quotes
+            ZohoSubscriptions.quotes.READ: Read Quotes
+            ZohoSubscriptions.quotes.DELETE: Delete Quotes

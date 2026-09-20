@@ -1,0 +1,127 @@
+openapi: 3.0.0
+info:
+  title: ZOHO CRM Integration
+  description: Import customers into Zoho Billing from Zoho CRM, either by Account ID or Contact ID. The available import method depends on your Zoho CRM sync configuration in Zoho Billing.
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: integration
+    description: integration Module
+paths:
+  /crm/account/{crm_account_id}/import:
+    x-mcp-group:
+      - ZOHO CRM Integration
+    post:
+      tags:
+        - integration
+      operationId: Import_Customer_Using_CRM_Account_ID
+      summary: Import a customer using the CRM account ID
+      description: Imports a customer into Zoho Billing using their Zoho CRM account ID. This endpoint requires the Zoho CRM integration to be configured with either "Accounts and Contacts" sync or "Accounts only" sync.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/import-a-customer-using-the-crm-account-id-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.contacts.CREATE
+    parameters:
+      - name: crm_account_id
+        in: path
+        required: true
+        description: Unique identifier of the Zoho CRM account.
+        schema:
+          type: string
+        example: '460000000026042'
+      - $ref: '#/components/parameters/organization_id'
+  /crm/contact/{crm_contact_id}/import:
+    x-mcp-group:
+      - ZOHO CRM Integration
+    post:
+      tags:
+        - integration
+      operationId: Import_Customer_Using_CRM_Contact_ID
+      summary: Import a customer using the CRM contact ID
+      description: Imports a customer into Zoho Billing using their Zoho CRM contact ID. This endpoint requires the Zoho CRM integration to be configured with either "Contacts only" sync, or "Accounts and their Contacts" sync with the "Include contacts not associated with any accounts" option enabled.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/import-a-customer-using-crm-contact-id-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.contacts.CREATE
+    parameters:
+      - name: crm_contact_id
+        in: path
+        required: true
+        description: Unique identifier of the Zoho CRM contact.
+        schema:
+          type: string
+        example: '460000000026042'
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/data'
+    customer_id:
+      description: Customer ID of the imported customer.
+      type: string
+      example: '903000000000099'
+    data:
+      type: object
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+    import-a-customer-using-the-crm-account-id-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        data:
+          $ref: '#/components/schemas/data'
+    import-a-customer-using-crm-contact-id-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        data:
+          $ref: '#/components/schemas/data'
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.contacts.CREATE: Create Customers

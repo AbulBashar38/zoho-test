@@ -1,0 +1,1756 @@
+openapi: 3.0.0
+info:
+  title: Customers
+  description: A customer object allows you to keep track of all customer related information.
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: customers
+    description: Customers Module
+paths:
+  /customers:
+    x-mcp-group:
+      - Customers
+    post:
+      tags:
+        - customers
+      operationId: Create_a_Customer
+      summary: Create a customer
+      description: A new customer can a be created separately as well as at the time of creation of a new subscription.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-a-customer-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create-a-customer-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.CREATE
+    get:
+      tags:
+        - customers
+      operationId: List_all_Customers
+      summary: List all customers
+      description: List of all customers. You can list customers based on various filter criteria. The allowed values for filter_by are Status.All, Active, Inactive, Gapps, Crm, NonSubscribers, PortalEnabled, PortalDisabled.
+      parameters:
+        - name: filter_by
+          in: query
+          description: 'Filter customers by status. Allowed values: Status.All, Status.Active, Status.Inactive, Status.Gapps, Status.Crm, Status.NonSubscribers, Status.PortalEnabled, Status.PortalDisabled.'
+          required: false
+          schema:
+            type: string
+          example: Status.Active
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-all-customers-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /customers/{customer_id}:
+    x-mcp-group:
+      - Customers
+    get:
+      tags:
+        - customers
+      operationId: Get_a_Customer
+      summary: Retrieve a customer
+      description: Details of an existing customer.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-a-customer-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.READ
+    put:
+      tags:
+        - customers
+      operationId: Update_a_Customer
+      summary: Update a customer
+      description: Update details of an existing customer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-a-customer-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-a-customer-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.UPDATE
+    delete:
+      tags:
+        - customers
+      operationId: Delete_a_Customer
+      summary: Delete a customer
+      description: Delete an existing customer.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-a-customer-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.DELETE
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        description: Unique identifier of the customer.
+        schema:
+          type: string
+        example: '903000000000099'
+      - $ref: '#/components/parameters/organization_id'
+  /customers/reference/{reference_id}:
+    x-mcp-group:
+      - Customers
+    get:
+      tags:
+        - customers
+      operationId: Get_a_Customer_by_Reference
+      summary: Retrieve a customer Using CRM Reference
+      description: Details of an existing customer using a CRM Reference ID.
+      parameters:
+        - name: reference_id_type
+          in: query
+          description: Possible values are <code> zcrm_account_id </code> and <code>zcrm_contact_id</code>.
+          required: true
+          schema:
+            type: string
+            enum:
+              - zcrm_account_id
+              - zcrm_contact_id
+          example: zcrm_account_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-a-customer-using-crm-reference-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.READ
+    parameters:
+      - name: reference_id
+        in: path
+        required: true
+        description: Unique identifier of the customer reference. The reference can be a CRM Contact ID (for contacts-only sync) or a CRM Account ID (for accounts-only or accounts-with-contacts sync).
+        schema:
+          type: string
+        example: '903000000021976'
+      - $ref: '#/components/parameters/organization_id'
+  /transactions:
+    x-mcp-group:
+      - Customers
+    get:
+      tags:
+        - customers
+      operationId: List_all_Transactions_of_a_Customer
+      summary: List of transactions
+      description: List of all transactions associated with a particular customer.
+      parameters:
+        - name: filter_by
+          in: query
+          description: Filter transactions by type.
+          required: false
+          schema:
+            type: string
+            enum:
+              - TransactionType.All
+              - TransactionType.INVOICE
+              - TransactionType.PAYMENT
+              - TransactionType.CREDIT
+              - TransactionType.REFUND
+          example: TransactionType.All
+        - name: customer_id
+          in: query
+          description: To list Transactions of a particular customer use the parameter <code>customer_id</code>.
+          required: false
+          schema:
+            type: string
+          example: '903000000000099'
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-of-transactions-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /customers/{customer_id}/markasactive:
+    x-mcp-group:
+      - Customers
+    post:
+      tags:
+        - customers
+      operationId: Mark_a_Customer_as_Active
+      summary: Mark as active
+      description: Change status of the customer to active.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mark-as-active-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.CREATE
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        description: Unique identifier of the customer.
+        schema:
+          type: string
+        example: '903000000000099'
+      - $ref: '#/components/parameters/organization_id'
+  /customers/{customer_id}/markasinactive:
+    x-mcp-group:
+      - Customers
+    post:
+      tags:
+        - customers
+      operationId: Mark_a_Customer_as_Inactive
+      summary: Mark as inactive
+      description: Change status of the customer to inactive. A customer can be marked as inactive only if there is no active subscription associated with the customer.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mark-as-inactive-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.CREATE
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        description: Unique identifier of the customer.
+        schema:
+          type: string
+        example: '903000000000099'
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/customer-response'
+    customer-response:
+      type: object
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        display_name:
+          $ref: '#/components/schemas/display_name'
+        salutation:
+          $ref: '#/components/schemas/salutation'
+        first_name:
+          $ref: '#/components/schemas/first_name'
+        last_name:
+          $ref: '#/components/schemas/last_name'
+        email:
+          $ref: '#/components/schemas/email'
+        tags:
+          type: array
+          items:
+            type: object
+            properties:
+              tag_option_id:
+                description: Id of the Tag Option
+                type: string
+                example: '460000000054280'
+              is_tag_mandatory:
+                type: string
+                example: false
+              tag_name:
+                type: string
+                example: Colors
+              tag_id:
+                description: ID of the Tag
+                type: string
+                example: '460000000054182'
+              tag_option_name:
+                type: string
+                example: Black
+        company_name:
+          $ref: '#/components/schemas/company_name'
+        phone:
+          $ref: '#/components/schemas/phone'
+        mobile:
+          $ref: '#/components/schemas/mobile'
+        website:
+          $ref: '#/components/schemas/website'
+        is_portal_enabled:
+          $ref: '#/components/schemas/is_portal_enabled'
+        department:
+          $ref: '#/components/schemas/department'
+        designation:
+          $ref: '#/components/schemas/designation'
+        billing_address:
+          $ref: '#/components/schemas/billing_address'
+        shipping_address:
+          $ref: '#/components/schemas/shipping_address'
+        currency_code:
+          $ref: '#/components/schemas/currency_code'
+        currency_id:
+          $ref: '#/components/schemas/currency_id'
+        ach_supported:
+          $ref: '#/components/schemas/ach_supported'
+        twitter:
+          $ref: '#/components/schemas/twitter'
+        facebook:
+          $ref: '#/components/schemas/facebook'
+        skype:
+          $ref: '#/components/schemas/skype'
+        notes:
+          $ref: '#/components/schemas/notes'
+        gst_no:
+          $ref: '#/components/schemas/gst_no'
+        gst_treatment:
+          $ref: '#/components/schemas/gst_treatment'
+        tax_reg_no:
+          $ref: '#/components/schemas/tax_reg_no'
+        tds_tax_id:
+          $ref: '#/components/schemas/tds_tax_id'
+        tax_treatment:
+          $ref: '#/components/schemas/tax_treatment'
+        tax_regime:
+          $ref: '#/components/schemas/tax_regime'
+        is_tds_registered:
+          $ref: '#/components/schemas/is_tds_registered'
+        place_of_contact:
+          $ref: '#/components/schemas/place_of_contact'
+        price_precision:
+          $ref: '#/components/schemas/price_precision'
+        unused_credits:
+          $ref: '#/components/schemas/unused_credits'
+        outstanding:
+          $ref: '#/components/schemas/outstanding'
+        status:
+          $ref: '#/components/schemas/status'
+        custom_fields:
+          description: Additional fields for customers.
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                $ref: '#/components/schemas/index'
+              value:
+                $ref: '#/components/schemas/value'
+              data_type:
+                $ref: '#/components/schemas/data_type'
+              label:
+                $ref: '#/components/schemas/label'
+        zcrm_account_id:
+          $ref: '#/components/schemas/zcrm_account_id'
+        zcrm_contact_id:
+          $ref: '#/components/schemas/zcrm_contact_id'
+        updated_time:
+          $ref: '#/components/schemas/updated_time'
+        created_time:
+          $ref: '#/components/schemas/created_time'
+        source:
+          $ref: '#/components/schemas/source'
+        payment_terms:
+          $ref: '#/components/schemas/payment_terms'
+        payment_terms_label:
+          $ref: '#/components/schemas/payment_terms_label'
+        is_linked_with_zohocrm:
+          $ref: '#/components/schemas/is_linked_with_zohocrm'
+        primary_contactperson_id:
+          $ref: '#/components/schemas/primary_contactperson_id'
+        can_add_card:
+          $ref: '#/components/schemas/can_add_card'
+        can_add_bank_account:
+          $ref: '#/components/schemas/can_add_bank_account'
+        default_templates:
+          description: Default templates associated with the customer.
+          type: object
+          properties:
+            invoice_template_id:
+              $ref: '#/components/schemas/invoice_template_id'
+            creditnote_template_id:
+              $ref: '#/components/schemas/creditnote_template_id'
+        documents:
+          description: List of files attached to a particular customer.
+          type: array
+          items:
+            type: object
+            properties:
+              can_show_in_portal:
+                $ref: '#/components/schemas/can_show_in_portal'
+              file_name:
+                $ref: '#/components/schemas/file_name'
+              file_type:
+                $ref: '#/components/schemas/file_type'
+              file_size:
+                $ref: '#/components/schemas/file_size'
+              file_size_formatted:
+                $ref: '#/components/schemas/file_size_formatted'
+              document_id:
+                $ref: '#/components/schemas/document_id'
+              attachment_order:
+                $ref: '#/components/schemas/attachment_order'
+    customer_id:
+      description: Unique ID generated by the server. This is used as identifier.
+      type: string
+      example: '903000000000099'
+    display_name:
+      description: Name of the customer which will be displayed in the interface and invoices.
+      type: string
+      example: Bowman Furniture
+    salutation:
+      description: Salutation of the customer.
+      type: string
+      example: Mr.
+    first_name:
+      description: First name of the customer.
+      type: string
+      example: Benjamin
+    last_name:
+      description: Last name of the customer.
+      type: string
+      example: George
+    email:
+      description: Email address of the customer.
+      type: string
+      example: benjamin.george@bowmanfurniture.com
+    company_name:
+      description: Registered name of the company the customer represents.
+      type: string
+      example: Bowman Furniture
+    phone:
+      description: Customer's landline or fixed-line number.
+      type: string
+      example: 23467278
+    mobile:
+      description: Customer's mobile phone number.
+      type: string
+      example: 938237475
+    department:
+      description: Customer's department.
+      type: string
+      example: Marketing
+    designation:
+      description: Customer's designation.
+      type: string
+      example: Evangelist
+    website:
+      description: Customer's website if any.
+      type: string
+      example: www.bowmanfurniture.com
+    attention:
+      description: Attention of the customer's billing address.
+      type: string
+      example: Benjamin George
+    street:
+      description: Street of the customer's billing address.
+      type: string
+      example: Harrington Bay Street
+    city:
+      description: City of the customer's billing address.
+      type: string
+      example: Salt Lake City
+    state:
+      description: State of the customer's billing address.
+      type: string
+      example: CA
+    zip:
+      description: Zip code of the customer's billing address.
+      type: string
+      example: 92612
+    country:
+      description: Country of the customer's billing address.
+      type: string
+      example: U.S.A
+    state_code:
+      description: State Code of the Customer's billing address. Find their region's code <a href="#state-codes">here</a>
+      type: string
+      example: CA
+    fax:
+      description: Fax number for the customer's billing address.
+      type: string
+      example: 4527389
+    currency_code:
+      description: Currency code of the currency in which the customer wants to pay. If currency_code is not specified here, the currency chosen in your Zoho Billing organization will be used for billing.
+      type: string
+      example: USD
+      default: currency_code chosen in organization profile settings
+    currency_id:
+      description: Currency ID of the customer's currency.
+      type: string
+      example: '90300000000097'
+    tags:
+      type: array
+      description: List of tags associated with the customer. A tag is a label that you can associate with customers to easily identify and categorize them. For example, you can create tags such as <code>High Value</code>, <code>Newsletter Subscriber</code>, <code>Trial</code> etc and associate them with customers based on their characteristics. You can also use these tags to filter customers while listing them.
+      items:
+        type: object
+        properties:
+          tag_id:
+            $ref: '#/components/schemas/tag_id'
+          tag_option_id:
+            $ref: '#/components/schemas/tag_option_id'
+    tag_id:
+      description: ID of the Tag
+      type: string
+      example: '460000000054182'
+    tag_option_id:
+      description: Id of the Tag Option
+      type: string
+      example: '460000000054280'
+    price_precision:
+      description: The Price Precision of the selected currency for the customer
+      type: integer
+      example: 2
+    unused_credits:
+      description: Customer's unused credits.
+      type: number
+      format: double
+      example: 0
+    balance:
+      description: Amount the customer still has to pay.
+      type: number
+      format: double
+      example: 0
+    outstanding:
+      description: Amount that has to be paid to the customer.
+      type: number
+      format: double
+      example: 0
+    notes:
+      description: A short note about the customer.
+      type: string
+      pattern: '[0-9a-zA-Z_%\~\\\{\}\|\"\*\^\#\-\=\;\.\$@\?\,\&\+\(\)\[\]\:\''\`\/\!\P{InBasicLatin}\s]+'
+      example: 'Order form 2026-CUST-001 (signed 13 Jul 2026). Billing contact: user@example.com'
+    status:
+      description: Status of the customer. It can either be <code>active</code> or <code>inactive</code>.
+      type: string
+      example: active
+    updated_time:
+      description: Time at which the customer details were last updated.
+      type: string
+      example: 2016-06-05T02:30:08-0700
+    created_time:
+      description: Time at which the customer was created.
+      type: string
+      example: 2016-06-05T12:30:08-0700
+    source:
+      description: Denotes how the customer was created.
+      type: string
+      example: user
+    is_gapps_customer:
+      description: Denotes whether imported from GApps.
+      type: boolean
+      example: false
+    payment_reminder_enabled:
+      description: Set to true if payment reminder is enabled.
+      type: boolean
+      example: true
+    payment_terms:
+      description: Net payment term for the customer.
+      type: integer
+      example: 0
+    payment_terms_label:
+      description: Text field of payment terms.
+      type: string
+      example: Due on receipt
+    is_linked_with_zohocrm:
+      description: Set to true if linked with Zoho CRM.
+      type: boolean
+      example: false
+    primary_contactperson_id:
+      description: Unique Id of primary contact person. This ID will refer to contactperson_id for this customer.
+      type: string
+      example: '903000001045003'
+    can_add_card:
+      description: Set to true if card can be associated.
+      type: boolean
+      example: true
+    can_add_bank_account:
+      description: Set to true if bank account can be associated.
+      type: boolean
+      example: true
+    default_templates:
+      description: Default templates associated with the customer.
+      type: object
+      properties:
+        invoice_template_id:
+          $ref: '#/components/schemas/invoice_template_id'
+        creditnote_template_id:
+          $ref: '#/components/schemas/creditnote_template_id'
+    invoice_template_id:
+      description: Unique Id used to denote the invoice template.
+      type: string
+      example: '90300000311340'
+    creditnote_template_id:
+      description: Unique Id used to denote the credit note template.
+      type: string
+      example: '90300000232140'
+    ach_supported:
+      description: Set to true if ACH payment is supported for the customer.
+      type: boolean
+      example: true
+      default: false
+    custom_fields:
+      description: Additional fields for customers.
+      type: array
+      items:
+        type: object
+        properties:
+          value:
+            $ref: '#/components/schemas/value'
+          label:
+            $ref: '#/components/schemas/label'
+          data_type:
+            $ref: '#/components/schemas/data_type'
+    index:
+      description: Index of the custom field. It can hold any value from 1 to 10.
+      type: integer
+      example: 1
+    label:
+      description: Label of the custom field.
+      type: string
+      example: label
+    value:
+      description: Value of the custom field.
+      type: string
+      example: 129890
+    zcrm_account_id:
+      description: This is the Zoho CRM account id of the customer if the customer is synced with the accounts in Zoho CRM.
+      type: string
+      example: '903000800069001'
+    zcrm_contact_id:
+      description: This is the Zoho CRM contact id of the customer if the customer is synced with the contacts in Zoho CRM.
+      type: string
+      example: '903000000098214'
+    twitter:
+      description: Twitter profile of the customer.
+      type: string
+      example: BowmanFurniture
+    facebook:
+      description: Facebook profile of the customer.
+      type: string
+      example: BowmanFurniture
+    skype:
+      description: Skype ID of the customer
+      type: string
+      example: Bowman Furniture
+    data_type:
+      description: Data type of the custom field.
+      type: string
+      example: text
+    transaction_id:
+      description: Unique ID to denote the transaction.
+      type: string
+      example: '903000000094534'
+    reference_id:
+      description: Unique reference number to denote the transaction.
+      type: string
+      example: '903000000021976'
+    date:
+      description: Date when the transaction was recorded.
+      type: string
+      example: '2016-09-30'
+    type:
+      description: Type of the transaction.
+      type: string
+      example: invoice
+    amount:
+      description: Amount involved in the transaction.
+      type: string
+      example: '20.50'
+    place_of_contact:
+      description: Customer's place of contact.
+      type: string
+      example: TN
+      x-node_available_in:
+        - India GST
+      x-node_unavailable_in: []
+    tax_specification:
+      description: Tax specification for the customer.
+      type: string
+      example: inter
+      x-node_available_in:
+        - India GST
+      x-node_unavailable_in: []
+    gst_no:
+      description: GSTIN Number for the customer.
+      type: string
+      example: 33AAAAA0000A1Z5
+      x-node_available_in:
+        - India GST
+      x-node_unavailable_in: []
+    gst_treatment:
+      description: 'GST Treatment for the customer.<br>Allowed values for <strong><code>gst_treatment</code></strong> : <br><code>business_gst</code>, <code>business_none</code>, <code>consumer</code>, <code>overseas</code><br> <code>business_gst</code> - For a GST Registered business owner. <br><code>business_none</code> - For a GST unregistered business owner. <br><code>consumer</code> - For a consumer. <br><code>overseas</code> - Customer for whom you export your goods/services.'
+      type: string
+      example: business_gst
+      x-node_available_in:
+        - India GST
+      x-node_unavailable_in: []
+    vat_treatment:
+      description: 'VAT treatment of the contact.Allowed Values: <br/><code>uk</code> (A business that is located in the UK.),<br/><code>eu_vat_registered</code> (A business that is reg for VAT and trade goods between Northern Ireland and EU. This node is available only for organizations enabled for NI protocal in VAT Settings.) and<br/><code>overseas</code> (A business that is located outside UK. Pre Brexit, this was split as <code>eu_vat_registered</code>, <code>eu_vat_not_registered</code> and <code>non_eu</code> ).'
+      type: string
+      example: overseas
+      x-node_available_in:
+        - VAT
+      x-node_unavailable_in: []
+    tax_treatment:
+      description: VAT treatment of the contact.Allowed Values:</br> <code>home_country_mexico</code> (A business that is located within MX)</br><code>border_region_mexico</code> (A business that is located in the northern and southern border regions in MX)</br><code>non_mexico</code> (A business that is located outside MX).
+      type: string
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    tax_regime:
+      description: 'Tax Regime of the contact.Allowed Values: <code>general_legal_person</code>, <code>legal_entities_non_profit</code>, <code>resident_abroad</code>, <code>production_cooperative_societies</code>, <code>agricultural_livestock</code>, <code>optional_group_of_companies</code>, <code>coordinated</code>, <code>simplified_trust</code>, <code>wages_salaries_income</code>, <code>lease</code>, <code>property_disposal_acquisition</code>, <code>other_income</code>, <code>resident_abroad</code>, <code>divident_income</code>, <code>individual_business_professional</code>, <code>interest_income</code>, <code>income_obtaining_price</code>, <code>no_tax_obligation</code>, <code>tax_incorporation</code>, <code>income_through_technology_platform</code>, <code>simplified_trust</code>.'
+      type: string
+      example: general_legal_person
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    is_tds_registered:
+      description: Boolean to check if tax is registered.
+      type: boolean
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    vat_reg_no:
+      description: VAT Registration number of a contact with length should be between 2 and 12 characters.
+      type: string
+      example: 51423456782
+      x-node_available_in:
+        - VAT
+      x-node_unavailable_in: []
+    tax_reg_no:
+      description: '12 digit Tax Registration number of a contact with Tax treatment as </br> <code>home_country_mexico</code>, <code>border_region_mexico</code>, <code>non_mexico</code>.</br> Consumers generic RFC: <code>XAXX010101000</code>, Overseas generic RFC: <code>XEXX010101000</code>'
+      type: string
+      example: 12345678912345
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    tax_id:
+      description: Unique ID of the tax or tax group that can be collected from the contact. Tax can be given only if <code>is_taxable</code> is <code>true</code>.
+      type: string
+      example: '903000002345'
+    tds_tax_id:
+      description: ID of the TDS tax.
+      type: string
+      example: 982000000557012
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    tax_authority_id:
+      description: Unique ID of the tax authority. Tax authority depends on the location of the customer. For example, if the customer is located in NY, then the tax authority is NY tax authority.
+      type: string
+      example: '903000006345'
+      x-node_available_in:
+        - Sales Tax
+      x-node_unavailable_in: []
+      x-required_info: for applying Tax exemption to a customer.
+    tax_authority_name:
+      description: Unique name of the tax authority. Either tax_authority_id or tax_authority_name can be given.
+      type: string
+      example: ATO
+      x-node_available_in:
+        - Sales Tax
+      x-node_unavailable_in: []
+      x-required_info: for applying Tax exemption to a customer.
+    tax_exemption_id:
+      description: Unique ID of the tax exemption.
+      type: string
+      example: '903000006345'
+      x-node_available_in:
+        - Sales Tax
+        - GST
+      x-node_unavailable_in: []
+    tax_exemption_code:
+      description: Unique code of the tax exemption.
+      type: string
+      example: GST FREE
+      x-node_available_in:
+        - Sales Tax
+        - GST
+      x-node_unavailable_in: []
+    is_taxable:
+      description: Set to true if customer's transactions must be tax inclusive.
+      type: string
+      example: true
+      x-node_available_in:
+        - Sales Tax
+        - GST
+      x-node_unavailable_in: []
+    billing_address:
+      description: Customer's billing address object. It contains <code>attention</code>,<code>street</code>, <code>city</code>, <code>state</code>,<code>zip</code>,<code>country</code>, <code>state_code</code> and <code>fax</code>.
+      type: object
+      properties:
+        attention:
+          $ref: '#/components/schemas/attention'
+        street:
+          $ref: '#/components/schemas/street'
+        city:
+          $ref: '#/components/schemas/city'
+        state:
+          $ref: '#/components/schemas/state'
+        zip:
+          $ref: '#/components/schemas/zip'
+        country:
+          $ref: '#/components/schemas/country'
+        state_code:
+          $ref: '#/components/schemas/state_code'
+        fax:
+          $ref: '#/components/schemas/fax'
+    shipping_address:
+      description: Customer's shipping address object. It contains <code>attention</code>,<code>street</code>, <code>city</code>, <code>state</code>,<code>zip</code>,<code>country</code>, <code>state_code</code> and <code>fax</code>.
+      type: object
+      properties:
+        attention:
+          description: Attention of the customer's shipping address.
+          type: string
+          example: Benjamin George
+        street:
+          description: Name of the street of the customer's shipping address.
+          type: string
+          example: Harrington Bay Street
+        city:
+          description: Name of the city of the customer's shipping address.
+          type: string
+          example: Salt Lake City
+        state:
+          description: Name of the state of the customer's shipping address.
+          type: string
+          example: CA
+        zip:
+          description: Zip code of the customer's shipping address.
+          type: string
+          example: 92612
+        country:
+          description: Country name of the customer's shipping address.
+          type: string
+          example: U.S.A
+        state_code:
+          description: State Code of the customer's shipping address. Find their region's code <a href="#state-codes">here</a>
+          type: string
+          example: CA
+        fax:
+          description: Fax number of the customer's shipping address.
+          type: string
+          example: 4527389
+    is_portal_enabled:
+      description: Is Client portal enabled for the customer.
+      type: boolean
+      example: true
+    language_code:
+      description: Client portal language for the customer
+      example: en
+    has_attachment:
+      description: Denotes whether a customer has any attachments associated with it.
+      example: true
+    can_show_in_portal:
+      description: Set to true if the attachment can be viewed in Client Portal.
+      example: true
+    file_name:
+      description: Name of the attached file.
+      example: Rental Agreement.pdf
+    file_type:
+      description: Type of the attached file.
+      example: pdf
+    file_size:
+      example: 5447
+    file_size_formatted:
+      example: 5.3 KB
+    document_id:
+      description: Unique ID of the attached file.
+      example: '903000005689'
+    attachment_order:
+      description: Order of the attached file for a particular customer.
+      example: 1
+    documents:
+      description: List of files attached to a particular customer.
+      type: array
+      items:
+        type: object
+        properties:
+          can_show_in_portal:
+            $ref: '#/components/schemas/can_show_in_portal'
+          file_name:
+            $ref: '#/components/schemas/file_name'
+          file_type:
+            $ref: '#/components/schemas/file_type'
+          file_size:
+            $ref: '#/components/schemas/file_size'
+          file_size_formatted:
+            $ref: '#/components/schemas/file_size_formatted'
+          document_id:
+            $ref: '#/components/schemas/document_id'
+          attachment_order:
+            $ref: '#/components/schemas/attachment_order'
+    create-a-customer-request:
+      required:
+        - display_name
+        - email
+        - tax_authority_id
+        - tax_authority_name
+      type: object
+      properties:
+        display_name:
+          $ref: '#/components/schemas/display_name'
+        salutation:
+          $ref: '#/components/schemas/salutation'
+        first_name:
+          $ref: '#/components/schemas/first_name'
+        last_name:
+          $ref: '#/components/schemas/last_name'
+        email:
+          $ref: '#/components/schemas/email'
+        tags:
+          $ref: '#/components/schemas/tags'
+        company_name:
+          $ref: '#/components/schemas/company_name'
+        phone:
+          $ref: '#/components/schemas/phone'
+        mobile:
+          $ref: '#/components/schemas/mobile'
+        department:
+          $ref: '#/components/schemas/department'
+        designation:
+          $ref: '#/components/schemas/designation'
+        website:
+          $ref: '#/components/schemas/website'
+        billing_address:
+          $ref: '#/components/schemas/billing_address'
+        shipping_address:
+          $ref: '#/components/schemas/shipping_address'
+        payment_terms:
+          $ref: '#/components/schemas/payment_terms'
+        payment_terms_label:
+          $ref: '#/components/schemas/payment_terms_label'
+        currency_code:
+          $ref: '#/components/schemas/currency_code'
+        ach_supported:
+          $ref: '#/components/schemas/ach_supported'
+        twitter:
+          $ref: '#/components/schemas/twitter'
+        facebook:
+          $ref: '#/components/schemas/facebook'
+        skype:
+          $ref: '#/components/schemas/skype'
+        notes:
+          $ref: '#/components/schemas/notes'
+        is_portal_enabled:
+          $ref: '#/components/schemas/is_portal_enabled'
+        gst_no:
+          $ref: '#/components/schemas/gst_no'
+        gst_treatment:
+          $ref: '#/components/schemas/gst_treatment'
+        place_of_contact:
+          $ref: '#/components/schemas/place_of_contact'
+        vat_treatment:
+          $ref: '#/components/schemas/vat_treatment'
+        tax_reg_no:
+          $ref: '#/components/schemas/tax_reg_no'
+        tds_tax_id:
+          $ref: '#/components/schemas/tds_tax_id'
+        tax_treatment:
+          $ref: '#/components/schemas/tax_treatment'
+        tax_regime:
+          $ref: '#/components/schemas/tax_regime'
+        is_tds_registered:
+          $ref: '#/components/schemas/is_tds_registered'
+        vat_reg_no:
+          $ref: '#/components/schemas/vat_reg_no'
+        is_taxable:
+          $ref: '#/components/schemas/is_taxable'
+        tax_id:
+          $ref: '#/components/schemas/tax_id'
+        tax_authority_id:
+          description: Unique ID of the tax authority. Tax authority depends on the location of the customer. For example, if the customer is located in NY, then the tax authority is NY tax authority.
+          type: string
+          example: '903000006345'
+          x-required_info: for applying Tax exemption to a customer.
+        tax_authority_name:
+          $ref: '#/components/schemas/tax_authority_name'
+        tax_exemption_id:
+          $ref: '#/components/schemas/tax_exemption_id'
+        tax_exemption_code:
+          $ref: '#/components/schemas/tax_exemption_code'
+        default_templates:
+          description: Default templates associated with the customer.
+          type: object
+          properties:
+            invoice_template_id:
+              $ref: '#/components/schemas/invoice_template_id'
+            creditnote_template_id:
+              $ref: '#/components/schemas/creditnote_template_id'
+        custom_fields:
+          description: Additional fields for customers.
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                $ref: '#/components/schemas/label'
+              value:
+                $ref: '#/components/schemas/value'
+    create-a-customer-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The customer has been created
+          readOnly: true
+        customer:
+          $ref: '#/components/schemas/customer-response'
+    list-all-customers-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        customers:
+          type: array
+          items:
+            type: object
+            properties:
+              customer_id:
+                $ref: '#/components/schemas/customer_id'
+              display_name:
+                $ref: '#/components/schemas/display_name'
+              salutation:
+                $ref: '#/components/schemas/salutation'
+              first_name:
+                $ref: '#/components/schemas/first_name'
+              last_name:
+                $ref: '#/components/schemas/last_name'
+              email:
+                $ref: '#/components/schemas/email'
+              tags:
+                $ref: '#/components/schemas/tags'
+              company_name:
+                $ref: '#/components/schemas/company_name'
+              phone:
+                $ref: '#/components/schemas/phone'
+              mobile:
+                $ref: '#/components/schemas/mobile'
+              website:
+                $ref: '#/components/schemas/website'
+              department:
+                $ref: '#/components/schemas/department'
+              designation:
+                $ref: '#/components/schemas/designation'
+              currency_code:
+                $ref: '#/components/schemas/currency_code'
+              unused_credits:
+                $ref: '#/components/schemas/unused_credits'
+              outstanding:
+                $ref: '#/components/schemas/outstanding'
+              is_gapps_customer:
+                $ref: '#/components/schemas/is_gapps_customer'
+              updated_time:
+                $ref: '#/components/schemas/updated_time'
+              created_time:
+                $ref: '#/components/schemas/created_time'
+              has_attachment:
+                $ref: '#/components/schemas/has_attachment'
+    retrieve-a-customer-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        customer:
+          type: object
+          properties:
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            display_name:
+              $ref: '#/components/schemas/display_name'
+            salutation:
+              $ref: '#/components/schemas/salutation'
+            first_name:
+              $ref: '#/components/schemas/first_name'
+            last_name:
+              $ref: '#/components/schemas/last_name'
+            email:
+              $ref: '#/components/schemas/email'
+            tags:
+              type: array
+              items:
+                type: object
+                properties:
+                  tag_option_id:
+                    description: Id of the Tag Option
+                    type: string
+                    example: '460000000054280'
+                  is_tag_mandatory:
+                    type: string
+                    example: false
+                  tag_name:
+                    type: string
+                    example: Colors
+                  tag_id:
+                    description: ID of the Tag
+                    type: string
+                    example: '460000000054182'
+                  tag_option_name:
+                    type: string
+                    example: Black
+            company_name:
+              $ref: '#/components/schemas/company_name'
+            phone:
+              $ref: '#/components/schemas/phone'
+            mobile:
+              $ref: '#/components/schemas/mobile'
+            website:
+              $ref: '#/components/schemas/website'
+            designation:
+              $ref: '#/components/schemas/designation'
+            department:
+              $ref: '#/components/schemas/department'
+            is_portal_enabled:
+              $ref: '#/components/schemas/is_portal_enabled'
+            billing_address:
+              $ref: '#/components/schemas/billing_address'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            currency_id:
+              $ref: '#/components/schemas/currency_id'
+            ach_supported:
+              $ref: '#/components/schemas/ach_supported'
+            gst_no:
+              $ref: '#/components/schemas/gst_no'
+            gst_treatment:
+              $ref: '#/components/schemas/gst_treatment'
+            tax_reg_no:
+              $ref: '#/components/schemas/tax_reg_no'
+            tds_tax_id:
+              $ref: '#/components/schemas/tds_tax_id'
+            tax_treatment:
+              $ref: '#/components/schemas/tax_treatment'
+            tax_regime:
+              $ref: '#/components/schemas/tax_regime'
+            is_tds_registered:
+              $ref: '#/components/schemas/is_tds_registered'
+            place_of_contact:
+              $ref: '#/components/schemas/place_of_contact'
+            price_precision:
+              $ref: '#/components/schemas/price_precision'
+            unused_credits:
+              $ref: '#/components/schemas/unused_credits'
+            outstanding:
+              $ref: '#/components/schemas/outstanding'
+            notes:
+              $ref: '#/components/schemas/notes'
+            status:
+              $ref: '#/components/schemas/status'
+            custom_fields:
+              description: Additional fields for customers.
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    $ref: '#/components/schemas/index'
+                  value:
+                    $ref: '#/components/schemas/value'
+                  data_type:
+                    $ref: '#/components/schemas/data_type'
+                  label:
+                    $ref: '#/components/schemas/label'
+            zcrm_account_id:
+              $ref: '#/components/schemas/zcrm_account_id'
+            zcrm_contact_id:
+              $ref: '#/components/schemas/zcrm_contact_id'
+            updated_time:
+              $ref: '#/components/schemas/updated_time'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            source:
+              $ref: '#/components/schemas/source'
+            payment_terms_label:
+              $ref: '#/components/schemas/payment_terms_label'
+            is_linked_with_zohocrm:
+              $ref: '#/components/schemas/is_linked_with_zohocrm'
+            primary_contactperson_id:
+              $ref: '#/components/schemas/primary_contactperson_id'
+            can_add_card:
+              $ref: '#/components/schemas/can_add_card'
+            can_add_bank_account:
+              $ref: '#/components/schemas/can_add_bank_account'
+            default_templates:
+              description: Default templates associated with the customer.
+              type: object
+              properties:
+                invoice_template_id:
+                  $ref: '#/components/schemas/invoice_template_id'
+                creditnote_template_id:
+                  $ref: '#/components/schemas/creditnote_template_id'
+            documents:
+              description: List of files attached to a particular customer.
+              type: array
+              items:
+                type: object
+                properties:
+                  can_show_in_portal:
+                    $ref: '#/components/schemas/can_show_in_portal'
+                  file_name:
+                    $ref: '#/components/schemas/file_name'
+                  file_type:
+                    $ref: '#/components/schemas/file_type'
+                  file_size:
+                    $ref: '#/components/schemas/file_size'
+                  file_size_formatted:
+                    $ref: '#/components/schemas/file_size_formatted'
+                  document_id:
+                    $ref: '#/components/schemas/document_id'
+                  attachment_order:
+                    $ref: '#/components/schemas/attachment_order'
+    update-a-customer-request:
+      required:
+        - display_name
+        - email
+        - tax_authority_id
+        - tax_authority_name
+      type: object
+      properties:
+        display_name:
+          $ref: '#/components/schemas/display_name'
+        salutation:
+          $ref: '#/components/schemas/salutation'
+        first_name:
+          $ref: '#/components/schemas/first_name'
+        last_name:
+          $ref: '#/components/schemas/last_name'
+        email:
+          $ref: '#/components/schemas/email'
+        tags:
+          $ref: '#/components/schemas/tags'
+        company_name:
+          $ref: '#/components/schemas/company_name'
+        phone:
+          $ref: '#/components/schemas/phone'
+        mobile:
+          $ref: '#/components/schemas/mobile'
+        billing_address:
+          $ref: '#/components/schemas/billing_address'
+        shipping_address:
+          $ref: '#/components/schemas/shipping_address'
+        fax:
+          $ref: '#/components/schemas/fax'
+        currency_code:
+          $ref: '#/components/schemas/currency_code'
+        twitter:
+          $ref: '#/components/schemas/twitter'
+        facebook:
+          $ref: '#/components/schemas/facebook'
+        skype:
+          $ref: '#/components/schemas/skype'
+        is_portal_enabled:
+          $ref: '#/components/schemas/is_portal_enabled'
+        gst_no:
+          $ref: '#/components/schemas/gst_no'
+        gst_treatment:
+          $ref: '#/components/schemas/gst_treatment'
+        place_of_contact:
+          $ref: '#/components/schemas/place_of_contact'
+        vat_treatment:
+          $ref: '#/components/schemas/vat_treatment'
+        vat_reg_no:
+          $ref: '#/components/schemas/vat_reg_no'
+        is_taxable:
+          $ref: '#/components/schemas/is_taxable'
+        tax_id:
+          $ref: '#/components/schemas/tax_id'
+        tax_authority_id:
+          $ref: '#/components/schemas/tax_authority_id'
+        tax_authority_name:
+          $ref: '#/components/schemas/tax_authority_name'
+        tax_exemption_id:
+          $ref: '#/components/schemas/tax_exemption_id'
+        tax_exemption_code:
+          $ref: '#/components/schemas/tax_exemption_code'
+        default_templates:
+          description: Default templates associated with the customer.
+          type: object
+          properties:
+            invoice_template_id:
+              $ref: '#/components/schemas/invoice_template_id'
+            creditnote_template_id:
+              $ref: '#/components/schemas/creditnote_template_id'
+        tax_reg_no:
+          $ref: '#/components/schemas/tax_reg_no'
+        tds_tax_id:
+          $ref: '#/components/schemas/tds_tax_id'
+        tax_treatment:
+          $ref: '#/components/schemas/tax_treatment'
+        tax_regime:
+          $ref: '#/components/schemas/tax_regime'
+        is_tds_registered:
+          $ref: '#/components/schemas/is_tds_registered'
+        custom_fields:
+          description: Additional fields for customers.
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                $ref: '#/components/schemas/index'
+              value:
+                $ref: '#/components/schemas/value'
+              label:
+                $ref: '#/components/schemas/label'
+              data_type:
+                $ref: '#/components/schemas/data_type'
+    update-a-customer-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The customer details have been updated.
+          readOnly: true
+        customer:
+          type: object
+          properties:
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            display_name:
+              $ref: '#/components/schemas/display_name'
+            salutation:
+              $ref: '#/components/schemas/salutation'
+            first_name:
+              $ref: '#/components/schemas/first_name'
+            last_name:
+              $ref: '#/components/schemas/last_name'
+            email:
+              $ref: '#/components/schemas/email'
+            tags:
+              type: array
+              items:
+                type: object
+                properties:
+                  tag_option_id:
+                    description: Id of the Tag Option
+                    type: string
+                    example: '460000000054280'
+                  is_tag_mandatory:
+                    type: string
+                    example: false
+                  tag_name:
+                    type: string
+                    example: Colors
+                  tag_id:
+                    description: ID of the Tag
+                    type: string
+                    example: '460000000054182'
+                  tag_option_name:
+                    type: string
+                    example: Black
+            company_name:
+              $ref: '#/components/schemas/company_name'
+            phone:
+              $ref: '#/components/schemas/phone'
+            mobile:
+              $ref: '#/components/schemas/mobile'
+            website:
+              $ref: '#/components/schemas/website'
+            department:
+              $ref: '#/components/schemas/department'
+            designation:
+              $ref: '#/components/schemas/designation'
+            is_portal_enabled:
+              $ref: '#/components/schemas/is_portal_enabled'
+            billing_address:
+              $ref: '#/components/schemas/billing_address'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            currency_id:
+              $ref: '#/components/schemas/currency_id'
+            ach_supported:
+              $ref: '#/components/schemas/ach_supported'
+            price_precision:
+              $ref: '#/components/schemas/price_precision'
+            unused_credits:
+              $ref: '#/components/schemas/unused_credits'
+            outstanding:
+              $ref: '#/components/schemas/outstanding'
+            notes:
+              $ref: '#/components/schemas/notes'
+            status:
+              $ref: '#/components/schemas/status'
+            custom_fields:
+              description: Additional fields for customers.
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    $ref: '#/components/schemas/index'
+                  value:
+                    $ref: '#/components/schemas/value'
+                  label:
+                    $ref: '#/components/schemas/label'
+                  data_type:
+                    $ref: '#/components/schemas/data_type'
+            zcrm_account_id:
+              $ref: '#/components/schemas/zcrm_account_id'
+            zcrm_contact_id:
+              $ref: '#/components/schemas/zcrm_contact_id'
+            updated_time:
+              $ref: '#/components/schemas/updated_time'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            source:
+              $ref: '#/components/schemas/source'
+            payment_terms_label:
+              $ref: '#/components/schemas/payment_terms_label'
+            is_linked_with_zohocrm:
+              $ref: '#/components/schemas/is_linked_with_zohocrm'
+            primary_contactperson_id:
+              $ref: '#/components/schemas/primary_contactperson_id'
+            can_add_card:
+              $ref: '#/components/schemas/can_add_card'
+            can_add_bank_account:
+              $ref: '#/components/schemas/can_add_bank_account'
+            default_templates:
+              description: Default templates associated with the customer.
+              type: array
+              items:
+                type: object
+                properties:
+                  invoice_template_id:
+                    $ref: '#/components/schemas/invoice_template_id'
+                  creditnote_template_id:
+                    $ref: '#/components/schemas/creditnote_template_id'
+            documents:
+              description: List of files attached to a particular customer.
+              type: array
+              items:
+                type: object
+                properties:
+                  can_show_in_portal:
+                    $ref: '#/components/schemas/can_show_in_portal'
+                  file_name:
+                    $ref: '#/components/schemas/file_name'
+                  file_type:
+                    $ref: '#/components/schemas/file_type'
+                  file_size:
+                    $ref: '#/components/schemas/file_size'
+                  file_size_formatted:
+                    $ref: '#/components/schemas/file_size_formatted'
+                  document_id:
+                    $ref: '#/components/schemas/document_id'
+                  attachment_order:
+                    $ref: '#/components/schemas/attachment_order'
+    delete-a-customer-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The customer has been deleted.
+          readOnly: true
+    retrieve-a-customer-using-crm-reference-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        customer:
+          type: object
+          properties:
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            display_name:
+              $ref: '#/components/schemas/display_name'
+            salutation:
+              $ref: '#/components/schemas/salutation'
+            first_name:
+              $ref: '#/components/schemas/first_name'
+            last_name:
+              $ref: '#/components/schemas/last_name'
+            email:
+              $ref: '#/components/schemas/email'
+            company_name:
+              $ref: '#/components/schemas/company_name'
+            phone:
+              $ref: '#/components/schemas/phone'
+            mobile:
+              $ref: '#/components/schemas/mobile'
+            website:
+              $ref: '#/components/schemas/website'
+            designation:
+              $ref: '#/components/schemas/designation'
+            department:
+              $ref: '#/components/schemas/department'
+            is_portal_enabled:
+              $ref: '#/components/schemas/is_portal_enabled'
+            billing_address:
+              $ref: '#/components/schemas/billing_address'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            currency_id:
+              $ref: '#/components/schemas/currency_id'
+            ach_supported:
+              $ref: '#/components/schemas/ach_supported'
+            gst_no:
+              $ref: '#/components/schemas/gst_no'
+            gst_treatment:
+              $ref: '#/components/schemas/gst_treatment'
+            tax_reg_no:
+              $ref: '#/components/schemas/tax_reg_no'
+            tds_tax_id:
+              $ref: '#/components/schemas/tds_tax_id'
+            tax_treatment:
+              $ref: '#/components/schemas/tax_treatment'
+            tax_regime:
+              $ref: '#/components/schemas/tax_regime'
+            is_tds_registered:
+              $ref: '#/components/schemas/is_tds_registered'
+            place_of_contact:
+              $ref: '#/components/schemas/place_of_contact'
+            price_precision:
+              $ref: '#/components/schemas/price_precision'
+            unused_credits:
+              $ref: '#/components/schemas/unused_credits'
+            outstanding:
+              $ref: '#/components/schemas/outstanding'
+            notes:
+              $ref: '#/components/schemas/notes'
+            status:
+              $ref: '#/components/schemas/status'
+            custom_fields:
+              description: Additional fields for customers.
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    $ref: '#/components/schemas/index'
+                  value:
+                    $ref: '#/components/schemas/value'
+                  data_type:
+                    $ref: '#/components/schemas/data_type'
+                  label:
+                    $ref: '#/components/schemas/label'
+            zcrm_account_id:
+              $ref: '#/components/schemas/zcrm_account_id'
+            zcrm_contact_id:
+              $ref: '#/components/schemas/zcrm_contact_id'
+            updated_time:
+              $ref: '#/components/schemas/updated_time'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            source:
+              $ref: '#/components/schemas/source'
+            payment_terms_label:
+              $ref: '#/components/schemas/payment_terms_label'
+            is_linked_with_zohocrm:
+              $ref: '#/components/schemas/is_linked_with_zohocrm'
+            primary_contactperson_id:
+              $ref: '#/components/schemas/primary_contactperson_id'
+            can_add_card:
+              $ref: '#/components/schemas/can_add_card'
+            can_add_bank_account:
+              $ref: '#/components/schemas/can_add_bank_account'
+            default_templates:
+              description: Default templates associated with the customer.
+              type: object
+              properties:
+                invoice_template_id:
+                  $ref: '#/components/schemas/invoice_template_id'
+                creditnote_template_id:
+                  $ref: '#/components/schemas/creditnote_template_id'
+            documents:
+              description: List of files attached to a particular customer.
+              type: array
+              items:
+                type: object
+                properties:
+                  can_show_in_portal:
+                    $ref: '#/components/schemas/can_show_in_portal'
+                  file_name:
+                    $ref: '#/components/schemas/file_name'
+                  file_type:
+                    $ref: '#/components/schemas/file_type'
+                  file_size:
+                    $ref: '#/components/schemas/file_size'
+                  file_size_formatted:
+                    $ref: '#/components/schemas/file_size_formatted'
+                  document_id:
+                    $ref: '#/components/schemas/document_id'
+                  attachment_order:
+                    $ref: '#/components/schemas/attachment_order'
+    list-of-transactions-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        transactions:
+          type: array
+          items:
+            type: object
+            properties:
+              transaction_id:
+                $ref: '#/components/schemas/transaction_id'
+              reference_id:
+                $ref: '#/components/schemas/reference_id'
+              date:
+                $ref: '#/components/schemas/date'
+              type:
+                $ref: '#/components/schemas/type'
+              status:
+                $ref: '#/components/schemas/status'
+              amount:
+                $ref: '#/components/schemas/amount'
+    mark-as-active-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The customer has been marked as active.
+          readOnly: true
+    mark-as-inactive-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The customer has been marked as inactive.
+          readOnly: true
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.customers.CREATE: Create Customers
+            ZohoSubscriptions.customers.READ: Read Customers
+            ZohoSubscriptions.customers.UPDATE: Update Customers
+            ZohoSubscriptions.customers.DELETE: Delete Customers

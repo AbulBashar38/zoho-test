@@ -1,0 +1,416 @@
+openapi: 3.0.0
+info:
+  title: Contact-Persons
+  description: A contact person is customer's additional point of contact.
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: contact-persons
+    description: Contact-Persons Module
+paths:
+  /customers/{customer_id}/contactpersons:
+    x-mcp-group:
+      - Contact Persons
+    post:
+      tags:
+        - contact-persons
+      operationId: Create_a_Contact_Person
+      summary: Create a contact person
+      description: Create a new contact person.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-a-contact-person-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create-a-contact-person-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.CREATE
+    get:
+      tags:
+        - contact-persons
+      operationId: List_all_Contact_Persons
+      summary: List of all contact persons
+      description: List of all contact persons of a customer.
+      parameters:
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-of-all-contact-persons-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.READ
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        description: Unique identifier of the customer.
+        schema:
+          type: string
+        example: '903000000000099'
+      - $ref: '#/components/parameters/organization_id'
+  /customers/{customer_id}/contactpersons/{contactperson_id}:
+    x-mcp-group:
+      - Contact Persons
+    get:
+      tags:
+        - contact-persons
+      operationId: Get_a_Contact_Person
+      summary: Retrieve a contact person
+      description: Details of an existing contact person.
+      parameters:
+        - name: contactperson_id
+          in: path
+          required: true
+          description: Unique identifier of the contact person.
+          schema:
+            type: string
+          example: '903000000053362'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-a-contact-person-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.READ
+    put:
+      tags:
+        - contact-persons
+      operationId: Update_a_Contact_Person
+      summary: Update a contact person
+      description: Update the details of an existing contact person.
+      parameters:
+        - name: contactperson_id
+          in: path
+          required: true
+          description: Unique identifier of the contact person.
+          schema:
+            type: string
+          example: '903000000053362'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-a-contact-person-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-a-contact-person-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.UPDATE
+    delete:
+      tags:
+        - contact-persons
+      operationId: Delete_a_Contact_Person
+      summary: Delete a contact person
+      description: Delete an existing contact person.
+      parameters:
+        - name: contactperson_id
+          in: path
+          required: true
+          description: Unique identifier of the contact person.
+          schema:
+            type: string
+          example: '903000000053362'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-a-contact-person-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.DELETE
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        description: Unique identifier of the customer.
+        schema:
+          type: string
+        example: '903000000000099'
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/contact_person-response'
+    contact_person-response:
+      type: object
+      properties:
+        contactperson_id:
+          $ref: '#/components/schemas/contactperson_id'
+        first_name:
+          $ref: '#/components/schemas/first_name'
+        last_name:
+          $ref: '#/components/schemas/last_name'
+        email:
+          $ref: '#/components/schemas/email'
+        mobile:
+          $ref: '#/components/schemas/mobile'
+        phone:
+          $ref: '#/components/schemas/phone'
+        fax:
+          $ref: '#/components/schemas/fax'
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        created_time:
+          $ref: '#/components/schemas/created_time'
+        updated_time:
+          $ref: '#/components/schemas/updated_time'
+    contactperson_id:
+      description: Unique ID generated by the server.This can be used as an identifier.
+      type: string
+      example: '903000000053362'
+    first_name:
+      description: First name of the contact person.
+      type: string
+      example: Mark
+    last_name:
+      description: Last name of the contact person.
+      type: string
+      example: Cruizer
+    email:
+      description: Email ID of the contact person to whom notifications regarding the subscription needs to be sent.
+      type: string
+      example: mark.cruzer@bowmanfurniture.com
+    mobile:
+      description: Mobile number of the contact person.
+      type: string
+      example: '786663728'
+    phone:
+      description: Landline or fixed line number of the contact person.
+      type: string
+      example: '0417254482'
+    customer_id:
+      description: Customer ID of the customer the contact person is associated with.
+      type: string
+      example: '903000000000099'
+    fax:
+      description: Customer's fax number.
+      type: string
+      example: 4527389
+    created_time:
+      description: Time at which the contact person was created.
+      type: string
+      example: 2016-06-05T12:30:08-0700
+    updated_time:
+      description: Time at which the contact person details were last updated.
+      type: string
+      example: 2016-06-05T02:30:08-0700
+    create-a-contact-person-request:
+      required:
+        - email
+      type: object
+      properties:
+        first_name:
+          $ref: '#/components/schemas/first_name'
+        last_name:
+          $ref: '#/components/schemas/last_name'
+        email:
+          $ref: '#/components/schemas/email'
+        mobile:
+          $ref: '#/components/schemas/mobile'
+        phone:
+          $ref: '#/components/schemas/phone'
+        fax:
+          $ref: '#/components/schemas/fax'
+    create-a-contact-person-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The contactperson has been Created
+          readOnly: true
+        contact_person:
+          $ref: '#/components/schemas/contact_person-response'
+    list-of-all-contact-persons-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        contact_persons:
+          type: array
+          items:
+            type: object
+            properties:
+              contactperson_id:
+                $ref: '#/components/schemas/contactperson_id'
+              first_name:
+                $ref: '#/components/schemas/first_name'
+              last_name:
+                $ref: '#/components/schemas/last_name'
+              email:
+                $ref: '#/components/schemas/email'
+              mobile:
+                $ref: '#/components/schemas/mobile'
+              phone:
+                $ref: '#/components/schemas/phone'
+    retrieve-a-contact-person-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        contact_person:
+          type: object
+          properties:
+            contactperson_id:
+              $ref: '#/components/schemas/contactperson_id'
+            first_name:
+              $ref: '#/components/schemas/first_name'
+            last_name:
+              $ref: '#/components/schemas/last_name'
+            email:
+              $ref: '#/components/schemas/email'
+            mobile:
+              $ref: '#/components/schemas/mobile'
+            phone:
+              $ref: '#/components/schemas/phone'
+            fax:
+              $ref: '#/components/schemas/fax'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            updated_time:
+              $ref: '#/components/schemas/updated_time'
+    update-a-contact-person-request:
+      required:
+        - email
+      type: object
+      properties:
+        first_name:
+          $ref: '#/components/schemas/first_name'
+        last_name:
+          $ref: '#/components/schemas/last_name'
+        email:
+          $ref: '#/components/schemas/email'
+        mobile:
+          $ref: '#/components/schemas/mobile'
+        phone:
+          $ref: '#/components/schemas/phone'
+        created_time:
+          $ref: '#/components/schemas/created_time'
+        updated_time:
+          $ref: '#/components/schemas/updated_time'
+    update-a-contact-person-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The contactperson details has been updated.
+          readOnly: true
+        contact_person:
+          type: object
+          properties:
+            contactperson_id:
+              $ref: '#/components/schemas/contactperson_id'
+            first_name:
+              $ref: '#/components/schemas/first_name'
+            last_name:
+              $ref: '#/components/schemas/last_name'
+            email:
+              $ref: '#/components/schemas/email'
+            mobile:
+              $ref: '#/components/schemas/mobile'
+            phone:
+              $ref: '#/components/schemas/phone'
+            fax:
+              $ref: '#/components/schemas/fax'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            updated_time:
+              $ref: '#/components/schemas/updated_time'
+    delete-a-contact-person-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The contact person has been deleted.
+          readOnly: true
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.customers.CREATE: Create Customers
+            ZohoSubscriptions.customers.READ: Read Customers
+            ZohoSubscriptions.customers.UPDATE: Update Customers
+            ZohoSubscriptions.customers.DELETE: Delete Customers

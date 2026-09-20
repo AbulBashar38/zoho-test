@@ -1,0 +1,2224 @@
+openapi: 3.0.0
+info:
+  title: Projects
+  description: 'A project is a series of tasks performed over a period of time, to achieve certain targets. There can be many number of people working on a single project and a project may consist of single or multiple tasks. A project is billed and charged upon a customer whom the project was taken up for.<br><br><b>Possible error codes: </b><br><table><thead><tr><th>Error Code</th><th>Message</th></tr></thead><tbody><tr><td><span style="color:#FF0000;"> 1002</span></td><td>Project does not exists</td></tr><tr><td><span style="color:#FF0000;"> 20004</span></td><td>Please ensure that the amount is not negative</td></tr><tr><td><span style="color:#FF0000;"> 20077</span></td><td>Expense has been recorded for this project. Hence, it cannot be deleted</td></tr></tbody></table></tbody></table>'
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: projects
+    description: Projects Module
+paths:
+  /projects:
+    x-mcp-group:
+      - Projects
+    post:
+      tags:
+        - projects
+      operationId: Create_a_Project
+      summary: Create a project
+      description: Create a new project.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-a-project-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create-a-project-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.CREATE
+    get:
+      tags:
+        - projects
+      operationId: List_all_Projects
+      summary: List projects
+      description: List all projects with pagination.
+      parameters:
+        - name: filter_by
+          in: query
+          description: 'Filter projects by any status. Allowed Values: <code>Status.All</code>, <code>Status.Active</code> and <code>Status.Inactive</code>'
+          required: false
+          schema:
+            type: string
+          example: Status.All
+        - name: customer_id
+          in: query
+          description: Unique ID of the customer.
+          required: false
+          schema:
+            type: string
+          example: '460000000044001'
+        - name: sort_column
+          in: query
+          description: 'Sort projects. Allowed Values: <code>project_name</code>, <code>customer_name</code>, <code>rate</code> and <code>created_time</code>'
+          required: false
+          schema:
+            type: string
+          example: created_time
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-projects-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}:
+    x-mcp-group:
+      - Projects
+    put:
+      tags:
+        - projects
+      operationId: Update_a_Project
+      summary: Update a project
+      description: Update details of a project.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-a-project-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-a-project-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.UPDATE
+    get:
+      tags:
+        - projects
+      operationId: Get_a_Project
+      summary: Get a project
+      description: Get the details of a project.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get-a-project-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.READ
+    delete:
+      tags:
+        - projects
+      operationId: Delete_a_Project
+      summary: Delete project
+      description: Deleting a existing project.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-project-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.DELETE
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '460000000044019'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/active:
+    x-mcp-group:
+      - Projects
+    post:
+      tags:
+        - projects
+      operationId: Mark_a_Project_as_Active
+      summary: Activate a project
+      description: Mark project as active
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/activate-a-project-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.CREATE
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '460000000044019'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/inactive:
+    x-mcp-group:
+      - Projects
+    post:
+      tags:
+        - projects
+      operationId: Mark_a_Project_as_Inactive
+      summary: Deactivate a project
+      description: Marking a project as inactive.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deactivate-a-project-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.CREATE
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '460000000044019'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/clone:
+    x-mcp-group:
+      - Projects
+    post:
+      tags:
+        - projects
+      operationId: Clone_a_Project
+      summary: Clone a project
+      description: Cloning the settings of an existing project.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clone-a-project-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/clone-a-project-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.CREATE
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '460000000044019'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/users:
+    x-mcp-group:
+      - Projects
+    post:
+      tags:
+        - projects
+      operationId: Assign_Users_to_a_Project
+      summary: Assign users
+      description: Assign a users to a project.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/assign-users-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/assign-users-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.CREATE
+    get:
+      tags:
+        - projects
+      operationId: List_all_Users_of_a_Project
+      summary: List Users
+      description: Get list of all users associated to a project.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-users-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.READ
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '460000000044019'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/users/invite:
+    x-mcp-group:
+      - Projects
+    post:
+      tags:
+        - projects
+      operationId: Invite_a_User_to_a_Project
+      summary: Invite user
+      description: Invite a user to the project.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/invite-user-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invite-user-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.CREATE
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '460000000044019'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/users/{user_id}:
+    x-mcp-group:
+      - Projects
+    put:
+      tags:
+        - projects
+      operationId: Update_a_User_of_a_Project
+      summary: Update user
+      description: Update details of a user.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: Unique identifier of the user.
+          schema:
+            type: string
+          example: '460000000024003'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-user-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-user-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.UPDATE
+    get:
+      tags:
+        - projects
+      operationId: Get_a_User_of_a_Project
+      summary: Get a User
+      description: Get details of a user in project.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: Unique identifier of the user.
+          schema:
+            type: string
+          example: '460000000024003'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get-a-user-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.READ
+    delete:
+      tags:
+        - projects
+      operationId: Remove_a_User_from_a_Project
+      summary: Delete user
+      description: Remove user from a project.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: Unique identifier of the user.
+          schema:
+            type: string
+          example: '460000000024003'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-user-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.DELETE
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '460000000044019'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/comments:
+    x-mcp-group:
+      - Projects
+    post:
+      tags:
+        - projects
+      operationId: Post_a_Comment_on_a_Project
+      summary: Post comment
+      description: Post comment to a project.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post-comment-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/post-comment-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.CREATE
+    get:
+      tags:
+        - projects
+      operationId: List_all_Comments_of_a_Project
+      summary: List comments
+      description: Get comments for a project.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-comments-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.READ
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '460000000044019'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/comments/{comment_id}:
+    x-mcp-group:
+      - Projects
+    delete:
+      tags:
+        - projects
+      operationId: Delete_a_Comment_of_a_Project
+      summary: Delete comment
+      description: Deleting a comment.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-comment-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.DELETE
+    parameters:
+      - name: project_id
+        in: path
+        schema:
+          type: string
+        required: true
+        description: Unique identifier of the project.
+        example: '460000000044019'
+      - name: comment_id
+        in: path
+        schema:
+          type: string
+        required: true
+        description: Unique identifier of the comment.
+        example: '460000000044027'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/invoices:
+    x-mcp-group:
+      - Projects
+    get:
+      tags:
+        - projects
+      operationId: List_all_Invoices_of_a_Project
+      summary: List invoices
+      description: Lists invoices created for this project.
+      parameters:
+        - name: sort_column
+          in: query
+          description: 'Sort invoices raised. Allowed Values: <code>invoice_number</code>, <code>date</code>, <code>total</code>, <code>balance</code> and <code>created_time</code>'
+          required: false
+          schema:
+            type: string
+          example: created_time
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-invoices-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.READ
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '460000000044019'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/tasks:
+    x-mcp-group:
+      - Tasks
+    post:
+      tags:
+        - tasks
+      operationId: Create_a_Task_in_a_Project
+      summary: Add a project task
+      description: Adding a new task to a project.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/add-a-task-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/add-a-task-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.CREATE
+    get:
+      tags:
+        - tasks
+      operationId: List_all_Tasks_of_a_Project
+      summary: List project tasks
+      description: Get list of all the tasks added to a project.
+      parameters:
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-tasks-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.READ
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '90300000072369'
+      - $ref: '#/components/parameters/organization_id'
+  /projects/{project_id}/tasks/{task_id}:
+    x-mcp-group:
+      - Tasks
+    put:
+      tags:
+        - tasks
+      operationId: Update_a_Task_of_a_Project
+      summary: Update a project task
+      description: Update the details of an existing project task.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Unique identifier of the project task.
+          schema:
+            type: string
+          example: '90300000072369'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-a-task-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-a-task-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.UPDATE
+    get:
+      tags:
+        - tasks
+      operationId: Get_a_Task_of_a_Project
+      summary: Get a project task
+      description: Get the details of a project task.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Unique identifier of the project task.
+          schema:
+            type: string
+          example: '90300000072369'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get-a-task-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.READ
+    delete:
+      tags:
+        - tasks
+      operationId: Delete_a_Task_of_a_Project
+      summary: Delete a project Task
+      description: Delete a task added to a project.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Unique identifier of the project task.
+          schema:
+            type: string
+          example: '90300000072369'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-a-task-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.projects.DELETE
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        description: Unique identifier of the project.
+        schema:
+          type: string
+        example: '90300000072369'
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/project-response'
+    project-response:
+      description: Name of the project
+      type: object
+      properties:
+        project_id:
+          $ref: '#/components/schemas/project_id'
+        project_name:
+          $ref: '#/components/schemas/project_name'
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        customer_name:
+          $ref: '#/components/schemas/customer_name'
+        currency_code:
+          $ref: '#/components/schemas/currency_code'
+        description:
+          $ref: '#/components/schemas/description'
+        status:
+          $ref: '#/components/schemas/status'
+        billing_type:
+          $ref: '#/components/schemas/billing_type'
+        rate:
+          $ref: '#/components/schemas/rate'
+        budget_type:
+          $ref: '#/components/schemas/budget_type'
+        total_hours:
+          $ref: '#/components/schemas/total_hours'
+        total_amount:
+          $ref: '#/components/schemas/total_amount'
+        billed_hours:
+          $ref: '#/components/schemas/billed_hours'
+        billed_amount:
+          $ref: '#/components/schemas/billed_amount'
+        un_billed_hours:
+          $ref: '#/components/schemas/un_billed_hours'
+        un_billed_amount:
+          $ref: '#/components/schemas/un_billed_amount'
+        billable_hours:
+          $ref: '#/components/schemas/billable_hours'
+        billable_amount:
+          $ref: '#/components/schemas/billable_amount'
+        non_billable_hours:
+          $ref: '#/components/schemas/non_billable_hours'
+        non_billable_amount:
+          $ref: '#/components/schemas/non_billable_amount'
+        created_time:
+          $ref: '#/components/schemas/created_time'
+        show_in_dashboard:
+          $ref: '#/components/schemas/show_in_dashboard'
+        tasks:
+          description: Tasks comprising a project
+          type: array
+          items:
+            type: object
+            properties:
+              task_id:
+                $ref: '#/components/schemas/task_id'
+              task_name:
+                $ref: '#/components/schemas/task_name'
+              description:
+                $ref: '#/components/schemas/description'
+              rate:
+                $ref: '#/components/schemas/rate'
+              budget_hours:
+                $ref: '#/components/schemas/budget_hours'
+              total_hours:
+                $ref: '#/components/schemas/total_hours'
+              billed_hours:
+                $ref: '#/components/schemas/billed_hours'
+              un_billed_hours:
+                $ref: '#/components/schemas/un_billed_hours'
+              non_billable_hours:
+                $ref: '#/components/schemas/non_billable_hours'
+              status:
+                $ref: '#/components/schemas/status'
+              is_billable:
+                $ref: '#/components/schemas/is_billable'
+              task_custom_fields:
+                $ref: '#/components/schemas/task_custom_fields'
+        users:
+          description: Users of a project
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                $ref: '#/components/schemas/user_id'
+              is_current_user:
+                $ref: '#/components/schemas/is_current_user'
+              user_name:
+                $ref: '#/components/schemas/user_name'
+              email:
+                $ref: '#/components/schemas/email'
+              user_role:
+                $ref: '#/components/schemas/user_role'
+              status:
+                $ref: '#/components/schemas/status'
+              rate:
+                $ref: '#/components/schemas/rate'
+              budget_hours:
+                $ref: '#/components/schemas/budget_hours'
+              total_hours:
+                $ref: '#/components/schemas/total_hours'
+              billed_hours:
+                $ref: '#/components/schemas/billed_hours'
+              un_billed_hours:
+                $ref: '#/components/schemas/un_billed_hours'
+    filter_by:
+      description: 'Filter projects by any status. Allowed Values: <code>Status.All</code>, <code>Status.Active</code> and <code>Status.Inactive</code>'
+      type: string
+      example: Status.All
+    customer_id:
+      description: Unique ID of the customer.
+      type: string
+      example: '460000000044001'
+    invoice_id:
+      description: ID of the invoice generated for the project
+      type: string
+      example: '460000000044001'
+    invoice_number:
+      description: Serial Number of the invoice
+      type: string
+      example: INV-00004
+    reference_number:
+      description: Refernce number of a transaction
+      type: string
+      example: ' '
+    total:
+      description: Total invoice amount
+      type: string
+      example: '310.75'
+    balance:
+      description: Balance, in case invoice is partially paid
+      type: string
+      example: '48.75'
+    sort_column:
+      description: 'Sort projects. Allowed Values: <code>project_name</code>, <code>customer_name</code>, <code>rate</code> and <code>created_time</code>'
+      type: string
+      example: created_time
+    created_time:
+      description: Time of project creation
+      type: string
+      example: 2013-11-18T18:05:27+0530
+    rate:
+      description: Total project cost
+      type: number
+      format: float
+      example: 5000
+    status:
+      description: Project Status
+      type: string
+      example: active
+    billing_type:
+      description: 'The way you bill your customer. Allowed Values: <code>fixed_cost_for_project</code>, <code>based_on_project_hours</code>, <code>based_on_staff_hours</code> and <code>based_on_task_hours</code>'
+      type: string
+      example: fixed_cost_for_project
+    description:
+      description: Project Description - A short note on the project details
+      type: string
+      example: A simple algorithm is to be tested with vehicle detection application.
+    customer_name:
+      description: Name of the client of the project
+      type: string
+      example: SAF Instruments Inc
+    project_name:
+      description: Name of the project. <code>Maximum length [100]</code>
+      type: string
+      example: REAL TIME TRAFFIC FLUX
+    project_id:
+      description: Unoque ID of the project
+      type: string
+      example: '460000000044019'
+    per_page:
+      description: Values per page
+      type: number
+      format: double
+      example: 450
+    page:
+      description: Current Page
+      type: number
+      format: double
+      example: 10
+    report_name:
+      description: Name of the report run
+      type: string
+      example: Projects
+    has_more_page:
+      description: To check for more pages
+      type: boolean
+      example: false
+    sort_order:
+      description: Order of sorting the projects
+      type: string
+      example: D
+    currency_code:
+      description: Code to denote currency
+      type: string
+      example: USD
+    budget_type:
+      description: Project budject type
+      type: string
+      example: ' '
+    total_hours:
+      description: Total hours spent on project
+      type: string
+      example: '12:26'
+    currency_id:
+      description: The currency ID of the currency
+      type: string
+      example: 982000000000190
+    log_time:
+      description: Total hours logged in the project.
+      type: number
+      format: double
+      example: '13:06'
+    has_attachment:
+      description: attached bills, receipts etc.
+      type: boolean
+      example: false
+    billable_hours:
+      description: Hours charged for, in total project hours
+      type: string
+      example: '12:26'
+    is_billable:
+      description: Boolean to check if a task or expense is billable in a project
+      type: boolean
+      example: true
+    non_billable_hours:
+      description: Non-billable project hours
+      type: string
+      example: '0.00'
+    billed_hours:
+      description: Total duration/hours of a project that is billed
+      type: string
+      example: '12:27'
+    un_billed_hours:
+      description: Hours of the project that cannot be billed
+      type: string
+      example: '00:00'
+    task_id:
+      description: ID of the task(s) performed in a project
+      type: string
+      example: '460000000044009'
+    task_name:
+      description: Name of the task performed in a project
+      type: string
+      example: Distribution Analysis
+    budget_hours:
+      description: Planned hours for completion of project
+      type: string
+      example: '0'
+    user_id:
+      description: ID of the user to be added to the project.
+      type: string
+      example: '460000000024003'
+    is_current_user:
+      type: boolean
+      description: Indicates if the user is current user
+      example: true
+    user_name:
+      description: Name of the user. <code>Maximum length [200]</code>
+      type: string
+      example: John David
+    email:
+      description: Email of the user. <code>Maximum length [100]</code>
+      type: string
+      example: test@zylker.org
+    user_role:
+      description: 'Role to be assigned. Allowed Values: <code>staff</code>, <code>admin</code> and <code>timesheetstaff</code>'
+      type: string
+      example: admin
+    budget_amount:
+      description: Total planned budget for the project
+      type: string
+      example: ' '
+    tasks:
+      description: Tasks comprising a project
+      type: array
+      items:
+        type: string
+    users:
+      description: Users of a project
+      type: array
+      items:
+        type: string
+    project:
+      description: Name of the project
+      type: object
+    comments:
+      description: A short noteon the project
+      type: array
+      items:
+        type: string
+    comment_id:
+      description: Unique ID of the project
+      type: string
+      example: '460000000044027'
+    commented_by_id:
+      description: Sort comment by ID of individual
+      type: string
+      example: '460000000024003'
+    commented_by:
+      description: Name of the individual who added comment
+      type: string
+      example: John David
+    date_description:
+      description: Number of days since the comment was made
+      type: string
+      example: 19 days ago
+    time:
+      description: Time of the comment
+      type: string
+      example: 6:52 PM
+    date:
+      description: Date of the comment
+      type: string
+      example: '2013-11-18'
+    due_date:
+      description: Due date for project completion
+      type: string
+      example: '2013-11-19'
+    total_amount:
+      description: Total cost of the project
+      type: number
+      format: double
+      example: 500
+    billed_amount:
+      description: Total billable amount of the project
+      type: number
+      format: double
+      example: 500
+    un_billed_amount:
+      description: Total value of Unbilled expense of the project
+      type: number
+      format: double
+      example: 0
+    billable_amount:
+      description: Total billed amount
+      type: number
+      format: double
+      example: 500
+    non_billable_amount:
+      description: Total value of non-billable expense
+      type: number
+      format: double
+      example: 0
+    show_in_dashboard:
+      description: To check if dashboard view is available for project
+      type: boolean
+      example: true
+    task_custom_fields:
+      description: Additional fields to describe task
+      type: string
+      example: ''
+    create-a-project-request:
+      required:
+        - project_name
+        - customer_id
+        - billing_type
+        - users
+      type: object
+      properties:
+        project_name:
+          description: Name of the project. <code>Maximum length [100]</code>
+          type: string
+          example: Network Distribution
+        customer_id:
+          description: ID of the customer.
+          type: string
+          example: '460000000044001'
+        description:
+          description: Project description. <code>Maximu length [500]</code>
+          type: string
+          example: Distribution for the system of intermediaries between the producer of goods and/or services and the final user
+        billing_type:
+          description: 'The way you bill your customer. Allowed Values: <code>fixed_cost_for_project</code>, <code>based_on_project_hours</code>, <code>based_on_staff_hours</code> and <code>based_on_task_hours</code>'
+          type: string
+          example: based_on_task_hours
+        rate:
+          description: Rate of the Project. <br>Mandatory for projects whose billing_type is either <code>fixed_cost_for_project</code> or <code>based_on_project_hours</code>
+          type: string
+          example: ' '
+        budget_type:
+          description: 'The way you budget. Allowed Values: <code>total_project_cost</code>, <code>total_project_hours</code>, <code>hours_per_task</code> and <code>hours_per_staff</code>'
+          type: string
+          example: ' '
+        budget_hours:
+          description: Task budget hours
+          type: string
+          example: ' '
+        budget_amount:
+          description: Give value, if you are estimating total project cost.
+          type: string
+          example: ' '
+        tasks:
+          description: Tasks comprising a project
+          type: array
+          items:
+            type: object
+            required:
+              - task_name
+            properties:
+              task_name:
+                description: Name of the task. <code>Maximum length [100]</code>
+                type: string
+                example: INV-00003
+              description:
+                description: Task description. <code>Maximum length [500]</code>
+                type: string
+                example: INV-00003
+              rate:
+                description: Hourly rate of a task.
+                type: string
+                example: INV-00003
+              budget_hours:
+                description: Task budgeting.
+                type: string
+                example: INV-00003
+        users:
+          description: Users of a project
+          type: array
+          required:
+            - user_id
+          items:
+            type: object
+            properties:
+              user_id:
+                description: ID of the user to be added to the project.
+                type: string
+                example: '460000000024003'
+              is_current_user:
+                $ref: '#/components/schemas/is_current_user'
+              user_name:
+                $ref: '#/components/schemas/user_name'
+              email:
+                $ref: '#/components/schemas/email'
+              user_role:
+                $ref: '#/components/schemas/user_role'
+              status:
+                $ref: '#/components/schemas/status'
+              rate:
+                description: Hourly rate for a task.
+                type: string
+                example: ' '
+              budget_hours:
+                description: Task budget hours
+                type: string
+                example: ' '
+              total_hours:
+                $ref: '#/components/schemas/total_hours'
+              billed_hours:
+                $ref: '#/components/schemas/billed_hours'
+              un_billed_hours:
+                $ref: '#/components/schemas/un_billed_hours'
+    create-a-project-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The project has been created.
+          readOnly: true
+        project:
+          $ref: '#/components/schemas/project-response'
+    list-projects-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        projects:
+          type: array
+          items:
+            type: object
+            properties:
+              project_id:
+                $ref: '#/components/schemas/project_id'
+              project_name:
+                $ref: '#/components/schemas/project_name'
+              customer_id:
+                $ref: '#/components/schemas/customer_id'
+              customer_name:
+                $ref: '#/components/schemas/customer_name'
+              description:
+                $ref: '#/components/schemas/description'
+              status:
+                $ref: '#/components/schemas/status'
+              billing_type:
+                $ref: '#/components/schemas/billing_type'
+              rate:
+                $ref: '#/components/schemas/rate'
+              created_time:
+                $ref: '#/components/schemas/created_time'
+              has_attachment:
+                $ref: '#/components/schemas/has_attachment'
+              total_hours:
+                $ref: '#/components/schemas/total_hours'
+              billable_hours:
+                $ref: '#/components/schemas/billable_hours'
+    update-a-project-request:
+      required:
+        - project_name
+        - customer_id
+        - billing_type
+        - users
+      type: object
+      properties:
+        project_name:
+          description: Name of the project. <code>Maximum length [100]</code>
+          type: string
+          example: Network Distribution
+        customer_id:
+          description: ID of the customer.
+          type: string
+          example: '460000000044001'
+        description:
+          description: Project description. <code>Maximum length [500]</code>
+          type: string
+          example: Distribution for the system of intermediaries between the producer of goods and/or services and the final user
+        billing_type:
+          description: 'The way you bill your customer. Allowed Values: <code>fixed_cost_for_project</code>, <code>based_on_project_hours</code>, <code>based_on_staff_hours</code> and <code>based_on_task_hours</code>'
+          type: string
+          example: based_on_task_hours
+        rate:
+          description: Hourly rate for a task. Mandatory for projects whose billing_type is either <code>fixed_cost_for_project"</code> or <code>"based_on_project_hours"</code>
+          type: string
+          example: ' '
+        budget_type:
+          description: 'The way you budget. Allowed Values: <code>total_project_cost</code>, <code>total_project_hours</code>, <code>hours_per_task</code> and <code>hours_per_staff</code>'
+          type: string
+          example: ' '
+        budget_hours:
+          description: Task budget hours
+          type: string
+          example: ' '
+        budget_amount:
+          description: Give value, if you are estimating total project cost.
+          type: string
+          example: ' '
+        tasks:
+          description: Tasks comprising a project
+          type: array
+          items:
+            type: object
+            required:
+              - task_name
+            properties:
+              task_name:
+                description: Name of the task. <code>Maximum length [100]</code>
+                type: string
+                example: INV-00003
+              description:
+                description: Task description. <code>Maximum length [500]</code>
+                type: string
+                example: INV-00003
+              rate:
+                description: Hourly rate of a task.
+                type: string
+                example: INV-00003
+              budget_hours:
+                description: Task budgeting.
+                type: string
+                example: INV-00003
+        users:
+          description: Users of a project
+          type: array
+          required:
+            - user_id
+          items:
+            type: object
+            properties:
+              user_id:
+                description: ID of the user to be added to the project.
+                type: string
+                example: '460000000024003'
+              is_current_user:
+                $ref: '#/components/schemas/is_current_user'
+              user_name:
+                $ref: '#/components/schemas/user_name'
+              email:
+                $ref: '#/components/schemas/email'
+              user_role:
+                $ref: '#/components/schemas/user_role'
+              status:
+                $ref: '#/components/schemas/status'
+              rate:
+                description: Hourly rate for a task.
+                type: string
+                example: ' '
+              budget_hours:
+                description: Task budget hours
+                type: string
+                example: ' '
+              total_hours:
+                $ref: '#/components/schemas/total_hours'
+              billed_hours:
+                $ref: '#/components/schemas/billed_hours'
+              un_billed_hours:
+                $ref: '#/components/schemas/un_billed_hours'
+    update-a-project-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The project information has been updated.
+          readOnly: true
+        project:
+          description: Name of the project
+          type: object
+          properties:
+            project_id:
+              $ref: '#/components/schemas/project_id'
+            project_name:
+              $ref: '#/components/schemas/project_name'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            description:
+              $ref: '#/components/schemas/description'
+            status:
+              $ref: '#/components/schemas/status'
+            billing_type:
+              $ref: '#/components/schemas/billing_type'
+            rate:
+              $ref: '#/components/schemas/rate'
+            budget_type:
+              $ref: '#/components/schemas/budget_type'
+            total_hours:
+              $ref: '#/components/schemas/total_hours'
+            total_amount:
+              $ref: '#/components/schemas/total_amount'
+            billed_hours:
+              $ref: '#/components/schemas/billed_hours'
+            billed_amount:
+              $ref: '#/components/schemas/billed_amount'
+            un_billed_hours:
+              $ref: '#/components/schemas/un_billed_hours'
+            un_billed_amount:
+              $ref: '#/components/schemas/un_billed_amount'
+            billable_hours:
+              $ref: '#/components/schemas/billable_hours'
+            billable_amount:
+              $ref: '#/components/schemas/billable_amount'
+            non_billable_hours:
+              $ref: '#/components/schemas/non_billable_hours'
+            non_billable_amount:
+              $ref: '#/components/schemas/non_billable_amount'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            show_in_dashboard:
+              $ref: '#/components/schemas/show_in_dashboard'
+            tasks:
+              description: Tasks comprising a project
+              type: array
+              items:
+                type: object
+                properties:
+                  task_id:
+                    $ref: '#/components/schemas/task_id'
+                  task_name:
+                    $ref: '#/components/schemas/task_name'
+                  description:
+                    $ref: '#/components/schemas/description'
+                  rate:
+                    $ref: '#/components/schemas/rate'
+                  budget_hours:
+                    $ref: '#/components/schemas/budget_hours'
+                  total_hours:
+                    $ref: '#/components/schemas/total_hours'
+                  billed_hours:
+                    $ref: '#/components/schemas/billed_hours'
+                  un_billed_hours:
+                    $ref: '#/components/schemas/un_billed_hours'
+                  non_billable_hours:
+                    $ref: '#/components/schemas/non_billable_hours'
+                  status:
+                    $ref: '#/components/schemas/status'
+                  is_billable:
+                    $ref: '#/components/schemas/is_billable'
+                  task_custom_fields:
+                    $ref: '#/components/schemas/task_custom_fields'
+            users:
+              description: Users of a project
+              type: array
+              items:
+                type: object
+                properties:
+                  user_id:
+                    $ref: '#/components/schemas/user_id'
+                  is_current_user:
+                    $ref: '#/components/schemas/is_current_user'
+                  user_name:
+                    $ref: '#/components/schemas/user_name'
+                  email:
+                    $ref: '#/components/schemas/email'
+                  user_role:
+                    $ref: '#/components/schemas/user_role'
+                  status:
+                    $ref: '#/components/schemas/status'
+                  rate:
+                    $ref: '#/components/schemas/rate'
+                  budget_hours:
+                    $ref: '#/components/schemas/budget_hours'
+                  total_hours:
+                    $ref: '#/components/schemas/total_hours'
+                  billed_hours:
+                    $ref: '#/components/schemas/billed_hours'
+                  un_billed_hours:
+                    $ref: '#/components/schemas/un_billed_hours'
+    get-a-project-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        project:
+          description: Name of the project
+          type: object
+          properties:
+            project_id:
+              $ref: '#/components/schemas/project_id'
+            project_name:
+              $ref: '#/components/schemas/project_name'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            description:
+              $ref: '#/components/schemas/description'
+            status:
+              $ref: '#/components/schemas/status'
+            billing_type:
+              $ref: '#/components/schemas/billing_type'
+            rate:
+              $ref: '#/components/schemas/rate'
+            budget_type:
+              $ref: '#/components/schemas/budget_type'
+            total_hours:
+              $ref: '#/components/schemas/total_hours'
+            total_amount:
+              $ref: '#/components/schemas/total_amount'
+            billed_hours:
+              $ref: '#/components/schemas/billed_hours'
+            billed_amount:
+              $ref: '#/components/schemas/billed_amount'
+            un_billed_hours:
+              $ref: '#/components/schemas/un_billed_hours'
+            un_billed_amount:
+              $ref: '#/components/schemas/un_billed_amount'
+            billable_hours:
+              $ref: '#/components/schemas/billable_hours'
+            billable_amount:
+              $ref: '#/components/schemas/billable_amount'
+            non_billable_hours:
+              $ref: '#/components/schemas/non_billable_hours'
+            non_billable_amount:
+              $ref: '#/components/schemas/non_billable_amount'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            show_in_dashboard:
+              $ref: '#/components/schemas/show_in_dashboard'
+            tasks:
+              description: Tasks comprising a project
+              type: array
+              items:
+                type: object
+                properties:
+                  task_id:
+                    $ref: '#/components/schemas/task_id'
+                  task_name:
+                    $ref: '#/components/schemas/task_name'
+                  description:
+                    $ref: '#/components/schemas/description'
+                  rate:
+                    $ref: '#/components/schemas/rate'
+                  budget_hours:
+                    $ref: '#/components/schemas/budget_hours'
+                  total_hours:
+                    $ref: '#/components/schemas/total_hours'
+                  billed_hours:
+                    $ref: '#/components/schemas/billed_hours'
+                  un_billed_hours:
+                    $ref: '#/components/schemas/un_billed_hours'
+                  non_billable_hours:
+                    $ref: '#/components/schemas/non_billable_hours'
+                  status:
+                    $ref: '#/components/schemas/status'
+                  is_billable:
+                    $ref: '#/components/schemas/is_billable'
+                  task_custom_fields:
+                    $ref: '#/components/schemas/task_custom_fields'
+    delete-project-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The project has been deleted.
+          readOnly: true
+    activate-a-project-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The selected Projects have been marked as active.
+          readOnly: true
+    deactivate-a-project-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The selected projects have been marked as inactive.
+          readOnly: true
+    clone-a-project-request:
+      required:
+        - project_name
+      type: object
+      properties:
+        project_name:
+          description: Name of the project. <code>Maximum length [100]</code>
+          type: string
+          example: Network Distribution
+        description:
+          description: Project description. <code>Maximum length [500]</code>
+          type: string
+          example: Distribution for the system of intermediaries between the producer of goods and/or services and the final user
+    clone-a-project-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Project has been cloned successfully.
+          readOnly: true
+        project:
+          description: Name of the project
+          type: object
+          properties:
+            project_id:
+              $ref: '#/components/schemas/project_id'
+            project_name:
+              $ref: '#/components/schemas/project_name'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            description:
+              $ref: '#/components/schemas/description'
+            status:
+              $ref: '#/components/schemas/status'
+            billing_type:
+              $ref: '#/components/schemas/billing_type'
+            rate:
+              $ref: '#/components/schemas/rate'
+            budget_type:
+              $ref: '#/components/schemas/budget_type'
+            total_hours:
+              $ref: '#/components/schemas/total_hours'
+            total_amount:
+              $ref: '#/components/schemas/total_amount'
+            billed_hours:
+              $ref: '#/components/schemas/billed_hours'
+            billed_amount:
+              $ref: '#/components/schemas/billed_amount'
+            un_billed_hours:
+              $ref: '#/components/schemas/un_billed_hours'
+            un_billed_amount:
+              $ref: '#/components/schemas/un_billed_amount'
+            billable_hours:
+              $ref: '#/components/schemas/billable_hours'
+            billable_amount:
+              $ref: '#/components/schemas/billable_amount'
+            non_billable_hours:
+              $ref: '#/components/schemas/non_billable_hours'
+            non_billable_amount:
+              $ref: '#/components/schemas/non_billable_amount'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            show_in_dashboard:
+              $ref: '#/components/schemas/show_in_dashboard'
+            tasks:
+              description: Tasks comprising a project
+              type: array
+              items:
+                type: object
+                properties:
+                  task_id:
+                    $ref: '#/components/schemas/task_id'
+                  task_name:
+                    $ref: '#/components/schemas/task_name'
+                  description:
+                    $ref: '#/components/schemas/description'
+                  rate:
+                    $ref: '#/components/schemas/rate'
+                  budget_hours:
+                    $ref: '#/components/schemas/budget_hours'
+                  total_hours:
+                    $ref: '#/components/schemas/total_hours'
+                  billed_hours:
+                    $ref: '#/components/schemas/billed_hours'
+                  un_billed_hours:
+                    $ref: '#/components/schemas/un_billed_hours'
+                  non_billable_hours:
+                    $ref: '#/components/schemas/non_billable_hours'
+                  status:
+                    $ref: '#/components/schemas/status'
+                  is_billable:
+                    $ref: '#/components/schemas/is_billable'
+                  task_custom_fields:
+                    $ref: '#/components/schemas/task_custom_fields'
+            users:
+              description: Users of a project
+              type: array
+              items:
+                type: object
+                properties:
+                  user_id:
+                    $ref: '#/components/schemas/user_id'
+                  is_current_user:
+                    $ref: '#/components/schemas/is_current_user'
+                  user_name:
+                    $ref: '#/components/schemas/user_name'
+                  email:
+                    $ref: '#/components/schemas/email'
+                  user_role:
+                    $ref: '#/components/schemas/user_role'
+                  status:
+                    $ref: '#/components/schemas/status'
+                  rate:
+                    $ref: '#/components/schemas/rate'
+                  budget_hours:
+                    $ref: '#/components/schemas/budget_hours'
+                  total_hours:
+                    $ref: '#/components/schemas/total_hours'
+                  billed_hours:
+                    $ref: '#/components/schemas/billed_hours'
+                  un_billed_hours:
+                    $ref: '#/components/schemas/un_billed_hours'
+    assign-users-request:
+      required:
+        - user_id
+      type: object
+      properties:
+        user_id:
+          description: ID of the user to be added to the project.
+          type: string
+          example: '460000000024003'
+        rate:
+          $ref: '#/components/schemas/rate'
+        budget_hours:
+          $ref: '#/components/schemas/budget_hours'
+    assign-users-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Users added.
+          readOnly: true
+        users:
+          description: Users of a project
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                $ref: '#/components/schemas/user_id'
+              is_current_user:
+                $ref: '#/components/schemas/is_current_user'
+              user_name:
+                $ref: '#/components/schemas/user_name'
+              email:
+                $ref: '#/components/schemas/email'
+              user_role:
+                $ref: '#/components/schemas/user_role'
+              status:
+                $ref: '#/components/schemas/status'
+              rate:
+                $ref: '#/components/schemas/rate'
+              budget_hours:
+                $ref: '#/components/schemas/budget_hours'
+    list-users-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                $ref: '#/components/schemas/user_id'
+              is_current_user:
+                $ref: '#/components/schemas/is_current_user'
+              user_name:
+                $ref: '#/components/schemas/user_name'
+              email:
+                $ref: '#/components/schemas/email'
+              user_role:
+                $ref: '#/components/schemas/user_role'
+              status:
+                $ref: '#/components/schemas/status'
+              rate:
+                $ref: '#/components/schemas/rate'
+              budget_hours:
+                $ref: '#/components/schemas/budget_hours'
+    invite-user-request:
+      required:
+        - user_name
+        - email
+      type: object
+      properties:
+        user_name:
+          $ref: '#/components/schemas/user_name'
+        email:
+          $ref: '#/components/schemas/email'
+        user_role:
+          $ref: '#/components/schemas/user_role'
+        rate:
+          description: Hourly rate for a task.
+          type: string
+          example: ' '
+        budget_hours:
+          $ref: '#/components/schemas/budget_hours'
+    invite-user-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The staff has been added.
+          readOnly: true
+        users:
+          description: Users of a project
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                $ref: '#/components/schemas/user_id'
+              user_name:
+                $ref: '#/components/schemas/user_name'
+              email:
+                $ref: '#/components/schemas/email'
+              user_role:
+                $ref: '#/components/schemas/user_role'
+              is_current_user:
+                $ref: '#/components/schemas/is_current_user'
+    update-user-request:
+      type: object
+      properties:
+        user_name:
+          $ref: '#/components/schemas/user_name'
+        user_role:
+          $ref: '#/components/schemas/user_role'
+        rate:
+          $ref: '#/components/schemas/rate'
+        budget_hours:
+          $ref: '#/components/schemas/budget_hours'
+    update-user-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The staff information has been updated.
+          readOnly: true
+        users:
+          description: Users of a project
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                $ref: '#/components/schemas/user_id'
+              user_name:
+                $ref: '#/components/schemas/user_name'
+              email:
+                $ref: '#/components/schemas/email'
+              user_role:
+                $ref: '#/components/schemas/user_role'
+              is_current_user:
+                $ref: '#/components/schemas/is_current_user'
+    get-a-user-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        users:
+          description: Users of a project
+          type: object
+          properties:
+            user_id:
+              $ref: '#/components/schemas/user_id'
+            is_current_user:
+              $ref: '#/components/schemas/is_current_user'
+            user_name:
+              $ref: '#/components/schemas/user_name'
+            email:
+              $ref: '#/components/schemas/email'
+            user_role:
+              $ref: '#/components/schemas/user_role'
+    delete-user-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The staff has been removed
+          readOnly: true
+    post-comment-request:
+      required:
+        - description
+      type: object
+      properties:
+        description:
+          description: Project description. <code>Maximum length [500]</code>
+          type: string
+          example: Billing based on task hours
+    post-comment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Comments added.
+          readOnly: true
+        comments:
+          description: A short noteon the project
+          type: array
+          items:
+            type: object
+            properties:
+              project_id:
+                $ref: '#/components/schemas/project_id'
+              comment_id:
+                $ref: '#/components/schemas/comment_id'
+              description:
+                $ref: '#/components/schemas/description'
+              commented_by_id:
+                $ref: '#/components/schemas/commented_by_id'
+              commented_by:
+                $ref: '#/components/schemas/commented_by'
+              date:
+                $ref: '#/components/schemas/date'
+              date_description:
+                $ref: '#/components/schemas/date_description'
+              time:
+                $ref: '#/components/schemas/time'
+    list-comments-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        comments:
+          type: array
+          items:
+            type: object
+            properties:
+              comment_id:
+                $ref: '#/components/schemas/comment_id'
+              project_id:
+                $ref: '#/components/schemas/project_id'
+              description:
+                $ref: '#/components/schemas/description'
+              commented_by_id:
+                $ref: '#/components/schemas/commented_by_id'
+              commented_by:
+                $ref: '#/components/schemas/commented_by'
+              is_current_user:
+                $ref: '#/components/schemas/is_current_user'
+              date:
+                $ref: '#/components/schemas/date'
+              date_description:
+                $ref: '#/components/schemas/date_description'
+              time:
+                $ref: '#/components/schemas/time'
+    delete-comment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The comment has been deleted.
+          readOnly: true
+    list-invoices-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        invoices:
+          type: array
+          items:
+            type: object
+            properties:
+              invoice_id:
+                $ref: '#/components/schemas/invoice_id'
+              customer_name:
+                $ref: '#/components/schemas/customer_name'
+              status:
+                $ref: '#/components/schemas/status'
+              invoice_number:
+                $ref: '#/components/schemas/invoice_number'
+              reference_number:
+                $ref: '#/components/schemas/reference_number'
+              date:
+                $ref: '#/components/schemas/date'
+              due_date:
+                $ref: '#/components/schemas/due_date'
+              total:
+                $ref: '#/components/schemas/total'
+              balance:
+                $ref: '#/components/schemas/balance'
+              created_time:
+                $ref: '#/components/schemas/created_time'
+    task-response:
+      type: object
+      properties:
+        project_id:
+          $ref: '#/components/schemas/project_id'
+        task_id:
+          $ref: '#/components/schemas/task_id'
+        currency_id:
+          $ref: '#/components/schemas/currency_id'
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        task_name:
+          $ref: '#/components/schemas/task_name'
+        project_name:
+          $ref: '#/components/schemas/project_name'
+        customer_name:
+          $ref: '#/components/schemas/customer_name'
+        billed_hours:
+          $ref: '#/components/schemas/billed_hours'
+        log_time:
+          $ref: '#/components/schemas/log_time'
+        un_billed_hours:
+          $ref: '#/components/schemas/un_billed_hours'
+    add-a-task-request:
+      required:
+        - task_name
+      type: object
+      properties:
+        task_name:
+          $ref: '#/components/schemas/task_name'
+        description:
+          $ref: '#/components/schemas/description'
+        rate:
+          $ref: '#/components/schemas/rate'
+        budget_hours:
+          $ref: '#/components/schemas/budget_hours'
+    add-a-task-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The project task has been added.
+          readOnly: true
+        task:
+          $ref: '#/components/schemas/task-response'
+    list-tasks-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        tasks:
+          type: array
+          items:
+            type: object
+            properties:
+              project_id:
+                $ref: '#/components/schemas/project_id'
+              task_id:
+                $ref: '#/components/schemas/task_id'
+              currency_id:
+                $ref: '#/components/schemas/currency_id'
+              customer_id:
+                $ref: '#/components/schemas/customer_id'
+              task_name:
+                $ref: '#/components/schemas/task_name'
+              project_name:
+                $ref: '#/components/schemas/project_name'
+              customer_name:
+                $ref: '#/components/schemas/customer_name'
+              billed_hours:
+                $ref: '#/components/schemas/billed_hours'
+              log_time:
+                $ref: '#/components/schemas/log_time'
+              un_billed_hours:
+                $ref: '#/components/schemas/un_billed_hours'
+    update-a-task-request:
+      required:
+        - task_name
+      type: object
+      properties:
+        task_name:
+          $ref: '#/components/schemas/task_name'
+        description:
+          $ref: '#/components/schemas/description'
+        rate:
+          $ref: '#/components/schemas/rate'
+        budget_hours:
+          $ref: '#/components/schemas/budget_hours'
+    update-a-task-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The project task information has been updated.
+          readOnly: true
+        task:
+          type: object
+          properties:
+            project_id:
+              $ref: '#/components/schemas/project_id'
+            task_id:
+              $ref: '#/components/schemas/task_id'
+            currency_id:
+              $ref: '#/components/schemas/currency_id'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            task_name:
+              $ref: '#/components/schemas/task_name'
+            project_name:
+              $ref: '#/components/schemas/project_name'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            billed_hours:
+              $ref: '#/components/schemas/billed_hours'
+            log_time:
+              $ref: '#/components/schemas/log_time'
+            un_billed_hours:
+              $ref: '#/components/schemas/un_billed_hours'
+    get-a-task-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        task:
+          type: object
+          properties:
+            project_id:
+              $ref: '#/components/schemas/project_id'
+            project_name:
+              $ref: '#/components/schemas/project_name'
+            task_id:
+              $ref: '#/components/schemas/task_id'
+            task_name:
+              $ref: '#/components/schemas/task_name'
+            description:
+              $ref: '#/components/schemas/description'
+            rate:
+              $ref: '#/components/schemas/rate'
+            status:
+              $ref: '#/components/schemas/status'
+            is_billable:
+              $ref: '#/components/schemas/is_billable'
+    delete-a-task-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The project task has been deleted successfully.
+          readOnly: true
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.projects.CREATE: Create Projects
+            ZohoSubscriptions.projects.UPDATE: Update Projects
+            ZohoSubscriptions.projects.READ: Read Projects
+            ZohoSubscriptions.projects.DELETE: Delete Projects

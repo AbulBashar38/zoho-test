@@ -1,0 +1,844 @@
+openapi: 3.0.0
+info:
+  title: Items
+  description: 'A product is the item offered for sale. It can be a commodity. Based on the type of your business, you can offer one or more goods.<br><br><b>Possible error codes: </b><br><table><thead><tr><th>Error Code</th><th>Message</th></tr></thead><tbody><tr><td><span style="color:#FF0000;"> 1000</span></td><td>The item name already exist</td></tr><tr><tr><td><span style="color:#FF0000;"> 2006</span></td><td>Item does not exist</td></tr><td><span style="color:#FF0000;"> 2049</span></td><td>Items which are a part of other transactions cannot be deleted. Instead, mark them as inactive</td></tr><tr><td><span style="color:#FF0000;"> 2076</span></td><td>Product type cannot be changed for Items having transactions</td></tr></tbody></table>'
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: items
+    description: Items Module
+paths:
+  /items:
+    x-mcp-group:
+      - Items
+    post:
+      tags:
+        - items
+      operationId: Create_an_Item
+      summary: Create an Item
+      description: Create a new item.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-an-item-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create-an-item-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.items.CREATE
+    get:
+      tags:
+        - items
+      operationId: List_all_Items
+      summary: List items
+      description: Get the list of all active items with pagination.
+      parameters:
+        - name: name
+          in: query
+          description: 'Search items by name. <code>Maximum length [100]</code>. Variants: <code>name_startswith</code> and <code>name_contains</code>'
+          required: false
+          schema:
+            type: string
+          example: Hard Drive
+        - name: description
+          in: query
+          description: 'Search items by description. <code>Maximum length [100]</code>. Variants: <code>description_startswith</code> and <code>description_contains</code>'
+          required: false
+          schema:
+            type: string
+          example: 500GB
+        - name: rate
+          in: query
+          description: 'Search items by rate. Variants: <code>rate_less_than</code>, <code>rate_less_equals</code>, <code>rate_greater_than</code> and <code>rate_greater_equals</code>'
+          required: false
+          schema:
+            type: string
+          example: 120
+        - name: tax_id
+          in: query
+          description: Search items by tax id.
+          required: false
+          schema:
+            type: string
+          example: 982000000037049
+        - name: filter_by
+          in: query
+          description: 'Filter items by status. Allowed Values: <code>Status.All</code>, <code>Status.Active</code> and <code>Status.Inactive</code>'
+          required: false
+          schema:
+            type: string
+          example: ''
+        - name: search_text
+          in: query
+          description: Search items by name or description. <code>Maximum length [100]</code>
+          required: false
+          schema:
+            type: string
+          example: ''
+        - name: sort_column
+          in: query
+          description: 'Sort items. Allowed Values: <code>name</code>, <code>rate</code> and <code>tax_name</code>'
+          required: false
+          schema:
+            type: string
+          example: ''
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-items-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.items.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /itemdetails:
+    x-mcp-group:
+      - Items
+    get:
+      tags:
+        - items
+      operationId: List_Item_Details
+      summary: Bulk fetch item details
+      description: Fetch item details for the mentioned item IDs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bulk-fetch-item-details-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.items.READ
+    parameters:
+      - name: item_ids
+        in: query
+        required: true
+        description: <code>List of item ids separated by comma</code>
+        schema:
+          type: string
+        example: 4815000000044208,4815000000044274,4815000000044340
+      - $ref: '#/components/parameters/organization_id'
+  /items/{item_id}:
+    x-mcp-group:
+      - Items
+    put:
+      tags:
+        - items
+      operationId: Update_an_Item
+      summary: Update an item
+      description: Update the details of an existing item.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-an-item-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-an-item-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.items.UPDATE
+    get:
+      tags:
+        - items
+      operationId: Get_an_Item
+      summary: Retrieve an item
+      description: Fetch details of an existing item.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-an-item-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.items.READ
+    delete:
+      tags:
+        - items
+      operationId: Delete_an_Item
+      summary: Delete an item
+      description: Delete an existing item. Items that are part of a transaction cannot be deleted.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-an-item-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.items.DELETE
+    parameters:
+      - name: item_id
+        in: path
+        required: true
+        description: Unique identifier of the item.
+        schema:
+          type: string
+        example: 903000000045027
+      - $ref: '#/components/parameters/organization_id'
+  /items/{item_id}/active:
+    x-mcp-group:
+      - Items
+    post:
+      tags:
+        - items
+      operationId: Mark_an_Item_as_Active
+      summary: Mark as active
+      description: Mark an inactive item as active.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mark-as-active-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.items.CREATE
+    parameters:
+      - name: item_id
+        in: path
+        required: true
+        description: Unique identifier of the item.
+        schema:
+          type: string
+        example: 903000000045027
+      - $ref: '#/components/parameters/organization_id'
+  /items/{item_id}/inactive:
+    x-mcp-group:
+      - Items
+    post:
+      tags:
+        - items
+      operationId: Mark_an_Item_as_Inactive
+      summary: Mark as inactive
+      description: Mark an active item as inactive.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mark-as-inactive-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.items.CREATE
+    parameters:
+      - name: item_id
+        in: path
+        required: true
+        description: Unique identifier of the item.
+        schema:
+          type: string
+        example: 903000000045027
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/item-response'
+    item-response:
+      type: object
+      properties:
+        item_id:
+          $ref: '#/components/schemas/item_id'
+        name:
+          $ref: '#/components/schemas/name'
+        status:
+          $ref: '#/components/schemas/status'
+        description:
+          $ref: '#/components/schemas/description'
+        rate:
+          $ref: '#/components/schemas/rate'
+        unit:
+          $ref: '#/components/schemas/unit'
+        tax_id:
+          $ref: '#/components/schemas/tax_id'
+        tax_name:
+          $ref: '#/components/schemas/tax_name'
+        tax_percentage:
+          $ref: '#/components/schemas/tax_percentage'
+        tax_type:
+          $ref: '#/components/schemas/tax_type'
+        sku:
+          $ref: '#/components/schemas/sku'
+        product_type:
+          $ref: '#/components/schemas/product_type'
+        hsn_or_sac:
+          $ref: '#/components/schemas/hsn_or_sac'
+        sat_item_key_code:
+          $ref: '#/components/schemas/sat_item_key_code'
+        unitkey_code:
+          $ref: '#/components/schemas/unitkey_code'
+        item_tax_preferences:
+          $ref: '#/components/schemas/item_tax_preferences'
+        custom_fields:
+          $ref: '#/components/schemas/custom_fields'
+    item_id:
+      description: Unique ID generated by the server for an item.
+      type: string
+      example: 903000000045027
+    name:
+      description: Name of the item. <code>Maximum length of the name [100]</code>
+      type: string
+      example: Hard Drive
+    rate:
+      description: Per unit price of an item.
+      type: number
+      format: double
+      example: 120
+    description:
+      description: Description for the item. <code>Maximum characters to be used for describing the item [2000]</code>
+      type: string
+      example: 500GB
+    status:
+      description: Status of the item. It can be <code>active</code> or <code>inactive</code>. It tells whether the Item is available for transactions.
+      type: string
+      example: active
+    unit:
+      description: Quantifying the amount of an item, using a measurement unit.
+      type: string
+      example: 100GB
+    tax_id:
+      description: ID of the tax to be associated to the item.
+      type: string
+      example: 982000000037049
+    tax_precentage:
+      description: Perentage of the Tax
+      type: string
+      example: 10.5
+      x-node_available_in: []
+      x-node_unavailable_in:
+        - us
+    tax_name:
+      description: Name of te Tax Included
+      type: string
+      example: Sales Tax
+    is_taxable:
+      description: Boolean to track the taxability of the item.
+      type: boolean
+      x-node_available_in:
+        - us
+        - ca
+        - in
+      x-node_unavailable_in: []
+    tax_exemption_id:
+      description: ID of the tax exemption applied. Mandatory, if <code>is_taxable</code> is false.
+      type: string
+      x-node_available_in:
+        - us
+        - ca
+        - in
+      x-node_unavailable_in: []
+    avatax_tax_code:
+      description: A tax code determines the taxability of the goods and services you sell. It groups goods and service type together. The <code>Maximum length allowed is [25]</code>
+      type: string
+      example: 982000000037049
+      x-node_available_in:
+        - Avalara Integration
+      x-node_unavailable_in: []
+    avatax_use_code:
+      description: Used to group like customers for exemption purposes. It is a custom value that links customers to a tax rule. Select from Avalara [standard codes][1] or enter a custom code. <code>Maximum length [25]</code>
+      type: string
+      example: 982000000037049
+      x-node_available_in:
+        - Avalara Integration
+      x-node_unavailable_in: []
+    tax_percentage:
+      description: Percent of the tax.
+      type: string
+      example: 70%
+    tax_type:
+      description: Type of the tax.
+      type: string
+      example: Service Tax
+    filter_by:
+      description: 'Filter items by status. Allowed Values: <code>Status.All</code>, <code>Status.Active</code> and <code>Status.Inactive</code>'
+      type: string
+    search_text:
+      description: Search items by name or description. <code>Maximum length [100]</code>
+      type: string
+    sort_column:
+      description: 'Sort items. Allowed Values: <code>name</code>, <code>rate</code> and <code>tax_name</code>'
+      type: string
+    product_type:
+      description: Specify the type of an item. It can be either <code> goods</code> or <code> service</code>
+      type: string
+      example: goods
+    sku:
+      description: SKU or the Stock Keeping Unit value of an item, should be unique throughout the product
+      type: string
+      example: s12345
+    page:
+      description: Number of pages
+      type: integer
+      example: 1
+    per_page:
+      description: Values per page
+      type: integer
+      example: 200
+    has_more_page:
+      description: Check if more pages are available
+      type: boolean
+      example: false
+    sort_order:
+      description: The order for sorting
+      type: string
+      example: A
+    applied_filter:
+      description: The filer applied
+      type: string
+      example: Status.All
+    report_name:
+      description: The displaying the  report name
+      type: string
+      example: Items
+    hsn_or_sac:
+      description: HSN Code
+      type: string
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    sat_item_key_code:
+      description: Add SAT Item Key Code for your goods/services. Download the <a href= http://omawww.sat.gob.mx/tramitesyservicios/Paginas/documentos/catCFDI_V_4_07122022.xls  >CFDI Catalogs.</a>
+      type: string
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    unitkey_code:
+      description: Add Unit Key Code for your goods/services. Download the <a href= http://omawww.sat.gob.mx/tramitesyservicios/Paginas/documentos/catCFDI_V_4_07122022.xls  >CFDI Catalogs.</a>
+      type: string
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    tax_specification:
+      description: Set whether the tax type is intra/interstate
+      type: string
+      example: intra
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    item_tax_preferences:
+      type: array
+      description: Tax preferences for the item.
+      items:
+        type: object
+        properties:
+          tax_id:
+            $ref: '#/components/schemas/tax_id'
+          tax_specification:
+            $ref: '#/components/schemas/tax_specification'
+    customfield_id:
+      type: string
+      description: Unique identifier of the custom field
+      example: '46000000012845'
+    value:
+      description: Value of the Custom Field
+      type: string
+      example: Normal
+    custom_fields:
+      description: Custom fields for an item.
+      type: array
+      items:
+        type: object
+        properties:
+          customfield_id:
+            $ref: '#/components/schemas/customfield_id'
+          value:
+            $ref: '#/components/schemas/value'
+    warehouse_id:
+      description: Enter warehouse ID
+      type: string
+      example: ''
+    warehouse_name:
+      description: Enter warehouse name
+      type: string
+      example: ''
+    is_primary:
+      description: Mention whether the item is primary or not
+      type: boolean
+      example: false
+    warehouse_stock_on_hand:
+      description: Current available stock in your warehouse.
+      type: string
+      example: ''
+    warehouse_available_stock:
+      description: Available stock in your warehouse.
+      type: string
+      example: ''
+    warehouse_actual_available_stock:
+      description: Actual available stock in your warehouse.
+      type: string
+      example: ''
+    warehouses:
+      type: array
+      items:
+        type: object
+        properties:
+          warehouse_id:
+            $ref: '#/components/schemas/warehouse_id'
+          warehouse_name:
+            $ref: '#/components/schemas/warehouse_name'
+          status:
+            $ref: '#/components/schemas/status'
+          is_primary:
+            $ref: '#/components/schemas/is_primary'
+          warehouse_stock_on_hand:
+            $ref: '#/components/schemas/warehouse_stock_on_hand'
+          warehouse_available_stock:
+            $ref: '#/components/schemas/warehouse_available_stock'
+          warehouse_actual_available_stock:
+            $ref: '#/components/schemas/warehouse_actual_available_stock'
+    create-an-item-request:
+      required:
+        - name
+        - rate
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/name'
+        rate:
+          $ref: '#/components/schemas/rate'
+        description:
+          $ref: '#/components/schemas/description'
+        tax_id:
+          $ref: '#/components/schemas/tax_id'
+        sku:
+          $ref: '#/components/schemas/sku'
+        product_type:
+          $ref: '#/components/schemas/product_type'
+        is_taxable:
+          $ref: '#/components/schemas/is_taxable'
+        tax_exemption_id:
+          $ref: '#/components/schemas/tax_exemption_id'
+        hsn_or_sac:
+          $ref: '#/components/schemas/hsn_or_sac'
+        sat_item_key_code:
+          $ref: '#/components/schemas/sat_item_key_code'
+        unitkey_code:
+          $ref: '#/components/schemas/unitkey_code'
+        item_tax_preferences:
+          $ref: '#/components/schemas/item_tax_preferences'
+        custom_fields:
+          $ref: '#/components/schemas/custom_fields'
+    create-an-item-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The item has been added.
+          readOnly: true
+        item:
+          $ref: '#/components/schemas/item-response'
+    list-items-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              item_id:
+                $ref: '#/components/schemas/item_id'
+              name:
+                $ref: '#/components/schemas/name'
+              status:
+                $ref: '#/components/schemas/status'
+              description:
+                $ref: '#/components/schemas/description'
+              rate:
+                $ref: '#/components/schemas/rate'
+              unit:
+                $ref: '#/components/schemas/unit'
+              tax_id:
+                $ref: '#/components/schemas/tax_id'
+              tax_name:
+                $ref: '#/components/schemas/tax_name'
+              tax_percentage:
+                $ref: '#/components/schemas/tax_percentage'
+              tax_type:
+                $ref: '#/components/schemas/tax_type'
+              sku:
+                $ref: '#/components/schemas/sku'
+              product_type:
+                $ref: '#/components/schemas/product_type'
+              custom_fields:
+                $ref: '#/components/schemas/custom_fields'
+    bulk-fetch-item-details-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              item_id:
+                $ref: '#/components/schemas/item_id'
+              name:
+                $ref: '#/components/schemas/name'
+              status:
+                $ref: '#/components/schemas/status'
+              description:
+                $ref: '#/components/schemas/description'
+              rate:
+                $ref: '#/components/schemas/rate'
+              unit:
+                $ref: '#/components/schemas/unit'
+              tax_id:
+                $ref: '#/components/schemas/tax_id'
+              tax_name:
+                $ref: '#/components/schemas/tax_name'
+              tax_percentage:
+                $ref: '#/components/schemas/tax_percentage'
+              tax_type:
+                $ref: '#/components/schemas/tax_type'
+              sku:
+                $ref: '#/components/schemas/sku'
+              product_type:
+                $ref: '#/components/schemas/product_type'
+              custom_fields:
+                $ref: '#/components/schemas/custom_fields'
+    update-an-item-request:
+      required:
+        - name
+        - rate
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/name'
+        rate:
+          $ref: '#/components/schemas/rate'
+        description:
+          $ref: '#/components/schemas/description'
+        tax_id:
+          $ref: '#/components/schemas/tax_id'
+        sku:
+          $ref: '#/components/schemas/sku'
+        product_type:
+          $ref: '#/components/schemas/product_type'
+        is_taxable:
+          $ref: '#/components/schemas/is_taxable'
+        tax_exemption_id:
+          $ref: '#/components/schemas/tax_exemption_id'
+        hsn_or_sac:
+          $ref: '#/components/schemas/hsn_or_sac'
+        sat_item_key_code:
+          $ref: '#/components/schemas/sat_item_key_code'
+        unitkey_code:
+          $ref: '#/components/schemas/unitkey_code'
+        item_tax_preferences:
+          $ref: '#/components/schemas/item_tax_preferences'
+        custom_fields:
+          $ref: '#/components/schemas/custom_fields'
+    update-an-item-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Item details have been saved.
+          readOnly: true
+        item:
+          type: object
+          properties:
+            item_id:
+              $ref: '#/components/schemas/item_id'
+            name:
+              $ref: '#/components/schemas/name'
+            status:
+              $ref: '#/components/schemas/status'
+            description:
+              $ref: '#/components/schemas/description'
+            rate:
+              $ref: '#/components/schemas/rate'
+            unit:
+              $ref: '#/components/schemas/unit'
+            tax_id:
+              $ref: '#/components/schemas/tax_id'
+            tax_name:
+              $ref: '#/components/schemas/tax_name'
+            tax_percentage:
+              $ref: '#/components/schemas/tax_percentage'
+            tax_type:
+              $ref: '#/components/schemas/tax_type'
+            sku:
+              $ref: '#/components/schemas/sku'
+            product_type:
+              $ref: '#/components/schemas/product_type'
+            hsn_or_sac:
+              $ref: '#/components/schemas/hsn_or_sac'
+            sat_item_key_code:
+              $ref: '#/components/schemas/sat_item_key_code'
+            unitkey_code:
+              $ref: '#/components/schemas/unitkey_code'
+            item_tax_preferences:
+              $ref: '#/components/schemas/item_tax_preferences'
+            custom_fields:
+              $ref: '#/components/schemas/custom_fields'
+    retrieve-an-item-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        item:
+          type: object
+          properties:
+            item_id:
+              $ref: '#/components/schemas/item_id'
+            name:
+              $ref: '#/components/schemas/name'
+            status:
+              $ref: '#/components/schemas/status'
+            description:
+              $ref: '#/components/schemas/description'
+            rate:
+              $ref: '#/components/schemas/rate'
+            unit:
+              $ref: '#/components/schemas/unit'
+            tax_id:
+              $ref: '#/components/schemas/tax_id'
+            tax_name:
+              $ref: '#/components/schemas/tax_name'
+            tax_percentage:
+              $ref: '#/components/schemas/tax_percentage'
+            tax_type:
+              $ref: '#/components/schemas/tax_type'
+            sku:
+              $ref: '#/components/schemas/sku'
+            product_type:
+              $ref: '#/components/schemas/product_type'
+            hsn_or_sac:
+              $ref: '#/components/schemas/hsn_or_sac'
+            sat_item_key_code:
+              $ref: '#/components/schemas/sat_item_key_code'
+            unitkey_code:
+              $ref: '#/components/schemas/unitkey_code'
+            item_tax_preferences:
+              $ref: '#/components/schemas/item_tax_preferences'
+            custom_fields:
+              $ref: '#/components/schemas/custom_fields'
+    delete-an-item-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The item has been deleted.
+          readOnly: true
+    mark-as-active-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The item has been marked Active.
+          readOnly: true
+    mark-as-inactive-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The item has been marked Inactive.
+          readOnly: true
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.items.CREATE: Create items
+            ZohoSubscriptions.items.UPDATE: Update items
+            ZohoSubscriptions.items.READ: Read items
+            ZohoSubscriptions.items.DELETE: Delete items

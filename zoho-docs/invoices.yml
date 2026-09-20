@@ -1,0 +1,4801 @@
+openapi: 3.0.0
+info:
+  title: Invoices
+  description: Invoices describe how much a customer owes for his subscription. Invoices are created for recurring charges, one time charges including any prorated adjustments.
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: invoices
+    description: Invoices Module
+paths:
+  /invoices:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Create_an_Invoice
+      summary: Create an invoice
+      description: Create an invoice for your customer.
+      parameters:
+        - name: send
+          in: query
+          description: Send the invoice to the contact person(s) associated with the invoice. Allowed values <code>true</code> and <code>false</code>.
+          required: false
+          schema:
+            type: boolean
+        - name: ignore_auto_number_generation
+          in: query
+          description: Ignore auto invoice number generation for this invoice. This mandates the invoice number. Allowed values <code>true</code> and <code>false</code>
+          required: false
+          schema:
+            type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-an-invoice-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create-an-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    get:
+      tags:
+        - invoices
+      operationId: List_all_Invoices
+      summary: List all invoices
+      description: List of all invoices. Invoices can also be filtered by subscription or customer.
+      parameters:
+        - name: filter_by
+          in: query
+          description: 'Filter invoices by status or date. Allowed Values: <code>Status.All</code>, <code>Status.Sent</code>, <code>Status.Draft</code>, <code>Status.OverDue</code>, <code>Status.Paid</code>, <code>Status.Void</code>, <code>Status.Unpaid</code>, <code>Status.PartiallyPaid</code>, <code>Status.Viewed</code>, <code>Status.AvalaraSyncFailed</code>, <code>Status.WriteOff</code>, <code>Status.Pending</code>, <code>Status.Pushed</code>, <code>Status.YetToBePushed</code>, <code>Status.Failed</code>, <code>Status.CancelInitiated</code>, <code>InvoiceDate.ThisMonth</code>, <code>InvoiceDate.PreviousMonth</code>.'
+          required: false
+          schema:
+            type: string
+            enum:
+              - Status.All
+              - Status.Sent
+              - Status.Draft
+              - Status.OverDue
+              - Status.Paid
+              - Status.Void
+              - Status.Unpaid
+              - Status.PartiallyPaid
+              - Status.Viewed
+              - Status.AvalaraSyncFailed
+              - Status.TaxAutomationFailed
+              - Status.WriteOff
+              - Status.Pending
+              - Status.Pushed
+              - Status.YetToBePushed
+              - Status.Failed
+              - Status.CancelInitiated
+              - Status.SLPDExceeded
+              - InvoiceDate.ThisMonth
+              - InvoiceDate.PreviousMonth
+              - ExceptionList
+              - ACHPaymentInitiated
+          example: Status.All
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-all-invoices-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}:
+    x-mcp-group:
+      - Invoices
+    put:
+      tags:
+        - invoices
+      operationId: Update_an_Invoice
+      summary: Update an invoice
+      description: Update an existing invoice. To remove a line item, remove it from the list of invoice items.
+      parameters:
+        - name: ignore_auto_number_generation
+          in: query
+          description: Ignore auto invoice number generation for this invoice. This mandates the invoice number. Allowed values <code>true</code> and <code>false</code>
+          required: false
+          schema:
+            type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-an-invoice-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-an-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.UPDATE
+    get:
+      tags:
+        - invoices
+      operationId: Get_an_Invoice
+      summary: Retrieve an invoice
+      description: Details of an existing invoice.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-an-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.READ
+    delete:
+      tags:
+        - invoices
+      operationId: Delete_an_Invoice
+      summary: Delete an invoice
+      description: Delete an existing invoice. Invoices which have payment or credits note applied cannot be deleted.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-an-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.DELETE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoice/{invoice_id}/customfields:
+    x-mcp-group:
+      - Invoices
+    put:
+      tags:
+        - invoices
+      operationId: Update_Custom_Fields_in_an_Invoice
+      summary: Update custom field in existing invoices
+      description: Update the value of the custom field in existing invoices.
+      parameters:
+        - name: invoice_id
+          in: path
+          required: true
+          description: Unique identifier of the invoice.
+          schema:
+            type: string
+          example: 982000000567114
+        - $ref: '#/components/parameters/organization_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/custom_fields_update'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-an-invoice-customfield-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.UPDATE
+  /invoices/{invoice_id}/converttoopen:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Convert_an_Invoice_to_Open
+      summary: Convert to open
+      description: Change the status of the invoice to open.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/convert-to-open-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/void:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Mark_an_Invoice_as_Void
+      summary: Void an invoice
+      description: Mark an invoice status as void. Upon voiding, the payments and credits associated with the invoices will be unassociated and will be under customer credits.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/void-an-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: 982000000567114
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/email:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Email_an_Invoice
+      summary: Email an invoice
+      description: Email an invoice.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/email-an-invoice-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/email-an-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/collect:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Collect_Payment_for_an_Invoice
+      summary: Collect charge via bank account / credit card
+      description: Charge a customer for an invoice using existing bank account.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/collect-charge-via-bank-account-credit-card-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/collect-charge-via-bank-account-credit-card-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/writeoff:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Write_Off_an_Invoice
+      summary: Write off an invoice
+      description: Write off a invoice.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/write-off-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/write-off-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/address:
+    x-mcp-group:
+      - Invoices
+    put:
+      tags:
+        - invoices
+      operationId: Update_the_Address_of_an_Invoice
+      summary: Update address
+      description: Update shipping and billing address of an invoice.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-address-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-address-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.UPDATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/credits:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Apply_Credits_to_an_Invoice
+      summary: Apply Multiple Credits to Invoice
+      description: To associate multiple creditnotes to a particular invoice.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/apply-multiple-credits-to-invoice-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apply-multiple-credits-to-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/lineitems:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Add_Usage_Charges_to_an_Invoice
+      summary: Add items to a pending invoice
+      description: Editing a pending invoice to add usage charges.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/add-items-to-a-pending-invoice-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/add-items-to-a-pending-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/lineitems/{item_id}:
+    x-mcp-group:
+      - Invoices
+    delete:
+      tags:
+        - invoices
+      operationId: Delete_a_Line_Item_from_an_Invoice
+      summary: Delete items from a pending invoice
+      description: Deleting an item from pending invoice.
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          description: Unique identifier of the item.
+          schema:
+            type: string
+          example: '7000000079434'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-items-from-a-pending-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.DELETE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/attachment:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Add_an_Attachment_to_an_Invoice
+      summary: Add attachment to an invoice
+      description: Attach a file to an invoice.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/add-attachment-to-an-invoice-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/add-attachment-to-an-invoice-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: '903000000079426'
+      - $ref: '#/components/parameters/organization_id'
+  /invoices/{invoice_id}/cancelwriteoff:
+    x-mcp-group:
+      - Invoices
+    post:
+      tags:
+        - invoices
+      operationId: Cancel_the_Write-Off_of_an_Invoice
+      summary: Cancel write off
+      description: Cancel the write off amount of an invoice.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cancel-write-off-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.invoices.CREATE
+    parameters:
+      - name: invoice_id
+        in: path
+        required: true
+        description: Unique identifier of the invoice.
+        schema:
+          type: string
+        example: 982000000567114
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/invoice-response'
+    invoice-response:
+      type: object
+      properties:
+        invoice_id:
+          $ref: '#/components/schemas/invoice_id'
+        ach_payment_initiated:
+          $ref: '#/components/schemas/ach_payment_initiated'
+        invoice_number:
+          $ref: '#/components/schemas/invoice_number'
+        is_pre_gst:
+          $ref: '#/components/schemas/is_pre_gst'
+        place_of_supply:
+          $ref: '#/components/schemas/place_of_supply'
+        gst_no:
+          $ref: '#/components/schemas/gst_no'
+        shipping_gst_no:
+          $ref: '#/components/schemas/shipping_gst_no'
+        shipping_trader_name:
+          $ref: '#/components/schemas/shipping_trader_name'
+        shipping_legal_name:
+          $ref: '#/components/schemas/shipping_legal_name'
+        gst_treatment:
+          $ref: '#/components/schemas/gst_treatment'
+        tax_treatment:
+          $ref: '#/components/schemas/tax_treatment'
+        cfdi_usage:
+          $ref: '#/components/schemas/cfdi_usage'
+        vat_treatment:
+          $ref: '#/components/schemas/vat_treatment'
+        vat_reg_no:
+          $ref: '#/components/schemas/vat_reg_no'
+        date:
+          $ref: '#/components/schemas/date'
+        status:
+          $ref: '#/components/schemas/status'
+        payment_terms:
+          $ref: '#/components/schemas/payment_terms'
+        payment_terms_label:
+          $ref: '#/components/schemas/payment_terms_label'
+        due_date:
+          $ref: '#/components/schemas/due_date'
+        payment_expected_date:
+          $ref: '#/components/schemas/payment_expected_date'
+        last_payment_date:
+          $ref: '#/components/schemas/last_payment_date'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        customer_name:
+          $ref: '#/components/schemas/customer_name'
+        contact_persons:
+          $ref: '#/components/schemas/contact_persons'
+        currency_id:
+          $ref: '#/components/schemas/currency_id'
+        currency_code:
+          $ref: '#/components/schemas/currency_code'
+        exchange_rate:
+          $ref: '#/components/schemas/exchange_rate'
+        discount:
+          $ref: '#/components/schemas/discount'
+        is_discount_before_tax:
+          $ref: '#/components/schemas/is_discount_before_tax'
+        discount_type:
+          $ref: '#/components/schemas/discount_type'
+        is_inclusive_tax:
+          $ref: '#/components/schemas/is_inclusive_tax'
+        is_viewed_by_client:
+          $ref: '#/components/schemas/is_viewed_by_client'
+        has_attachment:
+          $ref: '#/components/schemas/has_attachment'
+        client_viewed_time:
+          $ref: '#/components/schemas/client_viewed_time'
+        invoice_items:
+          description: Items listed in invoice
+          type: array
+          items:
+            type: object
+            properties:
+              item_id:
+                $ref: '#/components/schemas/line_item_id'
+              product_id:
+                $ref: '#/components/schemas/item_id'
+              project_id:
+                $ref: '#/components/schemas/project_id'
+              project_name:
+                $ref: '#/components/schemas/project_name'
+              time_entry_ids:
+                $ref: '#/components/schemas/time_entry_ids'
+              item_type:
+                $ref: '#/components/schemas/item_type'
+              product_type:
+                $ref: '#/components/schemas/product_type'
+              expense_id:
+                $ref: '#/components/schemas/expense_id'
+              name:
+                $ref: '#/components/schemas/name'
+              description:
+                $ref: '#/components/schemas/description'
+              item_order:
+                $ref: '#/components/schemas/item_order'
+              bcy_rate:
+                $ref: '#/components/schemas/bcy_rate'
+              price:
+                $ref: '#/components/schemas/price'
+              quantity:
+                $ref: '#/components/schemas/quantity'
+              unit:
+                $ref: '#/components/schemas/unit'
+              discount_amount:
+                $ref: '#/components/schemas/discount_amount'
+              discount:
+                $ref: '#/components/schemas/discount'
+              tax_id:
+                $ref: '#/components/schemas/tax_id'
+              tds_tax_id:
+                $ref: '#/components/schemas/tds_tax_id'
+              tax_name:
+                $ref: '#/components/schemas/tax_name'
+              tax_type:
+                $ref: '#/components/schemas/tax_type'
+              tax_percentage:
+                $ref: '#/components/schemas/tax_percentage'
+              item_total:
+                $ref: '#/components/schemas/item_total'
+              sat_item_key_code:
+                $ref: '#/components/schemas/sat_item_key_code'
+              unitkey_code:
+                $ref: '#/components/schemas/unitkey_code'
+        shipping_charge:
+          $ref: '#/components/schemas/shipping_charge'
+        adjustment:
+          $ref: '#/components/schemas/adjustment'
+        adjustment_description:
+          $ref: '#/components/schemas/adjustment_description'
+        sub_total:
+          $ref: '#/components/schemas/sub_total'
+        tax_total:
+          $ref: '#/components/schemas/tax_total'
+        total:
+          $ref: '#/components/schemas/total'
+        taxes:
+          $ref: '#/components/schemas/taxes'
+        payment_reminder_enabled:
+          $ref: '#/components/schemas/payment_reminder_enabled'
+        payment_made:
+          $ref: '#/components/schemas/payment_made'
+        credits_applied:
+          $ref: '#/components/schemas/credits_applied'
+        tax_amount_withheld:
+          $ref: '#/components/schemas/tax_amount_withheld'
+        balance:
+          $ref: '#/components/schemas/balance'
+        write_off_amount:
+          $ref: '#/components/schemas/write_off_amount'
+        allow_partial_payments:
+          $ref: '#/components/schemas/allow_partial_payments'
+        price_precision:
+          $ref: '#/components/schemas/price_precision'
+        payment_options:
+          $ref: '#/components/schemas/payment_options'
+        is_emailed:
+          $ref: '#/components/schemas/is_emailed'
+        reminders_sent:
+          $ref: '#/components/schemas/reminders_sent'
+        last_reminder_sent_date:
+          $ref: '#/components/schemas/last_reminder_sent_date'
+        billing_address:
+          $ref: '#/components/schemas/billing_address'
+        shipping_address:
+          $ref: '#/components/schemas/shipping_address'
+        notes:
+          $ref: '#/components/schemas/notes'
+        terms:
+          $ref: '#/components/schemas/terms'
+        custom_fields:
+          $ref: '#/components/schemas/custom_fields'
+        template_id:
+          $ref: '#/components/schemas/template_id'
+        template_name:
+          $ref: '#/components/schemas/template_name'
+        created_time:
+          $ref: '#/components/schemas/created_time'
+        last_modified_time:
+          $ref: '#/components/schemas/last_modified_time'
+        attachment_name:
+          $ref: '#/components/schemas/attachment_name'
+        can_send_in_mail:
+          $ref: '#/components/schemas/can_send_in_mail'
+        salesperson_id:
+          $ref: '#/components/schemas/salesperson_id'
+        salesperson_name:
+          $ref: '#/components/schemas/salesperson_name'
+        invoice_url:
+          $ref: '#/components/schemas/invoice_url'
+    invoice_id:
+      description: Unique ID generated for an invoice.
+      type: string
+      example: '903000000079426'
+    number:
+      description: Unique invoice number (starts with INV) generated for an invoice which will be used to display in interface and invoices.
+      type: string
+      example: INV-384
+    status:
+      description: Status of the invoice. It can be <code>paid</code>, <code>sent</code>, <code>overdue</code>, <code>partially_paid</code> or <code>void</code>.
+      type: string
+      example: paid
+    invoice_date:
+      description: The date on which the invoice is raised.
+      type: string
+      example: '2016-06-05'
+    due_date:
+      description: Date on which the invoice is due. If the invoice is not fully paid on or before this date, the status of the invoice will be changed to <code>overdue</code>. If the invoice is only partially paid, its status will be <code>partially_paid</code>.
+      type: string
+      example: '2016-06-05'
+    tags:
+      type: array
+      items:
+        type: object
+        properties:
+          tag_id:
+            $ref: '#/components/schemas/tag_id'
+          tag_option_id:
+            $ref: '#/components/schemas/tag_option_id'
+    tag_id:
+      description: ID of the Tag
+      type: string
+    tag_option_id:
+      description: Id of the Tag Option
+      type: string
+    item_custom_fields:
+      description: Custom fields for a item.
+      type: array
+      items:
+        type: object
+        properties:
+          label:
+            $ref: '#/components/schemas/label'
+          value:
+            $ref: '#/components/schemas/value'
+    label:
+      description: Label of the Custom Field
+      type: string
+    value:
+      description: Value of the Custom Field
+      type: string
+    payment_expected_date:
+      description: A date to specify the expected payment date.
+      type: string
+      example: 10-05-2013
+    ach_payment_initiated:
+      description: Set to true if ACH payment is initiated.
+      type: boolean
+      example: true
+    transaction_type:
+      description: Type of the transaction made.
+      type: string
+      example: renewal
+    tax_id:
+      description: Tax ID to which you would like to associate with this plan.
+      type: string
+      example: '903002205046032'
+    tax_exemption_id:
+      description: Unique Tax Exemption ID if you dont want to associate a tax to the plan.
+      type: string
+      example: '903002205042099'
+    tax_exemption_code:
+      description: Unique code to denote the tax exemption.
+      type: string
+      example: NGO
+    customer_id:
+      description: Customer ID of the customer to whom the invoice is raised.
+      type: string
+      example: '903000000000099'
+    customer_name:
+      description: Name of the customer to whom the invoice is raised.
+      type: string
+      example: Bowman Furniture
+    email:
+      description: Email address of the customer.
+      type: string
+      example: benjamin.george@bowmanfurniture.com
+    product_id:
+      description: The ID of the product included in the invoice.
+      type: string
+      example: '7000000079973'
+    item_id:
+      description: The ID of the item included in the invoice.
+      type: string
+      example: '7000000079434'
+    name:
+      description: Name of the item included in the invoice.
+      type: string
+      example: Basic
+    code:
+      description: Item code of the item included in the invoice.
+      type: string
+      example: basic-monthly
+    price:
+      description: Price of the item included in the invoice.
+      type: string
+      example: 50
+    quantity:
+      description: Quantity of the item included in the invoice.
+      type: integer
+      example: 1
+    product_type:
+      description: Product type for UK Edition.
+      type: string
+      example: goods
+      x-node_available_in:
+        - VAT
+        - India GST
+      x-node_unavailable_in: []
+    hsn_or_sac:
+      description: HSN or SAC code for Goods/Services
+      type: string
+      example: '74191010'
+      x-node_available_in:
+        - India GST
+      x-node_unavailable_in: []
+    item_total:
+      description: Cost of an item included in the invoice. This would be the product of quantity of the item included and the price of that item.
+      type: integer
+      example: 400
+    coupon_code:
+      description: The coupon code of the coupon applied to the invoice.
+      type: string
+      example: THANKSGIVING20
+    coupon_name:
+      description: Name of the coupon applied to the subscription.
+      type: string
+      example: Flat 10
+    creditnote_id:
+      description: Unique ID denoting the credit note.
+      type: string
+      example: '9030000079876'
+    creditnotes_number:
+      description: Reference number for the credit note.
+      type: string
+      example: CN-26
+    credited_date:
+      description: Date on which the credit were applied
+      type: string
+      example: '2016-06-15'
+    credited_amount:
+      description: Credited amount for the invoice
+      type: string
+      example: 15
+    discount_amount:
+      description: The discount amount included in an invoice on applying a coupon.
+      type: number
+      format: double
+      example: 80
+    total:
+      description: Total amount to be paid for the invoice. This would be the sum of individual costs of all items involved in the invoice. Total is determined only after customer credits (if any) are applied.
+      type: number
+      format: double
+      example: 370
+    payment_made:
+      description: Payments can be made in multiple instalments. payment_made refers to the amount paid for the invoice in the respective instalment.
+      type: number
+      format: double
+      example: 370
+    balance:
+      description: The unpaid amount of an invoice.
+      type: number
+      format: double
+      example: 0
+    credits_applied:
+      description: Credits applied for the invoice.
+      type: number
+      format: double
+      example: 0
+    write_off_amount:
+      description: The unpaid amount of an invoice that is written off.
+      type: number
+      format: double
+      example: 0
+    payment_id:
+      description: The payment ID of the payment made for the invoice.
+      type: string
+      example: '90300000079467'
+    payment_mode:
+      description: The mode in which payment is made for the invoice. This can be <code>check</code>, <code>cash</code>, <code>creditcard</code>, <code>banktransfer</code>, <code>bankremittance</code>, <code>autotransaction</code> or <code>others</code>.
+      type: string
+      example: autotransaction
+    invoice_payment_id:
+      description: Unique ID generated for an instalment of payment made for a particular invoice.
+      type: string
+      example: '90300000079469'
+    gateway_transaction_id:
+      description: Gateway transaction ID provided for the payment made to the invoice. This is applicable only if <code>payment_mode</code> is autotransaction.
+      type: string
+      example: B10E6E0F31BD
+    description:
+      description: Small description of the payment made for the invoice.
+      type: string
+      example: Payment has been made for the invoice INV-384
+    date:
+      description: Date on which the invoice is paid.
+      type: string
+      example: '2016-06-05'
+    reference_number:
+      description: Reference number of the invoice for which payment is made.
+      type: string
+      example: INV-384
+    amount:
+      description: Amount paid for the invoice.
+      type: number
+      format: double
+      example: 370
+    bank_charges:
+      description: Denotes any additional bank charges.
+      type: number
+      format: double
+      example: 10
+    exchange_rate:
+      description: Exchange-Rate for the currency.
+      type: number
+      format: double
+      example: 1
+    currency_code:
+      description: The customer's currency code.
+      type: string
+      example: USD
+    currency_symbol:
+      description: The customer's currency symbol.
+      type: string
+      example: $
+    salesperson_id:
+      description: Unique Id to denote the sales person.
+      type: string
+      example: '90300023000043'
+    salesperson_name:
+      description: Name of the sales person associated with the invoice for offline payments.
+      type: string
+      example: Bowman
+    created_time:
+      description: Time when the invoice was created.
+      type: string
+      example: 2016-06-05T02:15:15-0700
+    updated_time:
+      description: Time when the invoice details were last updated.
+      type: string
+      example: 2016-06-05T02:15:15-0700
+    billing_address:
+      description: Customer's billing address object. It contains <code>street</code>, <code>city</code>, <code>state</code>,<code>zip</code> and <code>country</code>.
+      type: object
+      properties:
+        city:
+          $ref: '#/components/schemas/city'
+        state:
+          $ref: '#/components/schemas/state'
+        zip:
+          $ref: '#/components/schemas/zip'
+        country:
+          $ref: '#/components/schemas/country'
+        fax:
+          $ref: '#/components/schemas/fax'
+    street:
+      description: Name of the street of the customer's billing address.
+      type: string
+      example: Harrington Bay Street
+    city:
+      description: Name of the city of the customer's billing address.
+      type: string
+      example: Salt Lake City
+    state:
+      description: Name of the state of the customer's billing address.
+      type: string
+      example: CA
+    zip:
+      description: Zip code of the customer's billing address.
+      type: string
+      example: 92612
+    country:
+      description: Name of the country of the customer's billing address.
+      type: string
+      example: U.S.A
+    fax:
+      description: Customer's fax number.
+      type: string
+      example: 4527389
+    comment_id:
+      description: Unique Id to denote the comment fro the particular invoice.
+      type: string
+      example: '9030000003133'
+    commented_by_id:
+      description: Unique Id to denote who has commented.
+      type: string
+      example: '90300000002099'
+    commented_by:
+      description: It denotes the name of the user who has commented or the system.
+      type: string
+      example: Zoho Billinh
+    comment_type:
+      description: It denotes whether user comment or system comment.
+      type: string
+      example: system
+    time:
+      description: Denotes the time at which the comment was created.
+      type: string
+      example: 2:50 AM
+    operation_type:
+      description: It denotes the type of operation performed on invoice.
+      type: string
+      example: Added
+    transaction_id:
+      description: Unique which denotes the type of transaction.
+      type: string
+      example: '903000001223'
+    invoice_url:
+      description: Url which corresponds to the invoice.
+      type: string
+      example: ''
+    from_mail_id:
+      description: The email ID from which the invoice is to be mailed.
+      type: array
+      items:
+        type: string
+        format: email
+      example:
+        - gator@zillum.com
+    to_mail_ids:
+      description: The email IDs to which the invoice is to be mailed.
+      type: array
+      items:
+        type: string
+        format: email
+      example:
+        - benjamin.george@bowmanfurniture.com
+        - paul@bowmanfurniture.com
+    cc_mail_ids:
+      description: The email IDs that have to be copied when the credit note is to be mailed.
+      type: array
+      items:
+        type: string
+        format: email
+      example:
+        - accounts@bowmanfurniture.com
+    subject:
+      description: The subject of the email.
+      type: string
+      example: Invoice for the subscription.
+    body:
+      description: The body of the email.
+      type: string
+      example: Please find attached invoice for your subscription.
+    amount_refunded:
+      description: Amount that is refund. Refunds are applicable only for payments whose payment_mode is <code>autotransaction</code>. Refunds would be made to the respective card provided by the customer.
+      type: number
+      format: double
+      example: 50
+    amount_due:
+      description: Balance amount that is due for the invoice.
+      type: number
+      format: double
+      example: 10
+    autotransaction:
+      description: If the payment mode is <code>autotransaction</code>, autotransaction information will be displayed in the autotransaction object. It contains <code>autotransaction_id</code>, <code>payment_gateway</code>, <code>gateway_transaction_id</code>, <code>card_id</code>, <code>last_four_digits</code>, <code>expiry_month</code> and <code>expiry_year</code>.
+      type: object
+      example: If the payment mode is <code>autotransaction</code>, autotransaction information will be displayed in the autotransaction object. It contains <code>autotransaction_id</code>, <code>payment_gateway</code>, <code>gateway_transaction_id</code>, <code>card_id</code>, <code>last_four_digits</code>, <code>expiry_month</code> and <code>expiry_year</code>.
+    autotransaction_id:
+      description: Auto-transaction ID generated for the payment made.
+      type: string
+      example: '9030000079465'
+    payment_gateway:
+      description: Name of the payment gateway associated with payment.
+      type: string
+      example: payflow_pro
+    gateway_error_message:
+      description: Gateway error message for a failed transaction.
+      type: string
+      example: Gateway error message for a failed transaction.
+    card_id:
+      description: Card ID of the card associated with the transaction. If you are collecting charge via bank account, use <code>account_id</code> (Unique ID of the bank account)
+      type: string
+      example: '90300000079226'
+    last_four_digits:
+      description: Last four digits of the card.
+      type: integer
+      example: 1111
+    expiry_month:
+      description: Expiry month of the card.
+      type: integer
+      example: 9
+    expiry_year:
+      description: Expiry year of the card.
+      type: integer
+      example: 2030
+    invoices:
+      description: List of invoices associated with the payment. Each invoice object contains <code>invoice_id</code>, <code>invoice_number</code>, <code>date</code>, <code>invoice_amount</code>, <code>amount_applied</code> and <code>balance_amount</code>.
+      type: array
+      items:
+        type: string
+    invoice_number:
+      description: Unique ID (starts with INV) of an invoice.
+      type: string
+      example: INV-384
+    invoice_amount:
+      description: Total amount raised for the invoice.
+      type: number
+      format: double
+      example: 450
+    amount_applied:
+      description: Amount paid for the invoice.
+      type: number
+      format: double
+      example: 450
+    balance_amount:
+      description: Unpaid amount of the invoice.
+      type: number
+      format: double
+      example: 0
+    tax_account_id:
+      description: Unique ID of the account which was used for transaction.
+      type: string
+      example: '903000000000370'
+    account_id:
+      description: Unique ID of the bank account. If you are collecting charge via credit card, use <code>card_id</code> (Card ID of the card associated with the transaction)
+      type: string
+      example: '9030000000000361'
+    custom_fields:
+      description: Additional fields for the invoices.
+      type: array
+      items:
+        type: string
+    custom_fields_update:
+      description: Custom fields for an invoice.
+      type: object
+      properties:
+        custom_fields:
+          description: List of custom fields to update on the invoice.
+          type: array
+          items:
+            type: object
+            required:
+              - label
+              - value
+            properties:
+              label:
+                $ref: '#/components/schemas/label'
+              value:
+                $ref: '#/components/schemas/value'
+    update-an-invoice-customfield-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Custom Fields Updated Successfully
+          readOnly: true
+    customfield_id:
+      type: string
+      example: 2000000029001
+    show_in_store:
+      type: boolean
+      example: false
+    is_active:
+      type: boolean
+      example: true
+    show_in_hp:
+      type: boolean
+      example: false
+    is_mandatory:
+      type: boolean
+      example: true
+    is_custom_field:
+      type: boolean
+      example: true
+    is_mandatory_in_sales_item:
+      type: boolean
+      example: false
+    is_mandatory_in_hp:
+      type: boolean
+      example: false
+    edit_on_store:
+      type: boolean
+      example: false
+    show_in_all_pdf:
+      type: boolean
+      example: true
+    search_entity:
+      type: string
+      example: invoice
+    pii_type:
+      type: string
+      example: non_pii
+    placeholder:
+      type: string
+      example: cf_test_field
+    is_inherited_value:
+      type: boolean
+      example: false
+    is_dependent_field:
+      type: boolean
+      example: false
+    max_length:
+      type: integer
+      example: 255
+    help_text:
+      type: string
+      example: ''
+    index:
+      description: Index of the custom field. It can hold any value from 1 to 10.
+      type: integer
+      example: 1
+    data_type:
+      description: Data type of the custom field.
+      type: string
+      example: text
+    apply_creditnotes:
+      description: List of creditnotes applied to the object.
+      type: array
+      items:
+        type: string
+    creditnotes_invoice_id:
+      description: Unique identifier to denote the Associated Credits to the invoice
+      type: string
+      example: '903000000054901'
+    date_formatted:
+      description: Formatted value for the date.
+      example: 05 Jun 2016
+    attachment:
+      description: 'The file to be attached.Allowed Extensions: <code>gif</code>, <code>png</code>, <code>jpeg</code>, <code>jpg</code>, <code>bmp</code> and <code>pdf</code>'
+      type: string
+      format: binary
+    has_attachment:
+      description: Denotes whether a customer has any attachments associated with it.
+      example: true
+    can_send_in_mail:
+      description: Set to true if all the attachments of this invoice can be attached in Invoice Emails.
+      example: true
+    file_name:
+      description: Name of the attached file.
+      example: Rental Agreement.pdf
+    file_type:
+      description: Type of the attached file.
+      example: pdf
+    file_size:
+      example: 5447
+    file_size_formatted:
+      example: 5.3 KB
+    document_id:
+      description: Unique ID of the attached file.
+      example: '903000005689'
+    attachment_order:
+      description: Order of the attached file for a particular customer.
+      example: 1
+    documents:
+      description: List of files attached to a particular customer.
+      type: array
+      items:
+        type: object
+        properties:
+          file_name:
+            $ref: '#/components/schemas/file_name'
+          file_type:
+            $ref: '#/components/schemas/file_type'
+          file_size:
+            $ref: '#/components/schemas/file_size'
+          file_size_formatted:
+            $ref: '#/components/schemas/file_size_formatted'
+          document_id:
+            $ref: '#/components/schemas/document_id'
+          attachment_order:
+            $ref: '#/components/schemas/attachment_order'
+    shipping_address:
+      description: Customer's shipping address object. It contains <code>street</code>, <code>city</code>, <code>state</code>,<code>zip</code> and <code>country</code>.
+      type: object
+      properties:
+        street:
+          description: Name of the street of the customer's shipping address.
+          type: string
+          example: Harrington Bay Street
+        city:
+          description: Name of the city of the customer's shipping address.
+          type: string
+          example: Salt Lake City
+        state:
+          description: Name of the state of the customer's shipping address.
+          type: string
+          example: CA
+        zip:
+          description: Zip code of the customer's shipping address.
+          type: string
+          example: 92612
+        country:
+          description: Country code of the customer's shipping address.
+          type: string
+          example: U.S.A
+        fax:
+          description: Zip code of the customer's shipping address.
+          type: string
+          example: 4527389
+    coupons:
+      description: The array of objects which contains the details of the added coupon. <code>coupon_code</code> and <code>discount_amount</code> are applied to the invoice total.
+      type: array
+      items:
+        type: object
+        properties:
+          coupon_code:
+            $ref: '#/components/schemas/coupon_code'
+          coupon_name:
+            $ref: '#/components/schemas/coupon_name'
+          discount_amount:
+            $ref: '#/components/schemas/discount_amount'
+    invoice_items:
+      description: |-
+        The list of items which are all included in the invoice. Each item object will have <code>item_id</code>, <code>name</code>, <code>code</code>, <code>price</code>, <code>quantity</code> and <code>item_total</code>.
+        description: Small description about the Invoice item.
+        example: "Charges for this duration (from 16-April-2016 to 8-June-2016)"
+      type: array
+      items:
+        type: object
+        properties:
+          item_id:
+            $ref: '#/components/schemas/item_id'
+          name:
+            $ref: '#/components/schemas/name'
+          description:
+            $ref: '#/components/schemas/description'
+          tags:
+            $ref: '#/components/schemas/tags'
+          item_custom_fields:
+            $ref: '#/components/schemas/item_custom_fields'
+          code:
+            $ref: '#/components/schemas/code'
+          price:
+            $ref: '#/components/schemas/price'
+          quantity:
+            $ref: '#/components/schemas/quantity'
+          discount_amount:
+            $ref: '#/components/schemas/discount_amount'
+          item_total:
+            $ref: '#/components/schemas/item_total'
+          tax_id:
+            $ref: '#/components/schemas/tax_id'
+          product_type:
+            $ref: '#/components/schemas/product_type'
+          hsn_or_sac:
+            $ref: '#/components/schemas/hsn_or_sac'
+          tax_exemption_id:
+            $ref: '#/components/schemas/tax_exemption_id'
+          tax_exemption_code:
+            $ref: '#/components/schemas/tax_exemption_code'
+    payments:
+      description: List of payment objects. Each object will contain <code>payment_id</code>, <code>payment_mode</code>, <code>invoice_payment_id</code>, <code>gateway_transaction_id</code>, <code>description</code>, <code>date</code>, <code>reference_number</code>, <code>amount</code> and <code>bank_charges</code>.
+      type: array
+      items:
+        type: object
+        properties:
+          payment_id:
+            $ref: '#/components/schemas/payment_id'
+          payment_mode:
+            $ref: '#/components/schemas/payment_mode'
+          invoice_payment_id:
+            $ref: '#/components/schemas/invoice_payment_id'
+          gateway_transaction_id:
+            $ref: '#/components/schemas/gateway_transaction_id'
+          description:
+            $ref: '#/components/schemas/description'
+          date:
+            $ref: '#/components/schemas/date'
+          reference_number:
+            $ref: '#/components/schemas/reference_number'
+          amount:
+            $ref: '#/components/schemas/amount'
+          bank_charges:
+            $ref: '#/components/schemas/bank_charges'
+          exchange_rate:
+            $ref: '#/components/schemas/exchange_rate'
+    show_comment_to_clients:
+      description: Boolean to check if the comment to be shown to the clients
+      type: boolean
+      example: true
+    ignore_auto_number_generation:
+      description: Ignore auto invoice number generation for this invoice. This mandates the invoice number. Allowed values <code>true</code> and <code>false</code>
+      type: boolean
+    send:
+      description: Send the invoice to the contact person(s) associated with the invoice. Allowed values <code>true</code> and <code>false</code>.
+      type: boolean
+    organization_contact_id:
+      description: ID of the contact's organisation
+      type: string
+      example: '2000000002266'
+    is_org_email_id:
+      description: To check if the email ID belongs to the organisation
+      type: boolean
+      example: true
+    place_of_supply:
+      description: Place where the goods/services are supplied to. (If not given, <code>place of contact</code> given for the contact will be taken)
+      type: string
+      example: TN
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    gst_treatment:
+      description: Choose whether the contact is GST registered/unregistered/consumer/overseas. Allowed values are <code> business_gst </code> , <code> business_none </code> , <code> overseas </code> , <code> consumer </code>.
+      type: string
+      example: business_gst
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    shipping_gst_no:
+      description: GSTIN of the shipping party, when it differs from the billed customer. Used for e-Way Bill and e-Invoice compliance. Max-length [15].
+      type: string
+      example: 22AAAAA0000A1Z5
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    shipping_trader_name:
+      description: Trade name of the shipping party, when it differs from the billed customer. Used for e-Way Bill and e-Invoice compliance. Max-length [100].
+      type: string
+      example: ABC Traders
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    shipping_legal_name:
+      description: Legal name of the shipping party, when it differs from the billed customer. Used for e-Invoice compliance. Max-length [100].
+      type: string
+      example: ABC Traders Pvt Ltd
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    gst_no:
+      description: 15 digit GST identification number of the customer.
+      type: string
+      example: 22AAAAA0000A1Z5
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    cfdi_usage:
+      description: Choose CFDI Usage. Allowed values:</br><code>acquisition_of_merchandise</code>, <code>return_discount_bonus</code>, <code>general_expense</code>, <code>buildings</code>, <code>furniture_office_equipment</code>, <code>transport_equipment</code>, <code>computer_equipmentdye_molds_tools</code>, <code>telephone_communication</code>, <code>satellite_communication</code>, <code>other_machinery_equipment</code>, <code>hospital_expense</code>, <code>medical_expense_disability</code>, <code>funeral_expense</code>, <code>donation</code>, <code>interest_mortage_loans</code>, <code>contribution_sar</code>, <code>medical_expense_insurance_pormium</code>, <code>school_transportation_expense</code>, <code>deposit_saving_account</code>, <code>payment_educational_service</code>, <code>no_tax_effect</code>, <code>payment</code>, <code>payroll</code>.
+      type: string
+      example: acquisition_of_merchandise
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    sat_item_key_code:
+      description: Add SAT Item Key Code for your goods/services. Download the <a href= http://omawww.sat.gob.mx/tramitesyservicios/Paginas/documentos/catCFDI_V_4_07122022.xls  >CFDI Catalogs.</a>
+      type: string
+      example: 71121206
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    unitkey_code:
+      description: Add SAT Unit Key Code for your goods/services. Download the <a href= http://omawww.sat.gob.mx/tramitesyservicios/Paginas/documentos/catCFDI_V_4_07122022.xls  >CFDI Catalogs.</a>
+      type: string
+      example: E48
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    warehouse_id:
+      description: Enter warehouse ID
+      type: string
+      example: ''
+    warehouse_name:
+      description: Enter warehouse name.
+      type: string
+      example: ''
+    warehouse_stock_on_hand:
+      description: Available stock in your warehouse.
+      type: string
+      example: ''
+    item_type:
+      description: Enter goods/services
+      type: string
+      example: goods
+    is_pre_gst:
+      description: Applicable for transactions that fall before july 1, 2017
+      type: boolean
+      example: true
+      x-node_available_in:
+        - in
+      x-node_unavailable_in: []
+    vat_reg_no:
+      description: Enter VAT registration number.
+      type: string
+    date_description:
+      description: Number of days since the comment was made
+      type: string
+      example: yesterday
+    online_transaction_id:
+      description: Unique ID of an online transaction
+      type: string
+      example: ''
+    invoice_payments:
+      description: Invoice payment list
+      type: array
+      items:
+        type: string
+    preview:
+      description: Get the thumbnail of the attachment.
+      type: boolean
+    credits:
+      description: The list of credits
+      type: array
+      items:
+        type: string
+    payment_number:
+      description: The payment Serial Number
+      type: integer
+      example: 7
+    is_single_invoice_payment:
+      description: To check if invoice is paid in a single payment or multiple payments
+      type: boolean
+      example: true
+    to_mails_str:
+      description: Mail recepients
+      type: string
+      example: ''
+    cc_mails_str:
+      description: Mail recepients who need to be CC'd
+      type: string
+      example: ''
+    from_email:
+      description: Mail sender
+      type: string
+      example: ''
+    from_address:
+      description: Sender's email address
+      type: string
+      example: ''
+    emailtemplate_documents:
+      description: Email templates used
+      type: array
+      items:
+        type: string
+      example: ''
+    file_name_without_extension:
+      description: Name of file included
+      type: string
+      example: INV-000004
+    print:
+      description: Print the exported pdf.
+      type: boolean
+    accept:
+      description: Get the details of a particular invoice in formats such as json/ pdf/ html. Default format is json. Allowed values <code>json</code> <code>pdf</code> and <code>html</code>
+      type: string
+    templates:
+      type: array
+      items:
+        type: string
+    template_type:
+      description: The type of template type
+      type: string
+      example: classic
+    error_list:
+      description: Error List
+      type: array
+      items:
+        type: string
+      example: []
+    to_contacts:
+      description: Email recepients
+      type: array
+      items:
+        type: string
+    first_name:
+      description: First name of the contact
+      type: string
+      example: David
+    phone:
+      description: Phone number of the contact
+      type: string
+      example: +1-925-921-9201
+    last_name:
+      description: Last name of the contact
+      type: string
+      example: John
+    salutation:
+      description: Salutation to the contact
+      type: string
+      example: Mr
+    contact_person_id:
+      description: Unique ID of the contact person.
+      type: string
+      example: 982000000567003
+    contact_persons:
+      description: The IDs of the contact person associated with the contact.
+      type: array
+      items:
+        type: object
+        properties:
+          contactperson_id:
+            $ref: '#/components/schemas/contact_person_id'
+      example:
+        - contactperson_id: '982000000567003'
+        - contactperson_id: '982000000567005'
+    mobile:
+      description: Mobile number of the contact person
+      type: string
+      example: +1-4054439562
+    from_emails:
+      description: Email sender address
+      type: array
+      items:
+        type: string
+    user_name:
+      description: User name of the contact
+      type: string
+      example: David John
+    emailtemplates:
+      description: Email template used to send invoice
+      type: array
+      items:
+        type: string
+    gateways_configured:
+      description: List of payment gateways configured
+      type: boolean
+      example: true
+    deprecated_placeholders_used:
+      description: List of placeholders used in invoice
+      type: array
+      items:
+        type: string
+      example: []
+    email_template_id:
+      description: Get the email content based on a specific email template. If this param is not inputted, then the content will be based on the email template associated with the customer. If no template is associated with the customer, then default template will be used.
+      type: string
+    invoice_ids:
+      description: Comma separated invoice ids which are to be emailed.
+      type: string
+    contacts:
+      description: Contacts to whom email or snail mail has to be sent.
+      type: array
+      items:
+        type: string
+    contact_id:
+      description: ID of the contact. Can specify if email or snail mail has to be sent for each contact.
+      type: string
+      example: 460000000026049
+    snail_mail:
+      description: The boolean check for snail mail
+      type: boolean
+      example: false
+    send_customer_statement:
+      description: Send customer statement pdf a with email.
+      type: boolean
+      example: ' '
+    send_attachment:
+      description: Send the invoice attachment a with the email.
+      type: boolean
+      example: ' '
+    send_from_org_email_id:
+      description: Boolean to trigger the email from the organization's email address
+      type: boolean
+      example: false
+    attachments:
+      description: Files to be attached to the email
+      type: string
+      format: binary
+    reason:
+      description: Reason for updating a sent invoice.
+      type: string
+      example: Correcting item quantity
+    custom_subject:
+      description: Customized Subject line
+      type: string
+      example: ' '
+    custom_body:
+      description: Customized email content
+      type: string
+      example: ' '
+    invoiced_estimate_id:
+      description: ID of the invoice from which the invoice is created.
+      type: string
+      example: ' '
+    attachment_name:
+      description: Name of the file attached
+      type: string
+      example: ' '
+    last_modified_time:
+      description: Date of last modification of the invoice
+      type: string
+      example: 2013-12-18T02:02:51-0800
+    template_id:
+      description: ID of the pdf template associated with the invoice.
+      type: string
+      example: 982000000000143
+    template_name:
+      description: Name of the invoice template used
+      type: string
+      example: Service - Classic
+    bcc_mails:
+      description: Bcc mail details
+      type: array
+      items:
+        type: string
+      example: ''
+    gateways_associated:
+      description: List of Payment gateways associated
+      type: boolean
+      example: true
+    bcc_mails_str:
+      description: Bcc mails content
+      type: string
+      example: ''
+    attach_pdf:
+      description: check if PDF attachment
+      type: boolean
+      example: true
+    entity_id:
+      description: Unique ID of the entity associated
+      type: string
+      example: '2000000007037'
+    show_on_pdf:
+      description: Enable/Disable show this custom field on pdf for that invoice
+      type: boolean
+      example: true
+    address:
+      description: Billing address for the invoice
+      type: string
+      example: 4900 Hopyard Rd, Suite 310
+    notes:
+      description: The notes added below expressing gratitude or for conveying some information.
+      type: string
+      example: Looking forward for your business.
+    terms:
+      description: The terms added below expressing gratitude or for conveying some information.
+      type: string
+      example: Terms & Conditions apply
+    is_emailed:
+      description: Boolean check to see if the mail has been sent
+      type: boolean
+      example: false
+    reminders_sent:
+      description: The number of reminders sent
+      type: integer
+      example: 1
+    last_reminder_sent_date:
+      description: The date the last email was sent
+      type: string
+      example: ' '
+    shipping_charge:
+      description: Shipping charges applied to the invoice. <code>Maximum length [100]</code>
+      type: string
+      example: 0
+    adjustment:
+      description: Adjustments made to the invoice.
+      type: number
+      format: double
+      example: 0
+    adjustment_description:
+      description: Customize the adjustment description. E.g. Rounding off.
+      type: string
+      example: ' '
+    sub_total:
+      description: The sub total of the all items
+      type: number
+      format: float
+      example: 153
+    tax_total:
+      description: The total amount of the tax levied
+      type: number
+      format: double
+      example: 22.6
+    price_precision:
+      description: The precision value on the price
+      type: integer
+      example: 2
+    taxes:
+      description: List of the taxes levied
+      type: array
+      items:
+        type: object
+        properties:
+          tax_name:
+            $ref: '#/components/schemas/tax_name'
+          tax_amount:
+            $ref: '#/components/schemas/tax_amount'
+    payment_reminder_enabled:
+      description: Boolean to check if reminders have been enabled
+      type: boolean
+      example: true
+    tax_amount_withheld:
+      description: The tax amount which has been withheld
+      type: number
+      format: float
+      example: 0
+    allow_partial_payments:
+      description: Boolean to check if partial payments are allowed for the contact
+      type: boolean
+      example: true
+    configured:
+      description: Boolean check to see if a payment gateway has been configured
+      type: boolean
+      example: true
+    additional_field1:
+      description: 'Paypal payment method. Allowed Values: <code>standard</code> and <code>adaptive</code>'
+      type: string
+      example: standard
+    gateway_name:
+      description: 'Name of the payment gateway associated with the invoice. E.g. paypal, stripe.Allowed Values: <code>paypal</code>, <code>authorize_net</code>, <code>payflow_pro</code>, <code>stripe</code>, <code>2checkout</code> and <code>braintree</code>'
+      type: string
+      example: paypal
+    payment_terms:
+      description: Payment terms in days e.g. 15, 30, 60. Invoice due date will be calculated based on this. <code>Maximum length [100]</code>
+      type: integer
+      example: 15
+    payment_terms_label:
+      description: Used to override the default payment terms label. Default value for 15 days is "Net 15 Days". <code>Maximum length [100]</code>
+      type: string
+      example: Net 15
+    is_primary_contact:
+      description: To mark contact person as primary for contact
+    tds_tax_id:
+      description: ID of the TDS tax.
+      type: string
+      example: '982000000557012'
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    tax_authority_id:
+      description: ID of the tax authority. Tax authority depends on the location of the customer. For example, if the customer is located in NY, then the tax authority is NY tax authority.
+      type: string
+      example: 11149000000061052
+      x-node_available_in:
+        - us
+        - ca
+      x-node_unavailable_in: []
+    avatax_use_code:
+      description: Used to group like customers for exemption purposes. It is a custom value that links customers to a tax rule. Select from Avalara [standard codes][1] or enter a custom code. <code>Maximum length [25]</code>
+      type: string
+      x-node_available_in:
+        - Avalara Integration
+      x-node_unavailable_in: []
+    avatax_exempt_no:
+      description: Exemption certificate number of the customer. <code>Maximum length [25]</code>
+      type: string
+      x-node_available_in:
+        - Avalara Integration
+      x-node_unavailable_in: []
+    vat_treatment:
+      description: (Optional) VAT treatment for the invoices. VAT treatment denotes the location of the customer, if the customer resides in UK then the VAT treatment is <code>uk</code>. If the customer is in an EU country & VAT registered, you are resides in Northen Ireland and selling Goods then his VAT treatment is <code>eu_vat_registered</code>, if he resides outside of the UK then his VAT treatment is <code>overseas</code> (For Pre Brexit, this can be split as <code>eu_vat_registered</code>, <code>eu_vat_not_registered</code> and <code>non_eu</code>).
+      type: string
+      x-node_available_in:
+        - uk
+      x-node_unavailable_in: []
+    tax_treatment:
+      description: VAT treatment for the Estimate.Allowed Values:</br><code>home_country_mexico</code>,<code>border_region_mexico</code>,<code>non_mexico</code> supported only for <b>MX</b>.
+      type: string
+      example: vat_registered
+      x-node_available_in:
+        - mx
+      x-node_unavailable_in: []
+    avatax_tax_code:
+      description: A tax code is a unique label used to group Items (products, services, or charges) together. <code>Maximum length [25]</code>
+      type: string
+      x-node_available_in:
+        - Avalara Integration
+      x-node_unavailable_in: []
+    discount:
+      description: Discount applied to the invoice. It can be either in % or in amount like 10% or 200.For percentage discounts, the value should include the % symbol (e.g., 10%).For example, on Rs.1000, a 10% discount results in Rs.900, while a flat Rs.200 discount results in Rs.800. <code>Maximum length [100]</code>
+      type: number
+      format: float
+      example: 0
+    is_discount_before_tax:
+      description: Check if discount is exclusive of tax
+      type: boolean
+      example: true
+    discount_type:
+      description: 'Type of discount. Allowed values: <code>entity_level</code> and <code>item_level</code>.'
+      type: string
+      example: item_level
+    is_inclusive_tax:
+      description: To check if discount is inclusive of tax
+      type: boolean
+      example: false
+    line_items:
+      description: Line items of an invoice.
+      type: array
+      items:
+        type: object
+        properties:
+          item_id:
+            $ref: '#/components/schemas/item_id'
+          project_id:
+            $ref: '#/components/schemas/project_id'
+          time_entry_ids:
+            $ref: '#/components/schemas/time_entry_ids'
+          expense_id:
+            $ref: '#/components/schemas/expense_id'
+          expense_receipt_name:
+            $ref: '#/components/schemas/expense_receipt_name'
+          name:
+            $ref: '#/components/schemas/name'
+          description:
+            $ref: '#/components/schemas/description'
+          item_order:
+            $ref: '#/components/schemas/item_order'
+          bcy_rate:
+            $ref: '#/components/schemas/bcy_rate'
+          rate:
+            $ref: '#/components/schemas/rate'
+          price:
+            $ref: '#/components/schemas/price'
+          quantity:
+            $ref: '#/components/schemas/quantity'
+          unit:
+            $ref: '#/components/schemas/unit'
+          discount_amount:
+            $ref: '#/components/schemas/discount_amount'
+          discount:
+            $ref: '#/components/schemas/discount'
+          tax_id:
+            $ref: '#/components/schemas/tax_id'
+          tds_tax_id:
+            $ref: '#/components/schemas/tds_tax_id'
+          tax_name:
+            $ref: '#/components/schemas/tax_name'
+          tax_type:
+            $ref: '#/components/schemas/tax_type'
+          tax_percentage:
+            $ref: '#/components/schemas/tax_percentage'
+          item_total:
+            $ref: '#/components/schemas/item_total'
+          sat_item_key_code:
+            $ref: '#/components/schemas/sat_item_key_code'
+          unitkey_code:
+            $ref: '#/components/schemas/unitkey_code'
+    project_id:
+      description: Unique ID of the projet associated to an invoice
+      type: string
+      example: 90300000087378
+    project_name:
+      description: Name of the project.
+      type: string
+      example: Sample Project
+    time_entry_ids:
+      description: Unique ID's of all the time entries associated to the linked project
+      type: array
+      items:
+        type: string
+      example: []
+    expense_id:
+      description: Unique ID of the expenses associated
+      type: string
+      example: ' '
+    expense_receipt_name:
+      description: Name of the expense receipt associated
+      type: string
+    line_item_id:
+      description: The line item ID
+      type: string
+      example: 982000000567021
+    item_order:
+      description: The order of the line item_order
+      type: integer
+      example: 1
+    bcy_rate:
+      description: base currency rate
+      type: number
+      format: double
+      example: 120
+    rate:
+      description: Rate of the line item.
+      type: number
+      format: double
+      example: 120
+    unit:
+      description: Unit of the line item e.g. kgs, Nos. <code>Maximum length [100]</code>
+      type: string
+      example: ' '
+    tax_name:
+      description: The name of the tax
+      type: string
+      example: VAT
+    tax_amount:
+      description: The amount of the tax levied
+      type: number
+      format: float
+      example: 19.13
+    tax_type:
+      description: The type of the tax
+      type: string
+      example: tax
+    tax_percentage:
+      description: The  percentage of tax levied
+      type: number
+      format: float
+      example: 12.5
+    item_name:
+      description: item name.<code>Maximum length [100]</code>
+      type: string
+      example: Desktop Units
+    item_description:
+      description: 'Search invoices by item description.Variants: <code>item_description_startswith</code> and <code>item_description_contains</code>. <code>Maximum length [100]</code>'
+      type: string
+      example: ' '
+    page_context:
+      description: The context of a particular page.
+      type: array
+      items:
+        type: string
+    applied_filter:
+      description: The filer applied for sorting
+      type: string
+      example: Status.All
+    page:
+      description: Number of pages
+      type: integer
+      example: 1
+    per_page:
+      description: Per page values
+      type: integer
+      example: 200
+    report_name:
+      description: The report name
+      type: string
+      example: Invoices
+    has_more_page:
+      description: Check if has more pages
+      type: boolean
+      example: false
+    sort_order:
+      description: The order for sorting
+      type: string
+      example: D
+    sort_column:
+      description: 'Sort invoices.Allowed Values: <code>customer_name</code>, <code>invoice_number</code>, <code>date</code>, <code> due_date</code>, <code>total</code>, <code>balance</code> and  <code>created_time</code>'
+      type: string
+      example: created_time
+    due_days:
+      description: Specifies the number of day in which the invoice would become overdue
+      type: string
+      example: Due in 14 day(s)
+    currency_id:
+      description: The currenct id of the currency
+      type: string
+      example: 982000000000190
+    custom_field:
+      description: custom fields for invoice.
+      type: string
+      example: ' '
+    filter_by:
+      description: 'Filter invoices by status or date. Allowed Values: <code>Status.All</code>, <code>Status.Sent</code>, <code>Status.Draft</code>, <code>Status.OverDue</code>, <code>Status.Paid</code>, <code>Status.Void</code>, <code>Status.Unpaid</code>, <code>Status.PartiallyPaid</code>, <code>Status.Viewed</code>, <code>Status.WriteOff</code>, <code>Status.Pending</code>, <code>Status.Pushed</code>, <code>Status.YetToBePushed</code>, <code>Status.Failed</code>, <code>Status.CancelInitiated</code>, <code>InvoiceDate.ThisMonth</code>, <code>InvoiceDate.PreviousMonth</code>.'
+      type: string
+      example: ' '
+    search_text:
+      description: Search invoices by invoice number or purchase order or customer name. <code>Maximum length [100]</code>
+      type: string
+      example: ' '
+    last_payment_date:
+      description: The last payment date of the invoice
+      type: string
+      example: ' '
+    selected:
+      description: To check if invoice is selected or not
+      type: boolean
+      example: true
+    schedule_time:
+      description: Schedule time for payment
+      type: string
+      example: ''
+    is_viewed_by_client:
+      description: Check if invoice is viewed by client
+      type: boolean
+      example: false
+    client_viewed_time:
+      description: Time when client viewed the statement
+      type: string
+      example: ''
+    payment_gateways:
+      description: Payment gateways integrated and supported
+      type: array
+      items:
+        type: object
+        properties:
+          configured:
+            $ref: '#/components/schemas/configured'
+          additional_field1:
+            $ref: '#/components/schemas/additional_field1'
+          gateway_name:
+            $ref: '#/components/schemas/gateway_name'
+    payment_options:
+      description: Payment options available for payment
+      type: object
+      properties:
+        payment_gateways:
+          $ref: '#/components/schemas/payment_gateways'
+    retrieve-an-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        invoice:
+          type: object
+          properties:
+            invoice_id:
+              $ref: '#/components/schemas/invoice_id'
+            number:
+              $ref: '#/components/schemas/number'
+            status:
+              $ref: '#/components/schemas/status'
+            invoice_date:
+              $ref: '#/components/schemas/invoice_date'
+            due_date:
+              $ref: '#/components/schemas/due_date'
+            payment_expected_date:
+              $ref: '#/components/schemas/payment_expected_date'
+            ach_payment_initiated:
+              $ref: '#/components/schemas/ach_payment_initiated'
+            transaction_type:
+              $ref: '#/components/schemas/transaction_type'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            email:
+              $ref: '#/components/schemas/email'
+            invoice_items:
+              description: |-
+                The list of items which are all included in the invoice. Each item object will have <code>item_id</code>, <code>name</code>, <code>code</code>, <code>price</code>, <code>quantity</code> and <code>item_total</code>.
+                description: Small description about the Invoice item.
+                example: "Charges for this duration (from 16-April-2016 to 8-June-2016)"
+              type: array
+              items:
+                type: object
+                properties:
+                  item_id:
+                    $ref: '#/components/schemas/item_id'
+                  product_id:
+                    $ref: '#/components/schemas/product_id'
+                  name:
+                    $ref: '#/components/schemas/name'
+                  description:
+                    description: Small description about the Invoice item.
+                    example: Charges for this duration (from 16-April-2016 to 8-June-2016)
+                  code:
+                    $ref: '#/components/schemas/code'
+                  tags:
+                    $ref: '#/components/schemas/tags'
+                  item_custom_fields:
+                    $ref: '#/components/schemas/item_custom_fields'
+                  price:
+                    $ref: '#/components/schemas/price'
+                  quantity:
+                    $ref: '#/components/schemas/quantity'
+                  discount_amount:
+                    $ref: '#/components/schemas/discount_amount'
+                  item_total:
+                    $ref: '#/components/schemas/item_total'
+                  tax_id:
+                    $ref: '#/components/schemas/tax_id'
+                  tax_exemption_id:
+                    $ref: '#/components/schemas/tax_exemption_id'
+                  tax_exemption_code:
+                    $ref: '#/components/schemas/tax_exemption_code'
+            coupons:
+              description: The array of objects which contains the details of the added coupon. <code>coupon_code</code> and <code>discount_amount</code> are applied to the invoice total.
+              type: array
+              items:
+                type: object
+                properties:
+                  coupon_code:
+                    $ref: '#/components/schemas/coupon_code'
+                  coupon_name:
+                    $ref: '#/components/schemas/coupon_name'
+                  discount_amount:
+                    $ref: '#/components/schemas/discount_amount'
+            credits:
+              type: array
+              items:
+                type: object
+                properties:
+                  creditnote_id:
+                    $ref: '#/components/schemas/creditnote_id'
+                  creditnotes_number:
+                    $ref: '#/components/schemas/creditnotes_number'
+                  credited_date:
+                    $ref: '#/components/schemas/credited_date'
+                  credited_amount:
+                    $ref: '#/components/schemas/credited_amount'
+            total:
+              $ref: '#/components/schemas/total'
+            payment_made:
+              $ref: '#/components/schemas/payment_made'
+            balance:
+              $ref: '#/components/schemas/balance'
+            credits_applied:
+              $ref: '#/components/schemas/credits_applied'
+            write_off_amount:
+              $ref: '#/components/schemas/write_off_amount'
+            payments:
+              description: List of payment objects. Each object will contain <code>payment_id</code>, <code>payment_mode</code>, <code>invoice_payment_id</code>, <code>gateway_transaction_id</code>, <code>description</code>, <code>date</code>, <code>reference_number</code>, <code>amount</code> and <code>bank_charges</code>.
+              type: array
+              items:
+                type: object
+                properties:
+                  payment_id:
+                    $ref: '#/components/schemas/payment_id'
+                  payment_mode:
+                    $ref: '#/components/schemas/payment_mode'
+                  invoice_payment_id:
+                    $ref: '#/components/schemas/invoice_payment_id'
+                  amount_refunded:
+                    $ref: '#/components/schemas/amount_refunded'
+                  gateway_transaction_id:
+                    $ref: '#/components/schemas/gateway_transaction_id'
+                  description:
+                    $ref: '#/components/schemas/description'
+                  date:
+                    $ref: '#/components/schemas/date'
+                  reference_number:
+                    $ref: '#/components/schemas/reference_number'
+                  amount:
+                    $ref: '#/components/schemas/amount'
+                  bank_charges:
+                    $ref: '#/components/schemas/bank_charges'
+                  exchange_rate:
+                    $ref: '#/components/schemas/exchange_rate'
+                  autotransaction:
+                    description: If the payment mode is <code>achpayment</code>, autotransaction information will be displayed in the autotransaction object. It contains <code>autotransaction_id</code>, <code>payment_gateway</code>, <code>gateway_transaction_id</code>, <code>account_id</code>.
+                    type: object
+                    properties:
+                      autotransaction_id:
+                        $ref: '#/components/schemas/autotransaction_id'
+                      payment_gateway:
+                        $ref: '#/components/schemas/payment_gateway'
+                      gateway_transaction_id:
+                        $ref: '#/components/schemas/gateway_transaction_id'
+                      gateway_error_message:
+                        $ref: '#/components/schemas/gateway_error_message'
+                      account_id:
+                        $ref: '#/components/schemas/account_id'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            currency_symbol:
+              $ref: '#/components/schemas/currency_symbol'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            updated_time:
+              $ref: '#/components/schemas/updated_time'
+            salesperson_id:
+              $ref: '#/components/schemas/salesperson_id'
+            salesperson_name:
+              $ref: '#/components/schemas/salesperson_name'
+            invoice_url:
+              $ref: '#/components/schemas/invoice_url'
+            billing_address:
+              description: Customer's billing address object. It contains <code>street</code>, <code>city</code>, <code>state</code>,<code>zip</code> and <code>country</code>.
+              type: object
+              properties:
+                city:
+                  $ref: '#/components/schemas/city'
+                state:
+                  $ref: '#/components/schemas/state'
+                zip:
+                  $ref: '#/components/schemas/zip'
+                country:
+                  $ref: '#/components/schemas/country'
+                fax:
+                  $ref: '#/components/schemas/fax'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+            shipping_gst_no:
+              $ref: '#/components/schemas/shipping_gst_no'
+            shipping_trader_name:
+              $ref: '#/components/schemas/shipping_trader_name'
+            shipping_legal_name:
+              $ref: '#/components/schemas/shipping_legal_name'
+            comments:
+              description: Lists the comments added by the system or by user.
+              type: array
+              items:
+                type: object
+                properties:
+                  comment_id:
+                    $ref: '#/components/schemas/comment_id'
+                  description:
+                    description: Small description about the comment.
+                    example: Invoice has been marked as void
+                  commented_by_id:
+                    $ref: '#/components/schemas/commented_by_id'
+                  commented_by:
+                    $ref: '#/components/schemas/commented_by'
+                  comment_type:
+                    $ref: '#/components/schemas/comment_type'
+                  date:
+                    description: Date on which the comment was created.
+                  time:
+                    $ref: '#/components/schemas/time'
+                  operation_type:
+                    $ref: '#/components/schemas/operation_type'
+                  transaction_id:
+                    $ref: '#/components/schemas/transaction_id'
+                  transaction_type:
+                    description: Small description about the type of transaction.
+                    example: invoice
+            custom_fields:
+              description: Additional fields for the invoices.
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    $ref: '#/components/schemas/index'
+                  label:
+                    $ref: '#/components/schemas/label'
+                  value:
+                    $ref: '#/components/schemas/value'
+                  data_type:
+                    $ref: '#/components/schemas/data_type'
+            can_send_in_mail:
+              $ref: '#/components/schemas/can_send_in_mail'
+            documents:
+              description: List of files attached to a particular customer.
+              type: array
+              items:
+                type: object
+                properties:
+                  file_name:
+                    $ref: '#/components/schemas/file_name'
+                  file_type:
+                    $ref: '#/components/schemas/file_type'
+                  file_size:
+                    $ref: '#/components/schemas/file_size'
+                  file_size_formatted:
+                    $ref: '#/components/schemas/file_size_formatted'
+                  document_id:
+                    $ref: '#/components/schemas/document_id'
+                  attachment_order:
+                    $ref: '#/components/schemas/attachment_order'
+    list-all-invoices-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        invoices:
+          type: array
+          items:
+            type: object
+            properties:
+              invoice_id:
+                $ref: '#/components/schemas/invoice_id'
+              number:
+                $ref: '#/components/schemas/number'
+              status:
+                $ref: '#/components/schemas/status'
+              invoice_date:
+                $ref: '#/components/schemas/invoice_date'
+              due_date:
+                $ref: '#/components/schemas/due_date'
+              customer_id:
+                $ref: '#/components/schemas/customer_id'
+              customer_name:
+                $ref: '#/components/schemas/customer_name'
+              email:
+                $ref: '#/components/schemas/email'
+              balance:
+                $ref: '#/components/schemas/balance'
+              total:
+                $ref: '#/components/schemas/total'
+              currency_code:
+                $ref: '#/components/schemas/currency_code'
+              currency_symbol:
+                $ref: '#/components/schemas/currency_symbol'
+              has_attachment:
+                $ref: '#/components/schemas/has_attachment'
+              created_time:
+                $ref: '#/components/schemas/created_time'
+              updated_time:
+                $ref: '#/components/schemas/updated_time'
+    collect-charge-via-bank-account-credit-card-request:
+      oneOf:
+        - type: object
+          required:
+            - account_id
+          properties:
+            account_id:
+              $ref: '#/components/schemas/account_id'
+        - type: object
+          required:
+            - card_id
+          properties:
+            card_id:
+              $ref: '#/components/schemas/card_id'
+    collect-charge-via-bank-account-credit-card-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The customer payment has been recorded.
+          readOnly: true
+        payment:
+          type: object
+          properties:
+            payment_id:
+              $ref: '#/components/schemas/payment_id'
+            payment_mode:
+              $ref: '#/components/schemas/payment_mode'
+            amount:
+              $ref: '#/components/schemas/amount'
+            amount_refunded:
+              $ref: '#/components/schemas/amount_refunded'
+            bank_charges:
+              $ref: '#/components/schemas/bank_charges'
+            date:
+              $ref: '#/components/schemas/date'
+            status:
+              $ref: '#/components/schemas/status'
+            reference_number:
+              $ref: '#/components/schemas/reference_number'
+            due_date:
+              $ref: '#/components/schemas/due_date'
+            amount_due:
+              $ref: '#/components/schemas/amount_due'
+            description:
+              $ref: '#/components/schemas/description'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            email:
+              $ref: '#/components/schemas/email'
+            autotransaction:
+              description: If the payment mode is <code>autotransaction</code>, autotransaction information will be displayed in the autotransaction object. It contains <code>autotransaction_id</code>, <code>payment_gateway</code>, <code>gateway_transaction_id</code>, <code>card_id</code>, <code>last_four_digits</code>, <code>expiry_month</code> and <code>expiry_year</code>.
+              type: object
+              properties:
+                autotransaction_id:
+                  $ref: '#/components/schemas/autotransaction_id'
+                payment_gateway:
+                  $ref: '#/components/schemas/payment_gateway'
+                gateway_transaction_id:
+                  $ref: '#/components/schemas/gateway_transaction_id'
+                gateway_error_message:
+                  $ref: '#/components/schemas/gateway_error_message'
+                account_id:
+                  $ref: '#/components/schemas/account_id'
+            invoices:
+              description: List of invoices associated with the payment. Each invoice object contains <code>invoice_id</code>, <code>invoice_number</code>, <code>date</code>, <code>invoice_amount</code>, <code>amount_applied</code> and <code>balance_amount</code>.
+              type: array
+              items:
+                type: object
+                properties:
+                  invoice_id:
+                    $ref: '#/components/schemas/invoice_id'
+                  invoice_number:
+                    $ref: '#/components/schemas/invoice_number'
+                  date:
+                    description: Date on which the invoice was raised.
+                    example: '2016-06-05'
+                  invoice_amount:
+                    $ref: '#/components/schemas/invoice_amount'
+                  amount_applied:
+                    $ref: '#/components/schemas/amount_applied'
+                  balance_amount:
+                    $ref: '#/components/schemas/balance_amount'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            currency_symbol:
+              $ref: '#/components/schemas/currency_symbol'
+            custom_fields:
+              description: Additional fields for the invoices.
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    $ref: '#/components/schemas/index'
+                  value:
+                    $ref: '#/components/schemas/value'
+                  label:
+                    $ref: '#/components/schemas/label'
+                  data_type:
+                    $ref: '#/components/schemas/data_type'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            updated_time:
+              $ref: '#/components/schemas/updated_time'
+    convert-to-void-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice has been marked as void.
+          readOnly: true
+    convert-to-open-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Status of the invoice has been changed to open.
+          readOnly: true
+    email-an-invoice-request:
+      required:
+        - to_mail_ids
+        - subject
+        - body
+      type: object
+      properties:
+        to_mail_ids:
+          $ref: '#/components/schemas/to_mail_ids'
+        cc_mail_ids:
+          $ref: '#/components/schemas/cc_mail_ids'
+        subject:
+          $ref: '#/components/schemas/subject'
+        body:
+          $ref: '#/components/schemas/body'
+    email-an-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Your invoice has been sent.
+          readOnly: true
+    write-off-request:
+      type: object
+      properties:
+        reason:
+          description: Description for Write off.
+          type: string
+          example: true
+    write-off-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice has been written off..
+          readOnly: true
+    cancel-write-off-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The write off done for this invoice has been cancelled.
+          readOnly: true
+    update-address-request:
+      type: object
+      properties:
+        billing_address:
+          description: Customer's billing address object. It contains <code>street</code>, <code>city</code>, <code>state</code>,<code>zip</code> and <code>country</code>.
+          type: object
+          properties:
+            city:
+              $ref: '#/components/schemas/city'
+            state:
+              $ref: '#/components/schemas/state'
+            zip:
+              $ref: '#/components/schemas/zip'
+            country:
+              $ref: '#/components/schemas/country'
+            fax:
+              $ref: '#/components/schemas/fax'
+        shipping_address:
+          $ref: '#/components/schemas/shipping_address'
+    update-address-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice address updated
+          readOnly: true
+        invoice_address:
+          type: object
+          properties:
+            billing_address:
+              description: Customer's billing address object. It contains <code>street</code>, <code>city</code>, <code>state</code>,<code>zip</code> and <code>country</code>.
+              type: object
+              properties:
+                city:
+                  $ref: '#/components/schemas/city'
+                state:
+                  $ref: '#/components/schemas/state'
+                zip:
+                  $ref: '#/components/schemas/zip'
+                country:
+                  $ref: '#/components/schemas/country'
+                fax:
+                  $ref: '#/components/schemas/fax'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+    update-custom-fields-request:
+      description: Custom field update payload for invoice custom fields.
+      type: object
+      properties:
+        custom_fields:
+          type: array
+          items:
+            type: object
+            required:
+              - label
+              - value
+            properties:
+              label:
+                type: string
+                description: Label of the custom field as configured in the organization settings.
+                example: Delivery Date
+              value:
+                $ref: '#/components/schemas/value'
+    update-custom-fields-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Custom Fields Updated Successfully
+          readOnly: true
+        custom_fields:
+          description: Additional fields for the invoices.
+          type: array
+          items:
+            type: object
+            properties:
+              customfield_id:
+                $ref: '#/components/schemas/customfield_id'
+              show_in_store:
+                $ref: '#/components/schemas/show_in_store'
+              is_active:
+                $ref: '#/components/schemas/is_active'
+              index:
+                type: integer
+                example: 1
+              show_in_hp:
+                $ref: '#/components/schemas/show_in_hp'
+              is_mandatory:
+                $ref: '#/components/schemas/is_mandatory'
+              label:
+                type: string
+                example: Test_field
+              is_custom_field:
+                $ref: '#/components/schemas/is_custom_field'
+              is_mandatory_in_sales_item:
+                $ref: '#/components/schemas/is_mandatory_in_sales_item'
+              is_mandatory_in_hp:
+                $ref: '#/components/schemas/is_mandatory_in_hp'
+              edit_on_store:
+                $ref: '#/components/schemas/edit_on_store'
+              show_in_all_pdf:
+                $ref: '#/components/schemas/show_in_all_pdf'
+              search_entity:
+                $ref: '#/components/schemas/search_entity'
+              data_type:
+                type: string
+                example: string
+              pii_type:
+                $ref: '#/components/schemas/pii_type'
+              placeholder:
+                $ref: '#/components/schemas/placeholder'
+              is_inherited_value:
+                $ref: '#/components/schemas/is_inherited_value'
+              value:
+                type: string
+                example: Test_value
+              is_dependent_field:
+                $ref: '#/components/schemas/is_dependent_field'
+              max_length:
+                $ref: '#/components/schemas/max_length'
+              help_text:
+                $ref: '#/components/schemas/help_text'
+    apply-multiple-credits-to-invoice-request:
+      required:
+        - apply_creditnotes
+      type: object
+      properties:
+        apply_creditnotes:
+          description: List of creditnotes applied to the object.
+          type: array
+          items:
+            type: object
+            required:
+              - creditnote_id
+              - amount_applied
+            properties:
+              creditnote_id:
+                $ref: '#/components/schemas/creditnote_id'
+              amount_applied:
+                description: Credit amount to be applied to the invoice.
+                type: number
+                format: float
+                example: 450
+    apply-multiple-credits-to-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Credits have been applied to the invoice(s).
+          readOnly: true
+        apply_creditnotes:
+          description: List of creditnotes applied to the object.
+          type: array
+          items:
+            type: object
+            properties:
+              creditnotes_invoice_id:
+                $ref: '#/components/schemas/creditnotes_invoice_id'
+              creditnote_id:
+                $ref: '#/components/schemas/creditnote_id'
+              invoice_id:
+                $ref: '#/components/schemas/invoice_id'
+              amount_applied:
+                $ref: '#/components/schemas/amount_applied'
+              date:
+                $ref: '#/components/schemas/date'
+              date_formatted:
+                $ref: '#/components/schemas/date_formatted'
+    add-items-to-a-pending-invoice-request:
+      type: object
+      properties:
+        invoice_items:
+          description: |-
+            The list of items which are all included in the invoice. Each item object will have <code>item_id</code>, <code>name</code>, <code>code</code>, <code>price</code>, <code>quantity</code> and <code>item_total</code>.
+            description: Small description about the Invoice item.
+            example: "Charges for this duration (from 16-April-2016 to 8-June-2016)"
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                description: Addon code of the addon.
+                type: string
+                example: UsageAddon
+              product_id:
+                description: Product ID of the product to which the addon is associated with.
+                type: string
+                example: '90300000079226'
+              name:
+                description: Name for the item.
+                type: string
+                example: usage charge
+              description:
+                description: Description for the item.
+                type: string
+                example: Usage charges for last month
+              price:
+                description: Price of the item.
+                type: number
+                format: double
+                example: 10
+              quantity:
+                description: Required quantity of the chosen item.
+                type: integer
+                example: 1
+              tax_id:
+                description: Unique ID of Tax or Tax Group that must be associated with the item.
+                type: string
+                example: '90300000079226'
+              tax_exemption_id:
+                description: Unique Tax Exemption ID if you dont want to associate a tax to the plan.
+                type: string
+                example: '90300000079226'
+    add-items-to-a-pending-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice information has been updated.
+          readOnly: true
+        invoice:
+          type: object
+          properties:
+            invoice_id:
+              $ref: '#/components/schemas/invoice_id'
+            number:
+              $ref: '#/components/schemas/number'
+            status:
+              $ref: '#/components/schemas/status'
+            invoice_date:
+              $ref: '#/components/schemas/invoice_date'
+            due_date:
+              $ref: '#/components/schemas/due_date'
+            payment_expected_date:
+              $ref: '#/components/schemas/payment_expected_date'
+            ach_payment_initiated:
+              $ref: '#/components/schemas/ach_payment_initiated'
+            transaction_type:
+              $ref: '#/components/schemas/transaction_type'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            email:
+              $ref: '#/components/schemas/email'
+            invoice_items:
+              description: |-
+                The list of items which are all included in the invoice. Each item object will have <code>item_id</code>, <code>name</code>, <code>code</code>, <code>price</code>, <code>quantity</code> and <code>item_total</code>.
+                description: Small description about the Invoice item.
+                example: "Charges for this duration (from 16-April-2016 to 8-June-2016)"
+              type: array
+              items:
+                type: object
+                properties:
+                  item_id:
+                    $ref: '#/components/schemas/item_id'
+                  name:
+                    $ref: '#/components/schemas/name'
+                  description:
+                    description: Small description about the Invoice item.
+                    example: Charges for this duration (from 16-April-2016 to 8-June-2016)
+                  tags:
+                    $ref: '#/components/schemas/tags'
+                  item_custom_fields:
+                    $ref: '#/components/schemas/item_custom_fields'
+                  code:
+                    $ref: '#/components/schemas/code'
+                  price:
+                    $ref: '#/components/schemas/price'
+                  quantity:
+                    $ref: '#/components/schemas/quantity'
+                  discount_amount:
+                    $ref: '#/components/schemas/discount_amount'
+                  item_total:
+                    $ref: '#/components/schemas/item_total'
+                  tax_id:
+                    $ref: '#/components/schemas/tax_id'
+                  product_type:
+                    $ref: '#/components/schemas/product_type'
+                  hsn_or_sac:
+                    $ref: '#/components/schemas/hsn_or_sac'
+                  tax_exemption_id:
+                    $ref: '#/components/schemas/tax_exemption_id'
+                  tax_exemption_code:
+                    $ref: '#/components/schemas/tax_exemption_code'
+            coupons:
+              $ref: '#/components/schemas/coupons'
+            credits:
+              type: array
+              items:
+                type: object
+                properties:
+                  creditnote_id:
+                    $ref: '#/components/schemas/creditnote_id'
+                  creditnotes_number:
+                    $ref: '#/components/schemas/creditnotes_number'
+                  credited_date:
+                    $ref: '#/components/schemas/credited_date'
+                  credited_amount:
+                    $ref: '#/components/schemas/credited_amount'
+            total:
+              $ref: '#/components/schemas/total'
+            payment_made:
+              $ref: '#/components/schemas/payment_made'
+            balance:
+              $ref: '#/components/schemas/balance'
+            credits_applied:
+              $ref: '#/components/schemas/credits_applied'
+            write_off_amount:
+              $ref: '#/components/schemas/write_off_amount'
+            payments:
+              $ref: '#/components/schemas/payments'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            currency_symbol:
+              $ref: '#/components/schemas/currency_symbol'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            updated_time:
+              $ref: '#/components/schemas/updated_time'
+            salesperson_id:
+              $ref: '#/components/schemas/salesperson_id'
+            salesperson_name:
+              $ref: '#/components/schemas/salesperson_name'
+            invoice_url:
+              $ref: '#/components/schemas/invoice_url'
+            billing_address:
+              description: Customer's billing address object. It contains <code>street</code>, <code>city</code>, <code>state</code>,<code>zip</code> and <code>country</code>.
+              type: object
+              properties:
+                city:
+                  $ref: '#/components/schemas/city'
+                state:
+                  $ref: '#/components/schemas/state'
+                zip:
+                  $ref: '#/components/schemas/zip'
+                country:
+                  $ref: '#/components/schemas/country'
+                fax:
+                  $ref: '#/components/schemas/fax'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+            comments:
+              description: Lists the comments added by the system or by user.
+              type: array
+              items:
+                type: object
+                properties:
+                  comment_id:
+                    $ref: '#/components/schemas/comment_id'
+                  description:
+                    description: Small description about the comment.
+                    example: Invoice has been marked as void
+                  commented_by_id:
+                    $ref: '#/components/schemas/commented_by_id'
+                  commented_by:
+                    $ref: '#/components/schemas/commented_by'
+                  comment_type:
+                    $ref: '#/components/schemas/comment_type'
+                  date:
+                    description: Date on which the comment was created.
+                  time:
+                    $ref: '#/components/schemas/time'
+                  operation_type:
+                    $ref: '#/components/schemas/operation_type'
+                  transaction_id:
+                    $ref: '#/components/schemas/transaction_id'
+                  transaction_type:
+                    description: Small description about the type of transaction.
+                    example: invoice
+            custom_fields:
+              description: Additional fields for the invoices.
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    $ref: '#/components/schemas/index'
+                  label:
+                    $ref: '#/components/schemas/label'
+                  value:
+                    $ref: '#/components/schemas/value'
+                  data_type:
+                    $ref: '#/components/schemas/data_type'
+    delete-items-from-a-pending-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice information has been updated.
+          readOnly: true
+    add-attachment-to-an-invoice-request:
+      type: object
+      properties:
+        can_send_in_mail:
+          description: True to send the attachment with the invoice when emailed.
+          type: boolean
+          example: true
+        attachment:
+          description: 'The file to be attached.Allowed Extensions: <code>gif</code>, <code>png</code>, <code>jpeg</code>, <code>jpg</code>, <code>bmp</code> and <code>pdf</code>'
+          type: string
+          format: binary
+    create-an-invoice-request:
+      required:
+        - customer_id
+        - invoice_items
+        - date
+      type: object
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        contact_persons:
+          $ref: '#/components/schemas/contact_persons'
+        invoice_number:
+          $ref: '#/components/schemas/invoice_number'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        place_of_supply:
+          $ref: '#/components/schemas/place_of_supply'
+        vat_treatment:
+          $ref: '#/components/schemas/vat_treatment'
+        gst_treatment:
+          $ref: '#/components/schemas/gst_treatment'
+        tax_treatment:
+          $ref: '#/components/schemas/tax_treatment'
+        cfdi_usage:
+          $ref: '#/components/schemas/cfdi_usage'
+        gst_no:
+          $ref: '#/components/schemas/gst_no'
+        shipping_gst_no:
+          $ref: '#/components/schemas/shipping_gst_no'
+        shipping_trader_name:
+          $ref: '#/components/schemas/shipping_trader_name'
+        shipping_legal_name:
+          $ref: '#/components/schemas/shipping_legal_name'
+        shipping_address:
+          $ref: '#/components/schemas/shipping_address'
+        template_id:
+          $ref: '#/components/schemas/template_id'
+        date:
+          $ref: '#/components/schemas/date'
+        payment_terms:
+          $ref: '#/components/schemas/payment_terms'
+        payment_terms_label:
+          $ref: '#/components/schemas/payment_terms_label'
+        due_date:
+          $ref: '#/components/schemas/due_date'
+        discount:
+          $ref: '#/components/schemas/discount'
+        is_discount_before_tax:
+          $ref: '#/components/schemas/is_discount_before_tax'
+        discount_type:
+          $ref: '#/components/schemas/discount_type'
+        is_inclusive_tax:
+          $ref: '#/components/schemas/is_inclusive_tax'
+        exchange_rate:
+          $ref: '#/components/schemas/exchange_rate'
+        invoiced_estimate_id:
+          $ref: '#/components/schemas/invoiced_estimate_id'
+        salesperson_name:
+          $ref: '#/components/schemas/salesperson_name'
+        custom_fields:
+          description: Custom fields for an invoice.
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                $ref: '#/components/schemas/label'
+              value:
+                $ref: '#/components/schemas/value'
+        project_id:
+          $ref: '#/components/schemas/project_id'
+        invoice_items:
+          description: Line items of an invoice.
+          type: array
+          items:
+            type: object
+            required:
+              - product_id
+            properties:
+              product_id:
+                $ref: '#/components/schemas/item_id'
+              project_id:
+                $ref: '#/components/schemas/project_id'
+              time_entry_ids:
+                $ref: '#/components/schemas/time_entry_ids'
+              expense_id:
+                $ref: '#/components/schemas/expense_id'
+              name:
+                $ref: '#/components/schemas/name'
+              product_type:
+                $ref: '#/components/schemas/product_type'
+              hsn_or_sac:
+                $ref: '#/components/schemas/hsn_or_sac'
+              sat_item_key_code:
+                $ref: '#/components/schemas/sat_item_key_code'
+              unitkey_code:
+                $ref: '#/components/schemas/unitkey_code'
+              description:
+                $ref: '#/components/schemas/description'
+              item_order:
+                $ref: '#/components/schemas/item_order'
+              price:
+                $ref: '#/components/schemas/price'
+              rate:
+                $ref: '#/components/schemas/rate'
+              quantity:
+                $ref: '#/components/schemas/quantity'
+              unit:
+                $ref: '#/components/schemas/unit'
+              discount:
+                $ref: '#/components/schemas/discount'
+              tax_id:
+                $ref: '#/components/schemas/tax_id'
+              tds_tax_id:
+                $ref: '#/components/schemas/tds_tax_id'
+              tax_exemption_id:
+                $ref: '#/components/schemas/tax_exemption_id'
+              avatax_use_code:
+                $ref: '#/components/schemas/avatax_use_code'
+              avatax_exempt_no:
+                $ref: '#/components/schemas/avatax_exempt_no'
+              tax_name:
+                $ref: '#/components/schemas/tax_name'
+              tax_type:
+                $ref: '#/components/schemas/tax_type'
+              tax_percentage:
+                $ref: '#/components/schemas/tax_percentage'
+              item_total:
+                $ref: '#/components/schemas/item_total'
+        payment_options:
+          $ref: '#/components/schemas/payment_options'
+        allow_partial_payments:
+          $ref: '#/components/schemas/allow_partial_payments'
+        custom_body:
+          $ref: '#/components/schemas/custom_body'
+        custom_subject:
+          $ref: '#/components/schemas/custom_subject'
+        notes:
+          $ref: '#/components/schemas/notes'
+        terms:
+          $ref: '#/components/schemas/terms'
+        shipping_charge:
+          $ref: '#/components/schemas/shipping_charge'
+        adjustment:
+          $ref: '#/components/schemas/adjustment'
+        adjustment_description:
+          $ref: '#/components/schemas/adjustment_description'
+        reason:
+          $ref: '#/components/schemas/reason'
+        tax_authority_id:
+          $ref: '#/components/schemas/tax_authority_id'
+        tax_exemption_id:
+          $ref: '#/components/schemas/tax_exemption_id'
+        avatax_use_code:
+          $ref: '#/components/schemas/avatax_use_code'
+        avatax_tax_code:
+          $ref: '#/components/schemas/avatax_tax_code'
+        avatax_exempt_no:
+          $ref: '#/components/schemas/avatax_exempt_no'
+    create-an-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The invoice has been created.
+          readOnly: true
+        invoice:
+          $ref: '#/components/schemas/invoice-response'
+    list-invoices-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        invoices:
+          type: array
+          items:
+            type: object
+            properties:
+              invoice_id:
+                $ref: '#/components/schemas/invoice_id'
+              ach_payment_initiated:
+                $ref: '#/components/schemas/ach_payment_initiated'
+              customer_name:
+                $ref: '#/components/schemas/customer_name'
+              customer_id:
+                $ref: '#/components/schemas/customer_id'
+              status:
+                $ref: '#/components/schemas/status'
+              invoice_number:
+                $ref: '#/components/schemas/invoice_number'
+              reference_number:
+                $ref: '#/components/schemas/reference_number'
+              date:
+                $ref: '#/components/schemas/date'
+              due_date:
+                $ref: '#/components/schemas/due_date'
+              due_days:
+                $ref: '#/components/schemas/due_days'
+              currency_id:
+                $ref: '#/components/schemas/currency_id'
+              schedule_time:
+                $ref: '#/components/schemas/schedule_time'
+              currency_code:
+                $ref: '#/components/schemas/currency_code'
+              is_viewed_by_client:
+                $ref: '#/components/schemas/is_viewed_by_client'
+              has_attachment:
+                $ref: '#/components/schemas/has_attachment'
+              client_viewed_time:
+                $ref: '#/components/schemas/client_viewed_time'
+              total:
+                $ref: '#/components/schemas/total'
+              balance:
+                $ref: '#/components/schemas/balance'
+              created_time:
+                $ref: '#/components/schemas/created_time'
+              last_modified_time:
+                $ref: '#/components/schemas/last_modified_time'
+              is_emailed:
+                $ref: '#/components/schemas/is_emailed'
+              reminders_sent:
+                $ref: '#/components/schemas/reminders_sent'
+              last_reminder_sent_date:
+                $ref: '#/components/schemas/last_reminder_sent_date'
+              payment_expected_date:
+                $ref: '#/components/schemas/payment_expected_date'
+              last_payment_date:
+                $ref: '#/components/schemas/last_payment_date'
+              custom_fields:
+                $ref: '#/components/schemas/custom_fields'
+              documents:
+                $ref: '#/components/schemas/documents'
+              salesperson_id:
+                $ref: '#/components/schemas/salesperson_id'
+              salesperson_name:
+                $ref: '#/components/schemas/salesperson_name'
+              shipping_charge:
+                $ref: '#/components/schemas/shipping_charge'
+              adjustment:
+                $ref: '#/components/schemas/adjustment'
+              write_off_amount:
+                $ref: '#/components/schemas/write_off_amount'
+              exchange_rate:
+                $ref: '#/components/schemas/exchange_rate'
+    update-an-invoice-request:
+      required:
+        - customer_id
+        - invoice_items
+        - reason
+      type: object
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        reason:
+          $ref: '#/components/schemas/reason'
+        contact_persons:
+          $ref: '#/components/schemas/contact_persons'
+        invoice_number:
+          $ref: '#/components/schemas/invoice_number'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        place_of_supply:
+          $ref: '#/components/schemas/place_of_supply'
+        vat_treatment:
+          $ref: '#/components/schemas/vat_treatment'
+        gst_treatment:
+          $ref: '#/components/schemas/gst_treatment'
+        tax_treatment:
+          $ref: '#/components/schemas/tax_treatment'
+        cfdi_usage:
+          $ref: '#/components/schemas/cfdi_usage'
+        gst_no:
+          $ref: '#/components/schemas/gst_no'
+        shipping_gst_no:
+          $ref: '#/components/schemas/shipping_gst_no'
+        shipping_trader_name:
+          $ref: '#/components/schemas/shipping_trader_name'
+        shipping_legal_name:
+          $ref: '#/components/schemas/shipping_legal_name'
+        template_id:
+          $ref: '#/components/schemas/template_id'
+        date:
+          $ref: '#/components/schemas/date'
+        payment_terms:
+          $ref: '#/components/schemas/payment_terms'
+        payment_terms_label:
+          $ref: '#/components/schemas/payment_terms_label'
+        due_date:
+          $ref: '#/components/schemas/due_date'
+        discount:
+          $ref: '#/components/schemas/discount'
+        is_discount_before_tax:
+          $ref: '#/components/schemas/is_discount_before_tax'
+        discount_type:
+          $ref: '#/components/schemas/discount_type'
+        is_inclusive_tax:
+          $ref: '#/components/schemas/is_inclusive_tax'
+        exchange_rate:
+          $ref: '#/components/schemas/exchange_rate'
+        invoiced_estimate_id:
+          $ref: '#/components/schemas/invoiced_estimate_id'
+        salesperson_name:
+          $ref: '#/components/schemas/salesperson_name'
+        custom_fields:
+          description: Custom fields for an invoice.
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                $ref: '#/components/schemas/label'
+              value:
+                $ref: '#/components/schemas/value'
+        project_id:
+          $ref: '#/components/schemas/project_id'
+        invoice_items:
+          description: Line items of an invoice.
+          type: array
+          items:
+            type: object
+            required:
+              - product_id
+            properties:
+              product_id:
+                $ref: '#/components/schemas/item_id'
+              project_id:
+                $ref: '#/components/schemas/project_id'
+              time_entry_ids:
+                $ref: '#/components/schemas/time_entry_ids'
+              expense_id:
+                $ref: '#/components/schemas/expense_id'
+              name:
+                $ref: '#/components/schemas/name'
+              product_type:
+                $ref: '#/components/schemas/product_type'
+              hsn_or_sac:
+                $ref: '#/components/schemas/hsn_or_sac'
+              sat_item_key_code:
+                $ref: '#/components/schemas/sat_item_key_code'
+              unitkey_code:
+                $ref: '#/components/schemas/unitkey_code'
+              description:
+                $ref: '#/components/schemas/description'
+              item_order:
+                $ref: '#/components/schemas/item_order'
+              price:
+                $ref: '#/components/schemas/price'
+              rate:
+                $ref: '#/components/schemas/rate'
+              quantity:
+                $ref: '#/components/schemas/quantity'
+              unit:
+                $ref: '#/components/schemas/unit'
+              discount:
+                $ref: '#/components/schemas/discount'
+              tax_id:
+                $ref: '#/components/schemas/tax_id'
+              tds_tax_id:
+                $ref: '#/components/schemas/tds_tax_id'
+              tax_exemption_id:
+                $ref: '#/components/schemas/tax_exemption_id'
+              avatax_use_code:
+                $ref: '#/components/schemas/avatax_use_code'
+              avatax_exempt_no:
+                $ref: '#/components/schemas/avatax_exempt_no'
+              tax_name:
+                $ref: '#/components/schemas/tax_name'
+              tax_type:
+                $ref: '#/components/schemas/tax_type'
+              tax_percentage:
+                $ref: '#/components/schemas/tax_percentage'
+              item_total:
+                $ref: '#/components/schemas/item_total'
+        payment_options:
+          $ref: '#/components/schemas/payment_options'
+        allow_partial_payments:
+          $ref: '#/components/schemas/allow_partial_payments'
+        custom_body:
+          $ref: '#/components/schemas/custom_body'
+        custom_subject:
+          $ref: '#/components/schemas/custom_subject'
+        notes:
+          $ref: '#/components/schemas/notes'
+        terms:
+          $ref: '#/components/schemas/terms'
+        shipping_charge:
+          $ref: '#/components/schemas/shipping_charge'
+        adjustment:
+          $ref: '#/components/schemas/adjustment'
+        adjustment_description:
+          $ref: '#/components/schemas/adjustment_description'
+        tax_authority_id:
+          $ref: '#/components/schemas/tax_authority_id'
+        tax_exemption_id:
+          $ref: '#/components/schemas/tax_exemption_id'
+        avatax_use_code:
+          $ref: '#/components/schemas/avatax_use_code'
+        avatax_tax_code:
+          $ref: '#/components/schemas/avatax_tax_code'
+        avatax_exempt_no:
+          $ref: '#/components/schemas/avatax_exempt_no'
+    update-an-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice information has been updated.
+          readOnly: true
+        invoice:
+          type: object
+          properties:
+            invoice_id:
+              $ref: '#/components/schemas/invoice_id'
+            ach_payment_initiated:
+              $ref: '#/components/schemas/ach_payment_initiated'
+            invoice_number:
+              $ref: '#/components/schemas/invoice_number'
+            date:
+              $ref: '#/components/schemas/date'
+            status:
+              $ref: '#/components/schemas/status'
+            is_pre_gst:
+              $ref: '#/components/schemas/is_pre_gst'
+            place_of_supply:
+              $ref: '#/components/schemas/place_of_supply'
+            gst_no:
+              $ref: '#/components/schemas/gst_no'
+            shipping_gst_no:
+              $ref: '#/components/schemas/shipping_gst_no'
+            shipping_trader_name:
+              $ref: '#/components/schemas/shipping_trader_name'
+            shipping_legal_name:
+              $ref: '#/components/schemas/shipping_legal_name'
+            gst_treatment:
+              $ref: '#/components/schemas/gst_treatment'
+            tax_treatment:
+              $ref: '#/components/schemas/tax_treatment'
+            cfdi_usage:
+              $ref: '#/components/schemas/cfdi_usage'
+            vat_treatment:
+              $ref: '#/components/schemas/vat_treatment'
+            vat_reg_no:
+              $ref: '#/components/schemas/vat_reg_no'
+            payment_terms:
+              $ref: '#/components/schemas/payment_terms'
+            payment_terms_label:
+              $ref: '#/components/schemas/payment_terms_label'
+            due_date:
+              $ref: '#/components/schemas/due_date'
+            payment_expected_date:
+              $ref: '#/components/schemas/payment_expected_date'
+            last_payment_date:
+              $ref: '#/components/schemas/last_payment_date'
+            reference_number:
+              $ref: '#/components/schemas/reference_number'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            contact_persons:
+              $ref: '#/components/schemas/contact_persons'
+            currency_id:
+              $ref: '#/components/schemas/currency_id'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            exchange_rate:
+              $ref: '#/components/schemas/exchange_rate'
+            discount:
+              $ref: '#/components/schemas/discount'
+            is_discount_before_tax:
+              $ref: '#/components/schemas/is_discount_before_tax'
+            discount_type:
+              $ref: '#/components/schemas/discount_type'
+            is_inclusive_tax:
+              $ref: '#/components/schemas/is_inclusive_tax'
+            is_viewed_by_client:
+              $ref: '#/components/schemas/is_viewed_by_client'
+            has_attachment:
+              $ref: '#/components/schemas/has_attachment'
+            client_viewed_time:
+              $ref: '#/components/schemas/client_viewed_time'
+            invoice_items:
+              description: Items listed in invoice
+              type: array
+              items:
+                type: object
+                properties:
+                  item_id:
+                    $ref: '#/components/schemas/line_item_id'
+                  product_id:
+                    $ref: '#/components/schemas/item_id'
+                  project_id:
+                    $ref: '#/components/schemas/project_id'
+                  project_name:
+                    $ref: '#/components/schemas/project_name'
+                  item_type:
+                    $ref: '#/components/schemas/item_type'
+                  product_type:
+                    $ref: '#/components/schemas/product_type'
+                  time_entry_ids:
+                    $ref: '#/components/schemas/time_entry_ids'
+                  expense_id:
+                    $ref: '#/components/schemas/expense_id'
+                  expense_receipt_name:
+                    $ref: '#/components/schemas/expense_receipt_name'
+                  name:
+                    $ref: '#/components/schemas/name'
+                  description:
+                    $ref: '#/components/schemas/description'
+                  item_order:
+                    $ref: '#/components/schemas/item_order'
+                  bcy_rate:
+                    $ref: '#/components/schemas/bcy_rate'
+                  price:
+                    $ref: '#/components/schemas/price'
+                  quantity:
+                    $ref: '#/components/schemas/quantity'
+                  unit:
+                    $ref: '#/components/schemas/unit'
+                  discount_amount:
+                    $ref: '#/components/schemas/discount_amount'
+                  discount:
+                    $ref: '#/components/schemas/discount'
+                  tax_id:
+                    $ref: '#/components/schemas/tax_id'
+                  tds_tax_id:
+                    $ref: '#/components/schemas/tds_tax_id'
+                  tax_name:
+                    $ref: '#/components/schemas/tax_name'
+                  tax_type:
+                    $ref: '#/components/schemas/tax_type'
+                  tax_percentage:
+                    $ref: '#/components/schemas/tax_percentage'
+                  item_total:
+                    $ref: '#/components/schemas/item_total'
+                  sat_item_key_code:
+                    $ref: '#/components/schemas/sat_item_key_code'
+                  unitkey_code:
+                    $ref: '#/components/schemas/unitkey_code'
+            shipping_charge:
+              $ref: '#/components/schemas/shipping_charge'
+            adjustment:
+              $ref: '#/components/schemas/adjustment'
+            adjustment_description:
+              $ref: '#/components/schemas/adjustment_description'
+            sub_total:
+              $ref: '#/components/schemas/sub_total'
+            tax_total:
+              $ref: '#/components/schemas/tax_total'
+            total:
+              $ref: '#/components/schemas/total'
+            taxes:
+              $ref: '#/components/schemas/taxes'
+            payment_reminder_enabled:
+              $ref: '#/components/schemas/payment_reminder_enabled'
+            payment_made:
+              $ref: '#/components/schemas/payment_made'
+            credits_applied:
+              $ref: '#/components/schemas/credits_applied'
+            tax_amount_withheld:
+              $ref: '#/components/schemas/tax_amount_withheld'
+            balance:
+              $ref: '#/components/schemas/balance'
+            write_off_amount:
+              $ref: '#/components/schemas/write_off_amount'
+            allow_partial_payments:
+              $ref: '#/components/schemas/allow_partial_payments'
+            price_precision:
+              $ref: '#/components/schemas/price_precision'
+            payment_options:
+              $ref: '#/components/schemas/payment_options'
+            is_emailed:
+              $ref: '#/components/schemas/is_emailed'
+            reminders_sent:
+              $ref: '#/components/schemas/reminders_sent'
+            last_reminder_sent_date:
+              $ref: '#/components/schemas/last_reminder_sent_date'
+            billing_address:
+              $ref: '#/components/schemas/billing_address'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+            notes:
+              $ref: '#/components/schemas/notes'
+            terms:
+              $ref: '#/components/schemas/terms'
+            custom_fields:
+              $ref: '#/components/schemas/custom_fields'
+            template_id:
+              $ref: '#/components/schemas/template_id'
+            template_name:
+              $ref: '#/components/schemas/template_name'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            last_modified_time:
+              $ref: '#/components/schemas/last_modified_time'
+            attachment_name:
+              $ref: '#/components/schemas/attachment_name'
+            can_send_in_mail:
+              $ref: '#/components/schemas/can_send_in_mail'
+            salesperson_id:
+              $ref: '#/components/schemas/salesperson_id'
+            salesperson_name:
+              $ref: '#/components/schemas/salesperson_name'
+            invoice_url:
+              $ref: '#/components/schemas/invoice_url'
+    get-an-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        invoice:
+          type: object
+          properties:
+            invoice_id:
+              $ref: '#/components/schemas/invoice_id'
+            ach_payment_initiated:
+              $ref: '#/components/schemas/ach_payment_initiated'
+            invoice_number:
+              $ref: '#/components/schemas/invoice_number'
+            is_pre_gst:
+              $ref: '#/components/schemas/is_pre_gst'
+            place_of_supply:
+              $ref: '#/components/schemas/place_of_supply'
+            gst_no:
+              $ref: '#/components/schemas/gst_no'
+            shipping_gst_no:
+              $ref: '#/components/schemas/shipping_gst_no'
+            shipping_trader_name:
+              $ref: '#/components/schemas/shipping_trader_name'
+            shipping_legal_name:
+              $ref: '#/components/schemas/shipping_legal_name'
+            gst_treatment:
+              $ref: '#/components/schemas/gst_treatment'
+            tax_treatment:
+              $ref: '#/components/schemas/tax_treatment'
+            cfdi_usage:
+              $ref: '#/components/schemas/cfdi_usage'
+            vat_treatment:
+              $ref: '#/components/schemas/vat_treatment'
+            vat_reg_no:
+              $ref: '#/components/schemas/vat_reg_no'
+            date:
+              $ref: '#/components/schemas/date'
+            status:
+              $ref: '#/components/schemas/status'
+            payment_terms:
+              $ref: '#/components/schemas/payment_terms'
+            payment_terms_label:
+              $ref: '#/components/schemas/payment_terms_label'
+            due_date:
+              $ref: '#/components/schemas/due_date'
+            payment_expected_date:
+              $ref: '#/components/schemas/payment_expected_date'
+            last_payment_date:
+              $ref: '#/components/schemas/last_payment_date'
+            reference_number:
+              $ref: '#/components/schemas/reference_number'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            contact_persons:
+              $ref: '#/components/schemas/contact_persons'
+            currency_id:
+              $ref: '#/components/schemas/currency_id'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            exchange_rate:
+              $ref: '#/components/schemas/exchange_rate'
+            discount:
+              $ref: '#/components/schemas/discount'
+            is_discount_before_tax:
+              $ref: '#/components/schemas/is_discount_before_tax'
+            discount_type:
+              $ref: '#/components/schemas/discount_type'
+            is_inclusive_tax:
+              $ref: '#/components/schemas/is_inclusive_tax'
+            is_viewed_by_client:
+              $ref: '#/components/schemas/is_viewed_by_client'
+            has_attachment:
+              $ref: '#/components/schemas/has_attachment'
+            client_viewed_time:
+              $ref: '#/components/schemas/client_viewed_time'
+            line_items:
+              description: Items listed in invoice
+              type: array
+              items:
+                type: object
+                properties:
+                  line_item_id:
+                    $ref: '#/components/schemas/line_item_id'
+                  item_id:
+                    $ref: '#/components/schemas/item_id'
+                  project_id:
+                    $ref: '#/components/schemas/project_id'
+                  project_name:
+                    $ref: '#/components/schemas/project_name'
+                  item_type:
+                    $ref: '#/components/schemas/item_type'
+                  product_type:
+                    $ref: '#/components/schemas/product_type'
+                  time_entry_ids:
+                    $ref: '#/components/schemas/time_entry_ids'
+                  expense_id:
+                    $ref: '#/components/schemas/expense_id'
+                  expense_receipt_name:
+                    $ref: '#/components/schemas/expense_receipt_name'
+                  name:
+                    $ref: '#/components/schemas/name'
+                  description:
+                    $ref: '#/components/schemas/description'
+                  item_order:
+                    $ref: '#/components/schemas/item_order'
+                  bcy_rate:
+                    $ref: '#/components/schemas/bcy_rate'
+                  rate:
+                    $ref: '#/components/schemas/rate'
+                  price:
+                    $ref: '#/components/schemas/price'
+                  quantity:
+                    $ref: '#/components/schemas/quantity'
+                  unit:
+                    $ref: '#/components/schemas/unit'
+                  discount_amount:
+                    $ref: '#/components/schemas/discount_amount'
+                  discount:
+                    $ref: '#/components/schemas/discount'
+                  tax_id:
+                    $ref: '#/components/schemas/tax_id'
+                  tds_tax_id:
+                    $ref: '#/components/schemas/tds_tax_id'
+                  tax_name:
+                    $ref: '#/components/schemas/tax_name'
+                  tax_type:
+                    $ref: '#/components/schemas/tax_type'
+                  tax_percentage:
+                    $ref: '#/components/schemas/tax_percentage'
+                  item_total:
+                    $ref: '#/components/schemas/item_total'
+                  sat_item_key_code:
+                    $ref: '#/components/schemas/sat_item_key_code'
+                  unitkey_code:
+                    $ref: '#/components/schemas/unitkey_code'
+            shipping_charge:
+              $ref: '#/components/schemas/shipping_charge'
+            adjustment:
+              $ref: '#/components/schemas/adjustment'
+            adjustment_description:
+              $ref: '#/components/schemas/adjustment_description'
+            sub_total:
+              $ref: '#/components/schemas/sub_total'
+            tax_total:
+              $ref: '#/components/schemas/tax_total'
+            total:
+              $ref: '#/components/schemas/total'
+            taxes:
+              $ref: '#/components/schemas/taxes'
+            payment_reminder_enabled:
+              $ref: '#/components/schemas/payment_reminder_enabled'
+            payment_made:
+              $ref: '#/components/schemas/payment_made'
+            credits_applied:
+              $ref: '#/components/schemas/credits_applied'
+            tax_amount_withheld:
+              $ref: '#/components/schemas/tax_amount_withheld'
+            balance:
+              $ref: '#/components/schemas/balance'
+            write_off_amount:
+              $ref: '#/components/schemas/write_off_amount'
+            allow_partial_payments:
+              $ref: '#/components/schemas/allow_partial_payments'
+            price_precision:
+              $ref: '#/components/schemas/price_precision'
+            payment_options:
+              $ref: '#/components/schemas/payment_options'
+            is_emailed:
+              $ref: '#/components/schemas/is_emailed'
+            reminders_sent:
+              $ref: '#/components/schemas/reminders_sent'
+            last_reminder_sent_date:
+              $ref: '#/components/schemas/last_reminder_sent_date'
+            billing_address:
+              $ref: '#/components/schemas/billing_address'
+            shipping_address:
+              $ref: '#/components/schemas/shipping_address'
+            notes:
+              $ref: '#/components/schemas/notes'
+            terms:
+              $ref: '#/components/schemas/terms'
+            custom_fields:
+              $ref: '#/components/schemas/custom_fields'
+            template_id:
+              $ref: '#/components/schemas/template_id'
+            template_name:
+              $ref: '#/components/schemas/template_name'
+            created_time:
+              $ref: '#/components/schemas/created_time'
+            last_modified_time:
+              $ref: '#/components/schemas/last_modified_time'
+            attachment_name:
+              $ref: '#/components/schemas/attachment_name'
+            can_send_in_mail:
+              $ref: '#/components/schemas/can_send_in_mail'
+            salesperson_id:
+              $ref: '#/components/schemas/salesperson_id'
+            salesperson_name:
+              $ref: '#/components/schemas/salesperson_name'
+            invoice_url:
+              $ref: '#/components/schemas/invoice_url'
+    delete-an-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The invoice has been deleted.
+          readOnly: true
+    mark-an-invoice-as-sent-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice status has been changed to Sent.
+          readOnly: true
+    void-an-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice status has been changed to Void.
+          readOnly: true
+    mark-as-draft-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Status of invoice changed from void to draft
+          readOnly: true
+    get-invoice-email-content-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        data:
+          description: content of the emails
+          type: object
+          properties:
+            bcc_mails:
+              $ref: '#/components/schemas/bcc_mails'
+            gateways_configured:
+              $ref: '#/components/schemas/gateways_configured'
+            gateways_associated:
+              $ref: '#/components/schemas/gateways_associated'
+            bcc_mails_str:
+              $ref: '#/components/schemas/bcc_mails_str'
+            body:
+              $ref: '#/components/schemas/body'
+            documents:
+              $ref: '#/components/schemas/documents'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            attach_pdf:
+              $ref: '#/components/schemas/attach_pdf'
+            entity_id:
+              $ref: '#/components/schemas/entity_id'
+            cc_mails_list:
+              description: recepients of the mail who are CC'd
+              type: array
+              items:
+                type: object
+                properties:
+                  user_name:
+                    $ref: '#/components/schemas/user_name'
+                  email:
+                    $ref: '#/components/schemas/email'
+            file_name_without_extension:
+              $ref: '#/components/schemas/file_name_without_extension'
+            to_mails_str:
+              $ref: '#/components/schemas/to_mails_str'
+            cc_mails_str:
+              $ref: '#/components/schemas/cc_mails_str'
+            from_email:
+              $ref: '#/components/schemas/from_email'
+            from_address:
+              $ref: '#/components/schemas/from_address'
+            deprecated_placeholders_used:
+              $ref: '#/components/schemas/deprecated_placeholders_used'
+            error_list:
+              $ref: '#/components/schemas/error_list'
+            subject:
+              $ref: '#/components/schemas/subject'
+            emailtemplates:
+              description: Templates used to mail
+              type: array
+              items:
+                type: object
+                properties:
+                  selected:
+                    description: To check if invoice is selected
+                    type: boolean
+                    example: true
+                  name:
+                    description: name of te invoice
+                    type: string
+                    example: Default
+                  email_template_id:
+                    description: ID of the email template used
+                    type: string
+                    example: '982000000000067'
+            emailtemplate_documents:
+              $ref: '#/components/schemas/emailtemplate_documents'
+            to_contacts:
+              description: Recepients of the mail
+              type: array
+              items:
+                type: object
+                properties:
+                  first_name:
+                    $ref: '#/components/schemas/first_name'
+                  selected:
+                    $ref: '#/components/schemas/selected'
+                  phone:
+                    $ref: '#/components/schemas/phone'
+                  email:
+                    $ref: '#/components/schemas/email'
+                  last_name:
+                    $ref: '#/components/schemas/last_name'
+                  salutation:
+                    $ref: '#/components/schemas/salutation'
+                  contact_person_id:
+                    $ref: '#/components/schemas/contact_person_id'
+                  mobile:
+                    $ref: '#/components/schemas/mobile'
+            attachment_name:
+              $ref: '#/components/schemas/attachment_name'
+            file_name:
+              $ref: '#/components/schemas/file_name'
+            from_emails:
+              description: Sender's email address
+              type: array
+              items:
+                type: object
+                properties:
+                  user_name:
+                    $ref: '#/components/schemas/user_name'
+                  selected:
+                    $ref: '#/components/schemas/selected'
+                  email:
+                    $ref: '#/components/schemas/email'
+                  organization_contact_id:
+                    $ref: '#/components/schemas/organization_contact_id'
+                  is_org_email_id:
+                    $ref: '#/components/schemas/is_org_email_id'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+    email-invoices-request:
+      required:
+        - contacts
+      type: object
+      properties:
+        contacts:
+          description: Contacts to whom email or snail mail has to be sent.
+          type: array
+          items:
+            type: object
+            required:
+              - contact_id
+              - email
+              - snail_mail
+            properties:
+              contact_id:
+                $ref: '#/components/schemas/contact_id'
+              email:
+                description: The boolean check for email
+                type: boolean
+                example: true
+              snail_mail:
+                description: The boolean check for snail mail
+                type: boolean
+                example: false
+    email-invoices-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Mission accomplished! We've sent all the invoices.
+          readOnly: true
+    remind-customer-request:
+      required:
+        - cc_mail_ids
+      type: object
+      properties:
+        to_mail_ids:
+          $ref: '#/components/schemas/to_mail_ids'
+        cc_mail_ids:
+          $ref: '#/components/schemas/cc_mail_ids'
+        subject:
+          $ref: '#/components/schemas/subject'
+        body:
+          description: content of the email
+          type: string
+          example: '<br>Dear Mr. John,&nbsp;<br><br>You might have missed the payment date and the invoice is now overdue by&nbsp;1&nbsp;days.<br><br>----------------------------------------------------------------------------------------<br><h2>Invoice# : INV-000004 </h2>Dated : 23 Dec 2016<br>----------------------------------------------------------------------------------------<br><b>&nbsp;Due Date &nbsp; &nbsp; &nbsp; &nbsp; : &nbsp;&nbsp;23 Dec 2016</b><br><b>&nbsp;Amount &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : &nbsp;&nbsp;$139.65</b><br>----------------------------------------------------------------------------------------<br><br><span>Not to worry at all !&nbsp;</span>View your invoice and take the easy way out by making an&nbsp;<a href="https://invoice.zoho.com/portal/zilliuminc/index#/invoices/invoice/2000000007037 ">online payment</a>.<br><br>If you have already paid, please accept our apologies and kindly ignore this payment reminder.<br><br><br>Regards,<br><br>David John<br>Zillium Inc<br><br><br>'
+        send_from_org_email_id:
+          $ref: '#/components/schemas/send_from_org_email_id'
+    remind-customer-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Your payment reminder has been sent.
+          readOnly: true
+    get-payment-reminder-mail-content-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        data:
+          description: Date of the email
+          type: object
+          properties:
+            bcc_mails:
+              $ref: '#/components/schemas/bcc_mails'
+            gateways_configured:
+              $ref: '#/components/schemas/gateways_configured'
+            gateways_associated:
+              $ref: '#/components/schemas/gateways_associated'
+            bcc_mails_str:
+              $ref: '#/components/schemas/bcc_mails_str'
+            body:
+              description: content of email sent
+              type: string
+              example: '<br>Dear Mr. John,&nbsp;<br><br>You might have missed the payment date and the invoice is now overdue by&nbsp;1&nbsp;days.<br><br>----------------------------------------------------------------------------------------<br><h2>Invoice# : INV-000004 </h2>Dated : 23 Dec 2016<br>----------------------------------------------------------------------------------------<br><b>&nbsp;Due Date &nbsp; &nbsp; &nbsp; &nbsp; : &nbsp;&nbsp;23 Dec 2016</b><br><b>&nbsp;Amount &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : &nbsp;&nbsp;$139.65</b><br>----------------------------------------------------------------------------------------<br><br><span>Not to worry at all !&nbsp;</span>View your invoice and take the easy way out by making an&nbsp;<a href="https://invoice.zoho.com/portal/zilliuminc/index#/invoices/invoice/2000000007037 ">online payment</a>.<br><br>If you have already paid, please accept our apologies and kindly ignore this payment reminder.<br><br><br>Regards,<br><br>David John<br>Zillium Inc<br><br><br>'
+            documents:
+              $ref: '#/components/schemas/documents'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            attach_pdf:
+              $ref: '#/components/schemas/attach_pdf'
+            entity_id:
+              $ref: '#/components/schemas/entity_id'
+            cc_mails_list:
+              description: CC'd mail recepients
+              type: array
+              items:
+                type: object
+                properties:
+                  user_name:
+                    $ref: '#/components/schemas/user_name'
+                  email:
+                    $ref: '#/components/schemas/email'
+            file_name_without_extension:
+              $ref: '#/components/schemas/file_name_without_extension'
+            to_mails_str:
+              $ref: '#/components/schemas/to_mails_str'
+            cc_mails_str:
+              $ref: '#/components/schemas/cc_mails_str'
+            from_email:
+              $ref: '#/components/schemas/from_email'
+            from_address:
+              $ref: '#/components/schemas/from_address'
+            deprecated_placeholders_used:
+              $ref: '#/components/schemas/deprecated_placeholders_used'
+            error_list:
+              $ref: '#/components/schemas/error_list'
+            subject:
+              $ref: '#/components/schemas/subject'
+            emailtemplates:
+              description: Email templates used
+              type: array
+              items:
+                type: object
+                properties:
+                  selected:
+                    description: Selected or not
+                    type: boolean
+                    example: true
+                  name:
+                    description: Name of the sender
+                    type: string
+                    example: Default
+                  email_template_id:
+                    description: ID of the email template used
+                    type: string
+                    example: '982000000000067'
+            emailtemplate_documents:
+              $ref: '#/components/schemas/emailtemplate_documents'
+            to_contacts:
+              description: Recepienyts pf the mail
+              type: array
+              items:
+                type: object
+                properties:
+                  first_name:
+                    $ref: '#/components/schemas/first_name'
+                  selected:
+                    $ref: '#/components/schemas/selected'
+                  phone:
+                    $ref: '#/components/schemas/phone'
+                  email:
+                    $ref: '#/components/schemas/email'
+                  last_name:
+                    $ref: '#/components/schemas/last_name'
+                  salutation:
+                    $ref: '#/components/schemas/salutation'
+                  contact_person_id:
+                    $ref: '#/components/schemas/contact_person_id'
+                  mobile:
+                    $ref: '#/components/schemas/mobile'
+            attachment_name:
+              $ref: '#/components/schemas/attachment_name'
+            file_name:
+              $ref: '#/components/schemas/file_name'
+            from_emails:
+              description: senders email address
+              type: array
+              items:
+                type: object
+                properties:
+                  user_name:
+                    $ref: '#/components/schemas/user_name'
+                  selected:
+                    $ref: '#/components/schemas/selected'
+                  email:
+                    $ref: '#/components/schemas/email'
+                  organization_contact_id:
+                    $ref: '#/components/schemas/organization_contact_id'
+                  is_org_email_id:
+                    $ref: '#/components/schemas/is_org_email_id'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+    bulk-invoice-reminder-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        info:
+          type: object
+          properties:
+            email_success_info:
+              description: Information on success of email delivery
+              type: object
+              properties:
+                message:
+                  description: Alert Message
+                  type: string
+                  example: The reminders were successfully sent
+                sent_count:
+                  description: Number of email s sent
+                  type: integer
+                  example: 2
+            email_errors_info:
+              description: error info
+              type: array
+              items:
+                type: object
+                properties:
+                  message:
+                    description: Alert Message
+                    type: string
+                    example: The reminders were successfully sent
+                  ids:
+                    description: ID's of mails sent
+                    type: array
+                    items:
+                      type: string
+                    example: '2000000007037'
+            code:
+              description: Code
+              type: integer
+              example: 4083
+    bulk-export-invoices-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+    bulk-print-invoices-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+    disable-payment-reminder-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Reminders stopped.
+          readOnly: true
+    enable-payment-reminder-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Reminders enabled.
+          readOnly: true
+    write-off-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice has been written off
+          readOnly: true
+    update-billing-address-request:
+      type: object
+      properties:
+        address:
+          description: Billing address of the customer
+          type: string
+          example: |-
+            B-1104, 11F, 
+            Horizon International Tower, 
+            No. 6, ZhiChun Road, HaiDian District
+        city:
+          description: City of the customer's billing address
+          type: string
+          example: Beijing
+        state:
+          description: State of the customer's billing address
+          type: string
+          example: Beijing
+        zip:
+          description: ZIP code of the contact's billing address
+          type: string
+          example: 1000881
+        country:
+          description: Country of the contact's billing address
+          type: string
+        fax:
+          description: FAX number of the customer
+          type: string
+          example: +86-10-82637827
+    update-billing-address-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Billing address updated
+          readOnly: true
+    update-shipping-address-request:
+      type: object
+      properties:
+        address:
+          description: Shipping address of the customer
+          type: string
+          example: 4900 Hopyard Rd, Suit 310
+        city:
+          description: City of the contact's shipping address
+          type: string
+          example: Pleasanton
+        state:
+          description: State of the Contact's shipping address
+          type: string
+          example: CA
+        zip:
+          description: ZIP code of the contact's shipping address
+          type: string
+          example: 945881
+        country:
+          description: Contact's country for the given shipping address
+          type: string
+          example: USA
+        fax:
+          description: FAX number of the contact
+          type: string
+          example: +1-925-924-9600
+    update-shipping-address-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Shipping address updated
+          readOnly: true
+    list-invoice-templates-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        templates:
+          type: array
+          items:
+            type: object
+            properties:
+              template_name:
+                $ref: '#/components/schemas/template_name'
+              template_id:
+                $ref: '#/components/schemas/template_id'
+              template_type:
+                $ref: '#/components/schemas/template_type'
+    update-invoice-template-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice information has been updated.
+          readOnly: true
+    list-invoice-payments-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        payments:
+          type: array
+          items:
+            type: object
+            properties:
+              payment_id:
+                $ref: '#/components/schemas/payment_id'
+              payment_number:
+                $ref: '#/components/schemas/payment_number'
+              invoice_id:
+                $ref: '#/components/schemas/invoice_id'
+              invoice_payment_id:
+                $ref: '#/components/schemas/invoice_payment_id'
+              payment_mode:
+                $ref: '#/components/schemas/payment_mode'
+              description:
+                $ref: '#/components/schemas/description'
+              date:
+                $ref: '#/components/schemas/date'
+              reference_number:
+                $ref: '#/components/schemas/reference_number'
+              exchange_rate:
+                $ref: '#/components/schemas/exchange_rate'
+              amount:
+                $ref: '#/components/schemas/amount'
+              tax_amount_withheld:
+                $ref: '#/components/schemas/tax_amount_withheld'
+              online_transaction_id:
+                $ref: '#/components/schemas/online_transaction_id'
+              is_single_invoice_payment:
+                $ref: '#/components/schemas/is_single_invoice_payment'
+    list-credits-applied-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        credits:
+          type: array
+          items:
+            type: object
+            properties:
+              creditnote_id:
+                $ref: '#/components/schemas/creditnote_id'
+              creditnotes_invoice_id:
+                $ref: '#/components/schemas/creditnotes_invoice_id'
+              creditnotes_number:
+                $ref: '#/components/schemas/creditnotes_number'
+              credited_date:
+                $ref: '#/components/schemas/credited_date'
+              amount_applied:
+                $ref: '#/components/schemas/amount_applied'
+    apply-credits-request:
+      type: object
+      properties:
+        invoice_payments:
+          description: Payments applied to an invoice.
+          type: array
+          items:
+            type: object
+            properties:
+              payment_id:
+                description: ID of the payment from which credit has to be applied.
+                type: string
+                example: 460000000031003
+              amount_applied:
+                description: Amount applied to the invoice.
+                type: number
+                format: float
+                example: 15
+        apply_creditnotes:
+          description: Credits applied to invoice.
+          type: array
+          items:
+            type: object
+            properties:
+              creditnote_id:
+                description: ID of the credit note from which credit has to be applied.
+                type: string
+                example: 460000000029003
+              amount_applied:
+                description: Amount applied to the invoice.
+                type: number
+                format: float
+                example: 22.5
+    apply-credits-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Credits have been applied to the invoice(s).
+          readOnly: true
+    delete-a-payment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The payment has been deleted.
+          readOnly: true
+    delete-applied-credit-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Credits applied to an invoice have been deleted.
+          readOnly: true
+    get-an-invoice-attachment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+    add-attachment-to-an-invoice-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Your file has been successfully attached to the invoice.
+          readOnly: true
+    update-attachment-preference-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Invoice information has been updated.
+          readOnly: true
+    delete-an-attachment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Your file is no longer attached to the invoice.
+          readOnly: true
+    delete-the-expense-receipt-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The attached expense receipt has been deleted.
+          readOnly: true
+    list-invoice-comments-and-history-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        comments:
+          description: Comments made
+          type: array
+          items:
+            type: object
+            properties:
+              comment_id:
+                description: The ID of the comment
+                type: string
+                example: 982000000567019
+              invoice_id:
+                $ref: '#/components/schemas/invoice_id'
+              description:
+                $ref: '#/components/schemas/description'
+              commented_by_id:
+                description: ID of comment made
+                type: string
+                example: 982000000554041
+              commented_by:
+                description: User who added comment
+                type: string
+                example: John David
+              comment_type:
+                description: type of comment made
+                type: string
+                example: system
+              operation_type:
+                description: Tyoe of operation done on invoice
+                type: string
+                example: Added
+              date:
+                description: Date of transaction
+                type: string
+                example: '2013-11-18'
+              date_description:
+                description: Date of description
+                type: string
+                example: yesterday
+              time:
+                description: Time of comment
+                type: string
+                example: 2:38 AM
+              transaction_id:
+                description: Unique ID of transaction made
+                type: string
+                example: '982000000567204'
+              transaction_type:
+                description: Type of transaction
+                type: string
+                example: invoice
+    add-comment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: Comments added.
+          readOnly: true
+    update-comment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        comment_id:
+          $ref: '#/components/schemas/comment_id'
+        invoice_id:
+          $ref: '#/components/schemas/invoice_id'
+        description:
+          $ref: '#/components/schemas/description'
+        commented_by_id:
+          $ref: '#/components/schemas/commented_by_id'
+        commented_by:
+          $ref: '#/components/schemas/commented_by'
+        date:
+          $ref: '#/components/schemas/date'
+        date_description:
+          $ref: '#/components/schemas/date_description'
+        time:
+          $ref: '#/components/schemas/time'
+        comment_type:
+          $ref: '#/components/schemas/comment_type'
+    delete-a-comment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The comment has been deleted.
+          readOnly: true
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.invoices.READ: Read Invoices
+            ZohoSubscriptions.invoices.CREATE: Create Invoices
+            ZohoSubscriptions.invoices.UPDATE: Update Invoices
+            ZohoSubscriptions.invoices.DELETE: Delete Invoices

@@ -1,0 +1,149 @@
+openapi: 3.0.0
+info:
+  title: Bank-Accounts
+  description: A bank account  object shows the cbank account information for a particular customer
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: bank-account
+    description: Bank-Account Module
+paths:
+  /customers/{customer_id}/bankaccounts/{account_id}:
+    x-mcp-group:
+      - Cards and Bank Accounts
+    get:
+      tags:
+        - bank-account
+      operationId: Get_a_Bank_Account
+      summary: Retrieve a bank account information
+      description: Details of an existing bank account.
+      parameters:
+        - name: account_id
+          in: path
+          required: true
+          description: Unique identifier of the bank account.
+          schema:
+            type: string
+          example: '90300000079126'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-a-bank-account-information-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.customers.READ
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        description: Unique identifier of the customer.
+        schema:
+          type: string
+        example: '9030000005664'
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/bank_accounts-response'
+    bank_accounts-response:
+      type: object
+      properties:
+        account_id:
+          $ref: '#/components/schemas/account_id'
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        customer_name:
+          $ref: '#/components/schemas/customer_name'
+        gateway:
+          $ref: '#/components/schemas/gateway'
+        last_four_digits:
+          $ref: '#/components/schemas/last_four_digits'
+        status:
+          $ref: '#/components/schemas/status'
+        last_modified_time:
+          $ref: '#/components/schemas/last_modified_time'
+        created_time:
+          $ref: '#/components/schemas/created_time'
+        created_by_id:
+          $ref: '#/components/schemas/created_by_id'
+        created_by_name:
+          $ref: '#/components/schemas/created_by_name'
+    customer_id:
+      description: Unique ID associated with the customer.
+      type: string
+      example: '9030000005664'
+    customer_name:
+      description: Name of the customer, whom the bank account is associated.
+      type: string
+      example: Bowman Furniture
+    account_id:
+      description: Account ID of the bank account from which payment is about to made by the customer.
+      type: string
+      example: '90300000079126'
+    gateway:
+      description: Payment gateway through which payment needs to be made. Supported payment gateway values <code>test_gateway</code>, <code>payflow_pro</code>, <code>stripe</code>, <code>2checkout</code>, <code>authorize_net</code>, <code>payments_pro</code>, <code>forte</code>, <code>worldpay</code>, <code>wepay</code>.
+      type: string
+      example: authorize_net
+    last_four_digits:
+      description: Last four digits of the customer's bank account.
+      type: integer
+      example: 2
+    status:
+      description: Status of the bank account.
+      type: string
+      example: active
+    last_modified_time:
+      description: Time at which the contact person details were last updated.
+      type: string
+      example: 2016-06-05T02:30:08-0700
+    created_time:
+      description: Time at which the contact person was created.
+      type: string
+      example: 2016-06-05T12:30:08-0700
+    created_by_id:
+      description: Unique ID to denote the user who added the bank account.
+      type: string
+      example: '9030000067542'
+    created_by_name:
+      description: Name of the user who added the bank account.
+      type: string
+      example: Benjamin
+    retrieve-a-bank-account-information-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        bank_accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/bank_accounts-response'
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.customers.READ: Read Customers

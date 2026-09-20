@@ -1,0 +1,357 @@
+openapi: 3.0.0
+info:
+  title: Settings
+  description: Tax Settings Related APIs.
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: settings
+    description: Settings Module
+paths:
+  /settings/taxes:
+    x-mcp-group:
+      - Taxes
+    get:
+      tags:
+        - settings
+      operationId: List_all_Taxes
+      summary: Retrieve list of taxes
+      description: Retrieves the list of taxes along with their details.
+      parameters:
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-list-of-taxes-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /settings/taxexemptions:
+    x-mcp-group:
+      - Taxes
+    get:
+      tags:
+        - settings
+      operationId: List_all_Tax_Exemptions
+      summary: Retrieve list of tax Exemptions
+      description: Retrieves the list of tax Exemptions.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-list-of-tax-exemptions-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /settings/taxauthorities:
+    x-mcp-group:
+      - Taxes
+    get:
+      tags:
+        - settings
+      operationId: List_all_Tax_Authorities
+      summary: Retrieve list of tax Authorities
+      description: Retrieves the list of tax Authorities.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-list-of-tax-authorities-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /settings/preferences/churnmessages:
+    x-mcp-group:
+      - Subscriptions
+    get:
+      tags:
+        - settings
+      operationId: Get_Churn_Message_Preferences
+      summary: Retrieve Churn Message preferences
+      description: Retrieves list of Advanced Churn Message preferences.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-churn-message-preferences-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/taxes-response'
+    taxes-response:
+      type: object
+      properties:
+        is_default_tax:
+          $ref: '#/components/schemas/is_default_tax'
+        is_editable:
+          $ref: '#/components/schemas/is_editable'
+        tax_authority_id:
+          $ref: '#/components/schemas/tax_authority_id'
+        tax_authority_name:
+          $ref: '#/components/schemas/tax_authority_name'
+        tax_id:
+          $ref: '#/components/schemas/tax_id'
+        tax_name:
+          $ref: '#/components/schemas/tax_name'
+        tax_percentage:
+          $ref: '#/components/schemas/tax_percentage'
+        tax_type:
+          $ref: '#/components/schemas/tax_type'
+    tax_id:
+      description: Unique ID of the tax or tax group that can be collected from the contact. Tax can be given only if <code>is_taxable</code> is <code>true</code>.
+      type: string
+      example: '903000002345'
+    tax_authority_id:
+      description: Unique ID of the tax authority. Tax authority depends on the location of the customer. For example, if the customer is located in NY, then the tax authority is NY tax authority.
+      type: string
+      example: '903000006345'
+      x-node_available_in:
+        - Sales Tax
+      x-node_unavailable_in: []
+      x-required_info: for applying Tax exemption to a customer.
+    tax_authority_name:
+      description: Unique name of the tax authority. Either tax_authority_id or tax_authority_name can be given.
+      type: string
+      example: ATO
+      x-node_available_in:
+        - Sales Tax
+      x-node_unavailable_in: []
+      x-required_info: for applying Tax exemption to a customer.
+    tax_exemption_id:
+      description: Unique ID of the tax exemption.
+      type: string
+      example: '903000006345'
+      x-node_available_in:
+        - Sales Tax
+        - GST
+      x-node_unavailable_in: []
+    tax_exemption_code:
+      description: Unique code of the tax exemption.
+      type: string
+      example: GST FREE
+      x-node_available_in:
+        - Sales Tax
+        - GST
+      x-node_unavailable_in: []
+    is_taxable:
+      description: Set to true if customer's transactions must be tax inclusive.
+      type: string
+      example: true
+      x-node_available_in:
+        - Sales Tax
+        - GST
+      x-node_unavailable_in: []
+    tax_name:
+      description: Name of the tax to which subscription is associated.
+      type: string
+      example: GST
+    tax_amount:
+      description: Tax amount applied to the subscription.
+      type: string
+      example: '2.50'
+    is_default_tax:
+      description: Set to true for default taxes.
+      type: string
+      example: true
+    is_editable:
+      description: Set to true for editable taxes.
+      type: string
+      example: true
+    tax_type:
+      description: Specifies whether the tax is Simple tax or Tax Group.
+      type: string
+      example: tax_group
+    tax_percentage:
+      description: Percentage of tax.
+      type: string
+      example: 15
+    description:
+      description: Appropriate description for teh tax exemption.
+      type: string
+      example: Non-Profit Organization
+    type:
+      description: Tax exemption can be of customer or item type.
+      type: string
+      example: customer
+    is_advanced_version:
+      description: Boolean to denote if it is an Simple version or Advanced Version.
+      type: string
+      example: true
+    is_reason_mandatory:
+      description: Whether reason is mandatory or not.
+      type: string
+      example: true
+    label:
+      description: Reason for cancellation
+      type: string
+      example: Doesn't meet my needs
+    index:
+      description: Inde value of the reason
+      type: string
+      example: 0
+    churn_message_id:
+      description: Unique ID of the cancellation reason
+      type: string
+      example: customer
+    churn_messages:
+      description: List of Cancellation reasons
+      type: array
+      items:
+        type: object
+        properties:
+          label:
+            $ref: '#/components/schemas/label'
+          index:
+            $ref: '#/components/schemas/index'
+          churn_message_id:
+            $ref: '#/components/schemas/churn_message_id'
+    retrieve-list-of-taxes-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        taxes:
+          type: array
+          items:
+            $ref: '#/components/schemas/taxes-response'
+    retrieve-list-of-tax-exemptions-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        tax_exemptions:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                $ref: '#/components/schemas/description'
+              tax_exemption_id:
+                $ref: '#/components/schemas/tax_exemption_id'
+              tax_exemption_code:
+                $ref: '#/components/schemas/tax_exemption_code'
+              type:
+                $ref: '#/components/schemas/type'
+    retrieve-list-of-tax-authorities-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        tax_authorities:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                $ref: '#/components/schemas/description'
+              tax_authority_id:
+                $ref: '#/components/schemas/tax_authority_id'
+              tax_authority_name:
+                $ref: '#/components/schemas/tax_authority_name'
+    retrieve-churn-message-preferences-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        churn_messages_settings:
+          type: object
+          properties:
+            is_advanced_version:
+              $ref: '#/components/schemas/is_advanced_version'
+            is_reason_mandatory:
+              $ref: '#/components/schemas/is_reason_mandatory'
+            churn_messages:
+              description: List of Cancellation reasons
+              type: array
+              items:
+                type: object
+                properties:
+                  label:
+                    $ref: '#/components/schemas/label'
+                  index:
+                    $ref: '#/components/schemas/index'
+                  churn_message_id:
+                    $ref: '#/components/schemas/churn_message_id'
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.settings.READ: Read Settings

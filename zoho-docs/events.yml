@@ -1,0 +1,410 @@
+openapi: 3.0.0
+info:
+  title: Events
+  description: Events can be used to let you know when something happens in your organization. Every happening in your organization will be recorded as a new Event. For example, when a new payment is received, we will create a <code>payment_thankyou</code> event; when a subscription is created, we will create a <code>subscription_created</code> event.<br/> <br/>You can retrieve these events individually or as a <a href="https://www.zoho.com/billing/api/v1/events/#list-of-events">list</a> using our API. If you want to update the data on your server when an event occurs, you can use webhooks to send these event objects directly to an endpoint on your application's server. Learn more about <a href="https://www.zoho.com/billing/help/settings/automation.html">webhooks</a>.<br/><br/><b>Note:</b> You can only access events created in the last 180 days.<br/><br/>
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: events
+    description: Events Module
+x-additionalInfo:
+  Event Types:
+    description: <p>The following are the list of events that Zoho Billing currently supports.</p><p> <i>Note&#58;</i> For backdated subscriptions, events will not be created for any actions that occur in a date previous than the current date. </p>
+    attributesTitle: Events
+    type: object
+    hideExample: true
+    properties:
+      subscription_created:
+        $ref: '#/components/schemas/subscription_created'
+      trial_expiring:
+        $ref: '#/components/schemas/trial_expiring'
+      subscription_activation:
+        $ref: '#/components/schemas/subscription_activation'
+      subscription_ahead:
+        $ref: '#/components/schemas/subscription_ahead'
+      subscription_renewed:
+        $ref: '#/components/schemas/subscription_renewed'
+      billing_date_changed:
+        $ref: '#/components/schemas/billing_date_changed'
+      subscription_upgraded:
+        $ref: '#/components/schemas/subscription_upgraded'
+      subscription_downgraded:
+        $ref: '#/components/schemas/subscription_downgraded'
+      subscription_unpaid:
+        $ref: '#/components/schemas/subscription_unpaid'
+      subscription_cancelled:
+        $ref: '#/components/schemas/subscription_cancelled'
+      subscription_reactivated:
+        $ref: '#/components/schemas/subscription_reactivated'
+      subscription_cancellation_scheduled:
+        $ref: '#/components/schemas/subscription_cancellation_scheduled'
+      subscription_move_to_free_scheduled:
+        $ref: '#/components/schemas/subscription_move_to_free_scheduled'
+      subscription_expiring:
+        $ref: '#/components/schemas/subscription_expiring'
+      subscription_expired:
+        $ref: '#/components/schemas/subscription_expired'
+      subscription_deleted:
+        $ref: '#/components/schemas/subscription_deleted'
+      subscription_reactivation_scheduled:
+        $ref: '#/components/schemas/subscription_reactivation_scheduled'
+      subscription_scheduled_cancellation_removed:
+        $ref: '#/components/schemas/subscription_scheduled_cancellation_removed'
+      subscription_cancelling:
+        $ref: '#/components/schemas/subscription_cancelling'
+      invoice_notification:
+        $ref: '#/components/schemas/invoice_notification'
+      invoice_updated:
+        $ref: '#/components/schemas/invoice_updated'
+      invoice_voided:
+        $ref: '#/components/schemas/invoice_voided'
+      creditnote_added:
+        $ref: '#/components/schemas/creditnote_added'
+      creditnote_refunded:
+        $ref: '#/components/schemas/creditnote_refunded'
+      creditnote_deleted:
+        $ref: '#/components/schemas/creditnote_deleted'
+      payment_thankyou:
+        $ref: '#/components/schemas/payment_thankyou'
+      payment_refunded:
+        $ref: '#/components/schemas/payment_refunded'
+      payment_declined:
+        $ref: '#/components/schemas/payment_declined'
+      payment_voided:
+        $ref: '#/components/schemas/payment_voided'
+      card_expired:
+        $ref: '#/components/schemas/card_expired'
+      card_expiring:
+        $ref: '#/components/schemas/card_expiring'
+      card_deleted:
+        $ref: '#/components/schemas/card_deleted'
+      payment_method_added:
+        $ref: '#/components/schemas/payment_method_added'
+      payment_method_deleted:
+        $ref: '#/components/schemas/payment_method_deleted'
+      payment_method_updated:
+        $ref: '#/components/schemas/payment_method_updated'
+      unbilled_charges_added:
+        $ref: '#/components/schemas/unbilled_charges_added'
+      unbilled_charges_updated:
+        $ref: '#/components/schemas/unbilled_charges_updated'
+      unbilled_charges_invoiced:
+        $ref: '#/components/schemas/unbilled_charges_invoiced'
+      unbilled_charges_deleted:
+        $ref: '#/components/schemas/unbilled_charges_deleted'
+paths:
+  /events/{event_id}:
+    x-mcp-group:
+      - Events
+    get:
+      tags:
+        - events
+      operationId: Get_an_Event
+      summary: Retrieve an event
+      description: Details of an existing event.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-an-event-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.webhooks.READ
+    parameters:
+      - name: event_id
+        in: path
+        required: true
+        description: Unique identifier of the event.
+        schema:
+          type: string
+        example: '90300000005337'
+      - $ref: '#/components/parameters/organization_id'
+  /events:
+    x-mcp-group:
+      - Events
+    get:
+      tags:
+        - events
+      operationId: List_all_Events
+      summary: List of events
+      description: List of all events.
+      parameters:
+        - name: page
+          in: query
+          description: Page number to be fetched. Default value is 1.
+          required: false
+          schema:
+            type: integer
+            default: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of records to be fetched per page. Default value is 200.
+          required: false
+          schema:
+            type: integer
+            default: 200
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-of-events-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.webhooks.READ
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/event-response'
+    event-response:
+      type: object
+      properties:
+        event_id:
+          $ref: '#/components/schemas/event_id'
+        event_type:
+          $ref: '#/components/schemas/event_type'
+        event_time:
+          $ref: '#/components/schemas/event_time'
+        payload:
+          $ref: '#/components/schemas/payload'
+        webhooks:
+          description: List of objects holds information about the webhooks. Each object contains <code>webhook_id</code>, <code>url</code>, <code>status</code> and <code>last_updated_time</code>.
+          type: array
+          items:
+            type: object
+            properties:
+              webhook_id:
+                $ref: '#/components/schemas/webhook_id'
+              url:
+                $ref: '#/components/schemas/url'
+              status:
+                $ref: '#/components/schemas/status'
+              last_updated_time:
+                $ref: '#/components/schemas/last_updated_time'
+    event_id:
+      description: Unique ID generated for a particular event
+      type: string
+      example: '90300000005337'
+    event_type:
+      description: The type of event.
+      type: string
+      example: subscription_activation
+    event_time:
+      description: The time at which the event is created.
+      type: string
+      example: 2016-06-05T18:28:20-0700
+    payload:
+      description: Holds information about the event that occurred.
+      type: string
+      example: '{...}'
+    webhooks:
+      description: List of objects holds information about the webhooks. Each object contains <code>webhook_id</code>, <code>url</code>, <code>status</code> and <code>last_updated_time</code>.
+      type: array
+      items:
+        type: object
+        properties:
+          webhook_id:
+            $ref: '#/components/schemas/webhook_id'
+          url:
+            $ref: '#/components/schemas/url'
+          status:
+            $ref: '#/components/schemas/status'
+          last_updated_time:
+            $ref: '#/components/schemas/last_updated_time'
+    webhook_id:
+      description: The unique ID generated for a webhook by the server. This can be used as an identifier.
+      type: string
+      example: '9030000020202'
+    url:
+      description: The URL for which the webhook is sent.
+      type: string
+      example: http://gatehost/webhooks/newsubscription/add
+    status:
+      description: Status of the webhook. This can be <code>success</code>, <code>scheduled</code> or <code>failure</code>.
+      type: string
+      example: success
+    last_updated_time:
+      description: The time at which the webhook was last sent.
+      type: string
+      example: 2016-07-01T20:28:20-0700
+    subscription_created:
+      type: string
+      description: Triggered when a subscription is created
+    trial_expiring:
+      type: string
+      description: Triggered 3 days before when a subscription trial is about to expire
+    subscription_activation:
+      type: string
+      description: Triggered when a subscription gets to Live state
+    subscription_ahead:
+      type: string
+      description: Triggered 3 days before a subscription is about to renew
+    subscription_renewed:
+      type: string
+      description: Triggered when a subscription is renewed
+    billing_date_changed:
+      type: string
+      description: Triggered when the billing date for a subscription is changed
+    subscription_upgraded:
+      type: string
+      description: Triggered when a subscription plan is upgraded from a lower to a higher plan
+    subscription_downgraded:
+      type: string
+      description: Triggered when a subscription plan is downgraded from a higher to a lower plan
+    subscription_unpaid:
+      type: string
+      description: Triggered when a subscription is marked as unpaid.
+    subscription_cancelled:
+      type: string
+      description: Triggers when a subscription is cancelled.
+    subscription_reactivated:
+      type: string
+      description: Triggered when a subscription is reactivated from the cancelled state.
+    subscription_cancellation_scheduled:
+      type: string
+      description: Triggers when a subscription is chose to cancel at the next renewal.
+    subscription_move_to_free_scheduled:
+      type: string
+      description: Triggers when a subscription is chosen to move to free plan at the next renewal.
+    subscription_expiring:
+      type: string
+      description: Triggered 3 days before a subscriptions is about expire
+    subscription_expired:
+      type: string
+      description: Triggers when a subscription is expired
+    subscription_deleted:
+      type: string
+      description: Triggers when a subscription is deleted
+    subscription_reactivation_scheduled:
+      type: string
+      description: Triggered when a subscription is scheduled for reactivation
+    subscription_scheduled_cancellation_removed:
+      type: string
+      description: Triggered when the scheduled cancellation of a subscription is removed
+    subscription_cancelling:
+      type: string
+      description: Triggered when a subscription is about to be cancelled
+    invoice_notification:
+      type: string
+      description: Triggers when an invoice notification is sent to the customer
+    invoice_updated:
+      type: string
+      description: Triggers when an invoice is updated
+    invoice_voided:
+      type: string
+      description: Triggers when an invoice is voided
+    creditnote_added:
+      type: string
+      description: Triggers when a credit note is added
+    creditnote_refunded:
+      type: string
+      description: Triggers when a credit note is refunded
+    creditnote_deleted:
+      type: string
+      description: Triggers when a credit note is deleted
+    payment_thankyou:
+      type: string
+      description: Triggers when a payment for an invoice is recieved
+    payment_refunded:
+      type: string
+      description: Triggers when a payment is refunded
+    payment_declined:
+      type: string
+      description: Triggers when a payment for an invoice fails
+    payment_voided:
+      type: string
+      description: Triggers when a payment is voided
+    card_expired:
+      type: string
+      description: Triggers when a customer card is expired
+    card_expiring:
+      type: string
+      description: Triggered 15 days before a customer card expires
+    card_deleted:
+      type: string
+      description: Triggered when a customer card is deleted
+    payment_method_added:
+      type: string
+      description: Triggers when a payment method is added
+    payment_method_deleted:
+      type: string
+      description: Triggers when a payment method is deleted
+    payment_method_updated:
+      type: string
+      description: Triggers when a payment method is updated
+    unbilled_charges_added:
+      type: string
+      description: Triggers when unbilled charges are added
+    unbilled_charges_updated:
+      type: string
+      description: Triggers when unbilled charges are updated
+    unbilled_charges_invoiced:
+      type: string
+      description: Triggers when unbilled charges are invoiced
+    unbilled_charges_deleted:
+      type: string
+      description: Triggers when unbilled charges are deleted
+    retrieve-an-event-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        event:
+          $ref: '#/components/schemas/event-response'
+    list-of-events-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        events:
+          type: array
+          items:
+            type: object
+            properties:
+              event_id:
+                $ref: '#/components/schemas/event_id'
+              event_type:
+                $ref: '#/components/schemas/event_type'
+              event_time:
+                $ref: '#/components/schemas/event_time'
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.webhooks.READ: Read Webhooks

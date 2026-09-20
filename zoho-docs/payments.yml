@@ -1,0 +1,815 @@
+openapi: 3.0.0
+info:
+  title: Payments
+  description: A payment object describes details regarding a particular customer payment. There can be multiple payments for a single invoice. Multiple invoices can be paid in a single payment as well.
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: payments
+    description: Payments Module
+paths:
+  /payments:
+    x-mcp-group:
+      - Payments
+    get:
+      operationId: List_all_Payments
+      tags:
+        - payments
+      summary: List payments
+      description: Get a list of payments with helpful pagination, filtering, search and sorting features. Perfect for viewing your payment data in organized ways, whether you need to find specific payments or browse through your records.
+      parameters:
+        - name: filter_by
+          in: query
+          description: 'Invoices of particular status can be filtered by passing a param <code>filter_by</code>. PaymentStatus allowed values: <code>PaymentStatus.All</code>, <code>PaymentStatus.Incomplete</code>, <code>PaymentStatus.Resolved</code>, <code>PaymentStatus.OnlineFailure</code>, <code>PaymentStatus.OnlineSuccess</code>. PaymentType allowed values: <code>PaymentType.Online</code>, <code>PaymentType.Offline</code>.'
+          required: false
+          schema:
+            type: string
+            enum:
+              - PaymentStatus.All
+              - PaymentStatus.Incomplete
+              - PaymentStatus.Resolved
+              - PaymentStatus.OnlineFailure
+              - PaymentStatus.OnlineSuccess
+              - PaymentType.Online
+              - PaymentType.Offline
+          example: PaymentStatus.All
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-all-payments-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.payments.READ
+    post:
+      operationId: Create_a_Payment
+      tags:
+        - payments
+      summary: Create a payment
+      description: Create a new payment.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-a-payment-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create-a-payment-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.payments.CREATE
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /payments/{payment_id}:
+    x-mcp-group:
+      - Payments
+    get:
+      operationId: Get_a_Payment
+      tags:
+        - payments
+      summary: Retrieve a payment
+      description: Details of an existing payment.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retrieve-a-payment-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.payments.READ
+    put:
+      operationId: Update_a_Payment
+      tags:
+        - payments
+      summary: Update a payment
+      description: Update an existing payment information.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-a-payment-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-a-payment-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.payments.UPDATE
+    delete:
+      operationId: Delete_a_Payment
+      tags:
+        - payments
+      summary: Delete a payment
+      description: Delete an existing payment.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-a-payment-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.payments.DELETE
+    parameters:
+      - name: payment_id
+        in: path
+        required: true
+        description: Unique identifier of the payment.
+        schema:
+          type: string
+        example: '9030000079467'
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/payment-response'
+    payment-response:
+      type: object
+      properties:
+        payment_id:
+          $ref: '#/components/schemas/payment_id'
+        payment_mode:
+          $ref: '#/components/schemas/payment_mode'
+        amount:
+          $ref: '#/components/schemas/amount'
+        amount_refunded:
+          $ref: '#/components/schemas/amount_refunded'
+        bank_charges:
+          $ref: '#/components/schemas/bank_charges'
+        date:
+          $ref: '#/components/schemas/date'
+        status:
+          $ref: '#/components/schemas/status'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        description:
+          $ref: '#/components/schemas/description'
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        customer_name:
+          $ref: '#/components/schemas/customer_name'
+        email:
+          $ref: '#/components/schemas/email'
+        autotransaction:
+          description: If the payment mode is <code>autotransaction</code>, autotransaction information will be displayed in the autotransaction object. It contains <code>autotransaction_id</code>, <code>payment_gateway</code>, <code>gateway_transaction_id</code>, <code>card_id</code>, <code>last_four_digits</code>, <code>expiry_month</code> and <code>expiry_year</code>.
+          type: object
+          properties:
+            autotransaction_id:
+              $ref: '#/components/schemas/autotransaction_id'
+            payment_gateway:
+              $ref: '#/components/schemas/payment_gateway'
+            gateway_transaction_id:
+              $ref: '#/components/schemas/gateway_transaction_id'
+            gateway_error_message:
+              $ref: '#/components/schemas/gateway_error_message'
+            card_id:
+              $ref: '#/components/schemas/card_id'
+            last_four_digits:
+              $ref: '#/components/schemas/last_four_digits'
+            expiry_month:
+              $ref: '#/components/schemas/expiry_month'
+            expiry_year:
+              $ref: '#/components/schemas/expiry_year'
+        invoices:
+          description: List of invoices associated with the payment. Each invoice object contains <code>invoice_id</code>, <code>invoice_number</code>, <code>date</code>, <code>invoice_amount</code>, <code>amount_applied</code> and <code>balance_amount</code>.
+          type: array
+          items:
+            type: object
+            properties:
+              invoice_id:
+                $ref: '#/components/schemas/invoice_id'
+              invoice_number:
+                $ref: '#/components/schemas/invoice_number'
+              date:
+                description: Date on which the invoice was raised.
+                example: '2016-06-05'
+              invoice_amount:
+                $ref: '#/components/schemas/invoice_amount'
+              amount_applied:
+                $ref: '#/components/schemas/amount_applied'
+              balance_amount:
+                $ref: '#/components/schemas/balance_amount'
+        currency_code:
+          $ref: '#/components/schemas/currency_code'
+        currency_symbol:
+          $ref: '#/components/schemas/currency_symbol'
+        custom_fields:
+          description: Additional fields for the payments.
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                $ref: '#/components/schemas/index'
+              value:
+                $ref: '#/components/schemas/value'
+              label:
+                $ref: '#/components/schemas/label'
+              data_type:
+                $ref: '#/components/schemas/data_type'
+    payments-list-response:
+      type: object
+      properties:
+        payment_id:
+          $ref: '#/components/schemas/payment_id'
+        invoice_number:
+          $ref: '#/components/schemas/invoice_number'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        date:
+          $ref: '#/components/schemas/date'
+        mode:
+          $ref: '#/components/schemas/mode'
+        status:
+          $ref: '#/components/schemas/status'
+        amount:
+          $ref: '#/components/schemas/amount'
+        last_four_digits:
+          $ref: '#/components/schemas/last_four_digits'
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        customer_name:
+          $ref: '#/components/schemas/customer_name'
+        email:
+          $ref: '#/components/schemas/email'
+        gateway_transaction_id:
+          $ref: '#/components/schemas/gateway_transaction_id'
+    payment_id:
+      description: Unique ID of the payment generated by the server.
+      type: string
+      example: '9030000079467'
+    payment_mode:
+      description: Mode through which payment is made. This can be <code>check</code>, <code>cash</code>, <code>creditcard</code>, <code>banktransfer</code>, <code>bankremittance</code>, <code>autotransaction</code> or <code>others</code>.
+      type: string
+      example: cash
+    mode:
+      description: Mode through which payment is made. This can be <code>check</code>, <code>cash</code>, <code>creditcard</code>, <code>banktransfer</code>, <code>bankremittance</code>, <code>autotransaction</code> or <code>others</code>.
+      type: string
+      example: cash
+    amount:
+      description: Amount paid in the respective payment.
+      type: number
+      format: double
+      example: 450
+    amount_refunded:
+      description: Amount that is refund. Refunds are applicable only for payments whose payment_mode is <code>autotransaction</code>. Refunds would be made to the respective card provided by the customer.
+      type: number
+      format: double
+      example: 50
+    date:
+      description: Date on which payment is made.
+      type: string
+      example: '2016-06-05'
+    status:
+      description: Status of the payment. It can either be <code>success</code> or <code>failure</code>.
+      type: string
+      example: success
+    reference_number:
+      description: Reference number generated for the payment. A string of your choice can also be used as the reference number.
+      type: string
+      maxLength: 50
+      example: INV-384
+    description:
+      description: Description about the payment.
+      type: string
+      example: Payment has been added to INV-384
+    customer_id:
+      description: Customer ID of the customer involved in the payment.
+      type: string
+      example: '903000000000099'
+    customer_name:
+      description: Name of the customer to whom the invoice is raised.
+      type: string
+      example: Bowman Furniture
+    email:
+      description: Email address of the customer involved in the payment.
+      type: string
+      example: benjamin.george@bowmanfurniture.com
+    autotransaction:
+      description: If the payment mode is <code>autotransaction</code>, autotransaction information will be displayed in the autotransaction object. It contains <code>autotransaction_id</code>, <code>payment_gateway</code>, <code>gateway_transaction_id</code>, <code>card_id</code>, <code>last_four_digits</code>, <code>expiry_month</code> and <code>expiry_year</code>.
+      type: object
+      properties:
+        autotransaction_id:
+          $ref: '#/components/schemas/autotransaction_id'
+        payment_gateway:
+          $ref: '#/components/schemas/payment_gateway'
+        gateway_transaction_id:
+          $ref: '#/components/schemas/gateway_transaction_id'
+        gateway_error_message:
+          $ref: '#/components/schemas/gateway_error_message'
+        card_id:
+          $ref: '#/components/schemas/card_id'
+        last_four_digits:
+          $ref: '#/components/schemas/last_four_digits'
+        expiry_month:
+          $ref: '#/components/schemas/expiry_month'
+        expiry_year:
+          $ref: '#/components/schemas/expiry_year'
+    autotransaction_id:
+      description: Auto-transaction ID generated for the payment made.
+      type: string
+      example: '90300000079465'
+    payment_gateway:
+      description: Name of the payment gateway associated with payment.
+      type: string
+      example: payflow_pro
+    gateway_transaction_id:
+      description: Transaction ID provided by the gateway for the transaction.
+      type: string
+      example: B10E6E0F31BD
+    gateway_error_message:
+      description: Gateway error message for a failed transaction.
+      type: string
+      example: Gateway error message for a failed transaction.
+    card_id:
+      description: Card ID of the card associated with the transaction.
+      type: string
+      example: '90300000079226'
+    last_four_digits:
+      description: Last four digits of the card.
+      type: integer
+      example: 1111
+    expiry_month:
+      description: Expiry month of the card.
+      type: integer
+      example: 9
+    expiry_year:
+      description: Expiry year of the card.
+      type: integer
+      example: 2030
+    invoices:
+      description: List of invoices associated with the payment. Each invoice object contains <code>invoice_id</code>, <code>invoice_number</code>, <code>date</code>, <code>invoice_amount</code>, <code>amount_applied</code> and <code>balance_amount</code>.
+      type: array
+      items:
+        type: object
+        properties:
+          invoice_id:
+            $ref: '#/components/schemas/invoice_id'
+          invoice_number:
+            $ref: '#/components/schemas/invoice_number'
+          date:
+            description: Date on which the invoice was raised.
+            example: '2016-06-05'
+          invoice_amount:
+            $ref: '#/components/schemas/invoice_amount'
+          amount_applied:
+            $ref: '#/components/schemas/amount_applied'
+          balance_amount:
+            $ref: '#/components/schemas/balance_amount'
+    invoice_id:
+      description: Invoice ID of the required invoice.
+      type: string
+      example: '90300000079426'
+    invoice_number:
+      description: Unique ID (starts with INV) of an invoice.
+      type: string
+      example: INV-384
+    invoice_amount:
+      description: Total amount raised for the invoice.
+      type: number
+      format: double
+      example: 450
+    amount_applied:
+      description: Amount paid for the invoice.
+      type: number
+      format: double
+      example: 450
+    balance_amount:
+      description: Unpaid amount of the invoice.
+      type: number
+      format: double
+      example: 0
+    currency_code:
+      description: Currency code in which the payment is made.
+      type: string
+      example: USD
+    currency_symbol:
+      description: Customer's currency symbol.
+      type: string
+      example: $
+    exchange_rate:
+      description: Exchange rate for the currency used in the invoices and customer's currency. The payment amount would be the multiplicative product of the original amount and the exchange rate.
+      type: number
+      format: double
+      example: 1
+      default: 1
+    bank_charges:
+      description: Denotes any additional bank charges.
+      type: number
+      format: double
+      example: 10
+    created_time:
+      description: Time when the payment was created.
+      type: string
+      example: 2016-06-05T02:15:20-0700
+    updated_time:
+      description: Time when the payment details were last updated.
+      type: string
+      example: 2016-06-05T02:15:20-0700
+    tax_account_id:
+      description: Unique ID of the account which was used for transaction.
+      type: string
+      example: '903000000000370'
+    account_id:
+      description: Unique ID of the account.
+      type: string
+      example: '903000000000361'
+    custom_fields:
+      description: Additional fields for the payments.
+      type: array
+      items:
+        type: object
+        properties:
+          value:
+            $ref: '#/components/schemas/value'
+          label:
+            $ref: '#/components/schemas/label'
+          data_type:
+            $ref: '#/components/schemas/data_type'
+    index:
+      description: Index of the custom field. It can hold any value from 1 to 10.
+      type: integer
+      example: 1
+    label:
+      description: Label of the custom field.
+      type: string
+      example: label
+    value:
+      description: Value of the custom field.
+      type: string
+      example: 129890
+    data_type:
+      description: Data type of the custom field.
+      type: string
+      example: text
+    create-a-payment-request:
+      required:
+        - customer_id
+        - payment_mode
+        - amount
+      type: object
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        payment_mode:
+          $ref: '#/components/schemas/payment_mode'
+        amount:
+          $ref: '#/components/schemas/amount'
+        date:
+          $ref: '#/components/schemas/date'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        description:
+          $ref: '#/components/schemas/description'
+        invoices:
+          description: List of invoices associated with the payment. Each invoice object contains <code>invoice_id</code>, <code>invoice_number</code>, <code>date</code>, <code>invoice_amount</code>, <code>amount_applied</code> and <code>balance_amount</code>.
+          type: array
+          items:
+            type: object
+            required:
+              - invoice_id
+              - amount_applied
+            properties:
+              invoice_id:
+                $ref: '#/components/schemas/invoice_id'
+              amount_applied:
+                $ref: '#/components/schemas/amount_applied'
+        exchange_rate:
+          $ref: '#/components/schemas/exchange_rate'
+        bank_charges:
+          $ref: '#/components/schemas/bank_charges'
+        tax_account_id:
+          $ref: '#/components/schemas/tax_account_id'
+        account_id:
+          $ref: '#/components/schemas/account_id'
+        custom_fields:
+          description: Additional fields for the payments.
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                $ref: '#/components/schemas/label'
+              value:
+                $ref: '#/components/schemas/value'
+    create-a-payment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The payment has been created.
+          readOnly: true
+        payment:
+          $ref: '#/components/schemas/payment-response'
+    list-all-payments-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        payments:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/payments-list-response'
+    retrieve-a-payment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        payment:
+          type: object
+          properties:
+            payment_id:
+              $ref: '#/components/schemas/payment_id'
+            payment_mode:
+              $ref: '#/components/schemas/payment_mode'
+            amount:
+              $ref: '#/components/schemas/amount'
+            amount_refunded:
+              $ref: '#/components/schemas/amount_refunded'
+            bank_charges:
+              $ref: '#/components/schemas/bank_charges'
+            date:
+              $ref: '#/components/schemas/date'
+            status:
+              $ref: '#/components/schemas/status'
+            reference_number:
+              $ref: '#/components/schemas/reference_number'
+            description:
+              $ref: '#/components/schemas/description'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            email:
+              $ref: '#/components/schemas/email'
+            autotransaction:
+              description: If the payment mode is <code>autotransaction</code>, autotransaction information will be displayed in the autotransaction object. It contains <code>autotransaction_id</code>, <code>payment_gateway</code>, <code>gateway_transaction_id</code>, <code>card_id</code>, <code>last_four_digits</code>, <code>expiry_month</code> and <code>expiry_year</code>.
+              type: object
+              properties:
+                autotransaction_id:
+                  $ref: '#/components/schemas/autotransaction_id'
+                payment_gateway:
+                  $ref: '#/components/schemas/payment_gateway'
+                gateway_transaction_id:
+                  $ref: '#/components/schemas/gateway_transaction_id'
+                gateway_error_message:
+                  $ref: '#/components/schemas/gateway_error_message'
+                card_id:
+                  $ref: '#/components/schemas/card_id'
+                last_four_digits:
+                  $ref: '#/components/schemas/last_four_digits'
+                expiry_month:
+                  $ref: '#/components/schemas/expiry_month'
+                expiry_year:
+                  $ref: '#/components/schemas/expiry_year'
+            invoices:
+              description: List of invoices associated with the payment. Each invoice object contains <code>invoice_id</code>, <code>invoice_number</code>, <code>date</code>, <code>invoice_amount</code>, <code>amount_applied</code> and <code>balance_amount</code>.
+              type: array
+              items:
+                type: object
+                properties:
+                  invoice_id:
+                    $ref: '#/components/schemas/invoice_id'
+                  invoice_number:
+                    $ref: '#/components/schemas/invoice_number'
+                  date:
+                    description: Date on which the invoice was raised.
+                    example: '2016-06-05'
+                  invoice_amount:
+                    $ref: '#/components/schemas/invoice_amount'
+                  amount_applied:
+                    $ref: '#/components/schemas/amount_applied'
+                  balance_amount:
+                    $ref: '#/components/schemas/balance_amount'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            currency_symbol:
+              $ref: '#/components/schemas/currency_symbol'
+            custom_fields:
+              description: Additional fields for the payments.
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    $ref: '#/components/schemas/index'
+                  value:
+                    $ref: '#/components/schemas/value'
+                  label:
+                    $ref: '#/components/schemas/label'
+                  data_type:
+                    $ref: '#/components/schemas/data_type'
+    update-a-payment-request:
+      required:
+        - customer_id
+        - payment_mode
+        - amount
+        - invoices
+      type: object
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/customer_id'
+        payment_mode:
+          $ref: '#/components/schemas/payment_mode'
+        amount:
+          $ref: '#/components/schemas/amount'
+        date:
+          $ref: '#/components/schemas/date'
+        reference_number:
+          $ref: '#/components/schemas/reference_number'
+        description:
+          $ref: '#/components/schemas/description'
+        invoices:
+          description: List of invoices associated with the payment. Each invoice object contains <code>invoice_id</code>, <code>invoice_number</code>, <code>date</code>, <code>invoice_amount</code>, <code>amount_applied</code> and <code>balance_amount</code>.
+          type: array
+          items:
+            type: object
+            required:
+              - invoice_id
+              - amount_applied
+            properties:
+              invoice_id:
+                $ref: '#/components/schemas/invoice_id'
+              amount_applied:
+                $ref: '#/components/schemas/amount_applied'
+        exchange_rate:
+          $ref: '#/components/schemas/exchange_rate'
+        bank_charges:
+          $ref: '#/components/schemas/bank_charges'
+        tax_account_id:
+          $ref: '#/components/schemas/tax_account_id'
+        account_id:
+          $ref: '#/components/schemas/account_id'
+        custom_fields:
+          description: Additional fields for the payments.
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                $ref: '#/components/schemas/label'
+              value:
+                $ref: '#/components/schemas/value'
+    update-a-payment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The payment details have been updated.
+          readOnly: true
+        payment:
+          type: object
+          properties:
+            payment_id:
+              $ref: '#/components/schemas/payment_id'
+            payment_mode:
+              $ref: '#/components/schemas/payment_mode'
+            amount:
+              $ref: '#/components/schemas/amount'
+            amount_refunded:
+              $ref: '#/components/schemas/amount_refunded'
+            bank_charges:
+              $ref: '#/components/schemas/bank_charges'
+            date:
+              $ref: '#/components/schemas/date'
+            status:
+              $ref: '#/components/schemas/status'
+            reference_number:
+              $ref: '#/components/schemas/reference_number'
+            description:
+              $ref: '#/components/schemas/description'
+            customer_id:
+              $ref: '#/components/schemas/customer_id'
+            customer_name:
+              $ref: '#/components/schemas/customer_name'
+            email:
+              $ref: '#/components/schemas/email'
+            autotransaction:
+              description: If the payment mode is <code>autotransaction</code>, autotransaction information will be displayed in the autotransaction object. It contains <code>autotransaction_id</code>, <code>payment_gateway</code>, <code>gateway_transaction_id</code>, <code>card_id</code>, <code>last_four_digits</code>, <code>expiry_month</code> and <code>expiry_year</code>.
+              type: object
+              properties:
+                autotransaction_id:
+                  $ref: '#/components/schemas/autotransaction_id'
+                payment_gateway:
+                  $ref: '#/components/schemas/payment_gateway'
+                gateway_transaction_id:
+                  $ref: '#/components/schemas/gateway_transaction_id'
+                gateway_error_message:
+                  $ref: '#/components/schemas/gateway_error_message'
+                card_id:
+                  $ref: '#/components/schemas/card_id'
+                last_four_digits:
+                  $ref: '#/components/schemas/last_four_digits'
+                expiry_month:
+                  $ref: '#/components/schemas/expiry_month'
+                expiry_year:
+                  $ref: '#/components/schemas/expiry_year'
+            invoices:
+              description: List of invoices associated with the payment. Each invoice object contains <code>invoice_id</code>, <code>invoice_number</code>, <code>date</code>, <code>invoice_amount</code>, <code>amount_applied</code> and <code>balance_amount</code>.
+              type: array
+              items:
+                type: object
+                properties:
+                  invoice_id:
+                    $ref: '#/components/schemas/invoice_id'
+                  invoice_number:
+                    $ref: '#/components/schemas/invoice_number'
+                  date:
+                    description: Date on which the invoice was raised.
+                    example: '2016-06-05'
+                  invoice_amount:
+                    $ref: '#/components/schemas/invoice_amount'
+                  amount_applied:
+                    $ref: '#/components/schemas/amount_applied'
+                  balance_amount:
+                    $ref: '#/components/schemas/balance_amount'
+            currency_code:
+              $ref: '#/components/schemas/currency_code'
+            currency_symbol:
+              $ref: '#/components/schemas/currency_symbol'
+            custom_fields:
+              description: Additional fields for the payments.
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    $ref: '#/components/schemas/index'
+                  value:
+                    $ref: '#/components/schemas/value'
+                  label:
+                    $ref: '#/components/schemas/label'
+                  data_type:
+                    $ref: '#/components/schemas/data_type'
+    delete-a-payment-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The payment has been deleted.
+          readOnly: true
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.payments.CREATE: Create Payments
+            ZohoSubscriptions.payments.READ: Read Payments
+            ZohoSubscriptions.payments.UPDATE: Update Payments
+            ZohoSubscriptions.payments.DELETE: Delete Payments

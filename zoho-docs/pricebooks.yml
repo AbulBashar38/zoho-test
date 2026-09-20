@@ -1,0 +1,617 @@
+openapi: 3.0.0
+info:
+  title: Price Lists
+  description: Price Lists allow you to define custom pricing for plans and addons, enabling flexible pricing strategies for different customer segments.
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: https://www.zohoapis.com/billing/v1
+    description: API Endpoint
+tags:
+  - name: pricebooks
+    description: Price Lists Module
+paths:
+  /pricebooks:
+    x-mcp-group:
+      - Price Lists
+    get:
+      tags:
+        - pricebooks
+      operationId: List_all_Price_Lists
+      summary: List pricebooks
+      description: Retrieve a list of all pricebooks.
+      parameters:
+        - name: filter_by
+          in: query
+          description: 'Filter pricebooks by type. Allowed values: <code>SalesOrPurchaseType.All</code>, <code>SalesOrPurchaseType.Sales</code>, <code>SalesOrPurchaseType.Purchases</code>.'
+          required: false
+          schema:
+            type: string
+          example: SalesOrPurchaseType.Sales
+        - name: search_text
+          in: query
+          description: Search pricebooks by name.
+          required: false
+          schema:
+            type: string
+          example: basic
+        - name: sort_column
+          in: query
+          description: 'Sort by column. Allowed values: <code>name</code>, <code>last_modified_time</code>.'
+          required: false
+          schema:
+            type: string
+          example: name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list-pricebooks-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.products.READ
+    post:
+      tags:
+        - pricebooks
+      operationId: Create_a_Price_List
+      summary: Create a pricebook
+      description: Create a new pricebook.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-pricebook-request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create-pricebook-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.products.CREATE
+    parameters:
+      - $ref: '#/components/parameters/organization_id'
+  /pricebooks/{pricebook_id}:
+    x-mcp-group:
+      - Price Lists
+    get:
+      tags:
+        - pricebooks
+      operationId: Get_a_Price_List
+      summary: Retrieve a pricebook
+      description: Retrieve details of a pricebook.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of pricebook items to return.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+          example: 200
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get-pricebook-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.READ
+    delete:
+      tags:
+        - pricebooks
+      operationId: Delete_a_Price_List
+      summary: Delete a pricebook
+      description: Delete an existing pricebook.
+      parameters:
+        - name: applicable_date
+          in: query
+          description: Date from which the pricebook deletion is applicable.
+          required: false
+          schema:
+            type: string
+            format: date
+          example: '2024-06-01'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-pricebook-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.DELETE
+    parameters:
+      - name: pricebook_id
+        in: path
+        required: true
+        description: Unique identifier of the pricebook.
+        schema:
+          type: string
+        example: '903000000067001'
+      - $ref: '#/components/parameters/organization_id'
+  /pricebooks/{pricebook_id}/{item_type}/{plan_or_addon_code}:
+    x-mcp-group:
+      - Price Lists
+    put:
+      tags:
+        - pricebooks
+      operationId: Update_a_Price_List_Item
+      summary: Update a pricebook item
+      description: Update the pricebook rate for a plan or addon.
+      parameters:
+        - name: applicable_date
+          in: query
+          description: Date from which the pricebook item update is applicable.
+          required: false
+          schema:
+            type: string
+            format: date
+          example: '2024-06-01'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-pricebook-item-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-pricebook-item-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.UPDATE
+    delete:
+      tags:
+        - pricebooks
+      operationId: Delete_a_Price_List_Item
+      summary: Delete a pricebook item
+      description: Remove a plan or addon from a pricebook.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-pricebook-item-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.DELETE
+    parameters:
+      - name: pricebook_id
+        in: path
+        required: true
+        description: Unique identifier of the pricebook.
+        schema:
+          type: string
+        example: '903000000067001'
+      - name: item_type
+        in: path
+        required: true
+        description: 'Type of item. Allowed values: <code>plans</code>, <code>addons</code>.'
+        schema:
+          type: string
+        example: plans
+      - name: plan_or_addon_code
+        in: path
+        required: true
+        description: Code of the plan or addon.
+        schema:
+          type: string
+        example: monthly-basic
+      - $ref: '#/components/parameters/organization_id'
+  /pricebooks/{pricebook_id}/items/{item_id}:
+    x-mcp-group:
+      - Price Lists
+    put:
+      tags:
+        - pricebooks
+      operationId: Update_a_Price_List_Line_Item
+      summary: Update a pricebook line item
+      description: Update the pricebook rate for a specific item.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-pricebook-line-item-request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update-pricebook-line-item-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.UPDATE
+    delete:
+      tags:
+        - pricebooks
+      operationId: Delete_a_Price_List_Line_Item
+      summary: Delete a pricebook line item
+      description: Remove an item from a pricebook.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete-pricebook-line-item-response'
+      deprecated: false
+      security:
+        - Zoho_Auth:
+            - ZohoSubscriptions.settings.DELETE
+    parameters:
+      - name: pricebook_id
+        in: path
+        required: true
+        description: Unique identifier of the pricebook.
+        schema:
+          type: string
+        example: '903000000067001'
+      - name: item_id
+        in: path
+        required: true
+        description: Unique identifier of the pricebook line item.
+        schema:
+          type: string
+        example: '903000000089001'
+      - $ref: '#/components/parameters/organization_id'
+components:
+  parameters:
+    organization_id:
+      name: X-com-zoho-subscriptions-organizationid
+      description: ID of the organization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: '10234695'
+  schemas:
+    gendoc-attributes-schema:
+      $ref: '#/components/schemas/pricebook-response'
+    pricebook-response:
+      type: object
+      properties:
+        pricebook_id:
+          description: Unique identifier of the pricebook.
+          type: string
+          example: '903000000067001'
+        name:
+          description: Name of the pricebook.
+          type: string
+          example: Startup Pricebook
+        description:
+          description: A brief description of the pricebook.
+          type: string
+          example: Pricebook for startup customers
+        currency_id:
+          description: Unique identifier of the currency associated with the pricebook.
+          type: string
+          example: '903000000000099'
+        currency_code:
+          description: ISO currency code of the pricebook.
+          type: string
+          example: USD
+        status:
+          description: Current status of the pricebook.
+          type: string
+          example: active
+        is_default:
+          description: Indicates whether this is the default pricebook.
+          type: boolean
+          example: false
+        pricebook_type:
+          description: Pricing rule type of the pricebook.
+          type: string
+          example: absolute
+        percentage:
+          description: Percentage value used for percentage-based pricebooks.
+          type: number
+          format: double
+          example: 10
+        is_increase:
+          description: Indicates whether the percentage is an increase or decrease.
+          type: boolean
+          example: true
+        rounding_type:
+          description: Rounding type applied to calculated prices.
+          type: string
+          example: no_rounding
+        sales_or_purchase_type:
+          description: Indicates whether the pricebook is for sales or purchases.
+          type: string
+          example: sales
+        decimal_place:
+          description: Number of decimal places used for prices in this pricebook.
+          type: integer
+          example: 2
+        pricebook_items:
+          description: List of plans or addons included in the pricebook with their custom rates.
+          type: array
+          items:
+            $ref: '#/components/schemas/pricebook-item-response'
+    pricebook-item-response:
+      type: object
+      properties:
+        pricebook_item_id:
+          description: Unique identifier of the pricebook item.
+          type: string
+          example: '903000000089001'
+        item_id:
+          description: Unique identifier of the associated item.
+          type: string
+          example: '903000000045040'
+        product_code:
+          description: Code of the plan or addon.
+          type: string
+          example: monthly-basic
+        pricebook_rate:
+          description: Custom rate for the plan or addon in this pricebook.
+          type: number
+          format: double
+          example: 90
+    pricebook-list-item-response:
+      type: object
+      properties:
+        pricebook_id:
+          description: Unique identifier of the pricebook.
+          type: string
+          example: '903000000067001'
+        name:
+          description: Name of the pricebook.
+          type: string
+          example: Startup Pricebook
+        description:
+          description: A brief description of the pricebook.
+          type: string
+          example: Pricebook for startup customers
+        currency_id:
+          description: Unique identifier of the currency associated with the pricebook.
+          type: string
+          example: '903000000000099'
+        currency_code:
+          description: ISO currency code of the pricebook.
+          type: string
+          example: USD
+        status:
+          description: Current status of the pricebook.
+          type: string
+          example: active
+        last_modified_time:
+          description: Date and time when the pricebook was last modified.
+          type: string
+          example: 2024-06-01T14:00:00-0700
+    create-pricebook-request:
+      required:
+        - name
+        - currency_id
+        - type
+      type: object
+      properties:
+        name:
+          description: Name of the pricebook.
+          type: string
+          maxLength: 100
+          example: Startup Pricebook
+        description:
+          description: A brief description of the pricebook.
+          type: string
+          example: Pricebook for startup customers
+        currency_id:
+          description: Currency ID for the pricebook.
+          type: string
+          example: '903000000000099'
+        type:
+          description: Type of pricebook.
+          type: integer
+          example: 1
+        pricebook_type:
+          description: Pricing rule type.
+          type: string
+          example: absolute
+        pricebook_items:
+          description: List of plans or addons to include in the pricebook.
+          type: array
+          items:
+            type: object
+            properties:
+              plan_or_addon_code:
+                description: Code of the plan or addon to include.
+                type: string
+                example: monthly-basic
+              pricebook_rate:
+                description: Custom rate for the plan or addon in this pricebook.
+                type: number
+                format: double
+                example: 90
+    create-pricebook-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The pricebook has been created.
+          readOnly: true
+        pricebook:
+          $ref: '#/components/schemas/pricebook-response'
+    list-pricebooks-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        pricebooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/pricebook-list-item-response'
+        page_context:
+          type: object
+          properties:
+            page:
+              description: Current page number.
+              type: integer
+              example: 1
+            per_page:
+              description: Number of records per page.
+              type: integer
+              example: 200
+            has_more_page:
+              description: Indicates whether more pages are available.
+              type: boolean
+            sort_column:
+              description: Column used for sorting.
+              type: string
+            sort_order:
+              description: Sort order applied.
+              type: string
+    get-pricebook-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: success
+          readOnly: true
+        pricebook:
+          $ref: '#/components/schemas/pricebook-response'
+    delete-pricebook-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The pricebook has been deleted.
+          readOnly: true
+    update-pricebook-item-request:
+      required:
+        - pricebook_rate
+      type: object
+      properties:
+        pricebook_rate:
+          description: New rate for the plan or addon in this pricebook.
+          type: number
+          format: double
+          example: 90
+        pricebook_setup_fee:
+          description: Setup fee for the plan in this pricebook.
+          type: number
+          format: double
+          example: 0
+        pricebook_item_id:
+          description: Unique identifier of the pricebook item.
+          type: string
+          example: '903000000089001'
+        price_brackets:
+          description: Price brackets for tiered or volume pricing.
+          type: array
+          items:
+            type: object
+            properties:
+              start_quantity:
+                description: Start quantity for this price bracket.
+                type: integer
+                example: 1
+              end_quantity:
+                description: End quantity for this price bracket.
+                type: integer
+                example: 10
+              pricebook_rate:
+                description: Rate applicable for this price bracket.
+                type: number
+                format: double
+                example: 90
+    update-pricebook-item-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The pricebook item has been updated.
+          readOnly: true
+        pricebook_item:
+          $ref: '#/components/schemas/pricebook-item-response'
+    delete-pricebook-item-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The pricebook item has been deleted.
+          readOnly: true
+    update-pricebook-line-item-request:
+      allOf:
+        - $ref: '#/components/schemas/update-pricebook-item-request'
+    update-pricebook-line-item-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The pricebook line item has been updated.
+          readOnly: true
+        pricebook_item:
+          $ref: '#/components/schemas/pricebook-item-response'
+    delete-pricebook-line-item-response:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          readOnly: true
+        message:
+          type: string
+          example: The pricebook line item has been deleted.
+          readOnly: true
+  securitySchemes:
+    Zoho_Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://accounts.zoho.com/oauth/v2/auth
+          scopes:
+            ZohoSubscriptions.products.CREATE: Create Products
+            ZohoSubscriptions.products.READ: Read Products
+            ZohoSubscriptions.settings.READ: Read Settings
+            ZohoSubscriptions.settings.UPDATE: Update Settings
+            ZohoSubscriptions.settings.DELETE: Delete Settings
