@@ -1,8 +1,5 @@
 import { prisma } from '../../../app/lib/prisma'
-import {
-    markPaymentRequestPaidByInvoice,
-    reconcilePaymentLinksForCustomer,
-} from './payment-request.service'
+import { markOrderPaidByInvoice, reconcileOrdersForCustomer } from './order.service'
 import { mirrorInvoice, mirrorPayment, mirrorSubscription } from './zoho-billing.service'
 import { getZohoBillingInvoice, type TZohoBillingInvoice } from './zoho-billing-invoice'
 import type { TZohoSubscription } from './zoho-billing-subscription'
@@ -102,7 +99,7 @@ const handlePaymentThankyou = async (body: TZohoEventBody) => {
     // A payment link settles a locally-priced order rather than a Zoho invoice, so check
     // the paying customer's pending links first.
     if (payment.customer_id && !payment.invoices?.length) {
-        const { settled, awaitingStatus } = await reconcilePaymentLinksForCustomer({
+        const { settled, awaitingStatus } = await reconcileOrdersForCustomer({
             customerId: payment.customer_id,
             paymentId: payment.payment_id,
             amount: payment.amount,
@@ -115,13 +112,13 @@ const handlePaymentThankyou = async (body: TZohoEventBody) => {
         // once its status has caught up.
         if (awaitingStatus.length) {
             throw new Error(
-                `Payment ${payment.payment_id} matches pending payment link(s) ${awaitingStatus.join(', ')}, but Zoho still reports them unpaid — will retry`,
+                `Payment ${payment.payment_id} matches pending order(s) ${awaitingStatus.join(', ')}, but Zoho still reports their links unpaid — will retry`,
             )
         }
 
         // Nothing local matches: a payment recorded straight in Zoho, for instance.
         console.log(
-            `  no local payment request or invoice matches payment ${payment.payment_id}; nothing to update`,
+            `  no local order or invoice matches payment ${payment.payment_id}; nothing to update`,
         )
         return
     }
@@ -158,7 +155,7 @@ const handlePaymentThankyou = async (body: TZohoEventBody) => {
         )
 
         // The invoice may be standing in for a locally-priced order.
-        await markPaymentRequestPaidByInvoice(application.invoice_id, payment.payment_id)
+        await markOrderPaidByInvoice(application.invoice_id, payment.payment_id)
 
         // Re-read the invoice so the stored status and balance reflect Zoho exactly, which
         // matters when a payment only partly settles it.

@@ -5,6 +5,16 @@ import {
     preparePayment,
     subscribeAndGetPaymentUrl,
 } from '../../../integrations/zoho/billing/zoho-billing.service'
+import {
+    getZohoBillingItem,
+    getZohoBillingItemIdByName,
+    listZohoBillingItems,
+} from '../../../integrations/zoho/billing/zoho-billing-item'
+import {
+    getZohoProduct,
+    getZohoProductIdByName,
+    listAllZohoProducts,
+} from '../../../integrations/zoho/billing/zoho-billing-product'
 import { handleZohoBillingWebhook } from '../../../integrations/zoho/billing/zoho-billing-webhook'
 import config from '../../config'
 import { catchAsync } from '../../utils/catchAsync'
@@ -105,6 +115,83 @@ const webhook = catchAsync(async (req: Request, res: Response) => {
     }
 })
 
+// Looks an item up in Zoho. ?name= returns the single exact match (with its item_id),
+// ?search= or no filter returns the list.
+const findItems = catchAsync(async (req: Request, res: Response) => {
+    const name = typeof req.query.name === 'string' ? req.query.name.trim() : undefined
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() : undefined
+
+    if (name) {
+        const item = await getZohoBillingItemIdByName(name)
+
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: 'Item found',
+            data: item,
+        })
+        return
+    }
+
+    const items = await listZohoBillingItems(search ? { search_text: search } : {})
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Items fetched from Zoho',
+        data: items,
+    })
+})
+
+const getItem = catchAsync(async (req: Request, res: Response) => {
+    const result = await getZohoBillingItem(req.params.id as string)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Item fetched from Zoho',
+        data: result,
+    })
+})
+
+// Looks a product up in Zoho. ?name= returns the single exact match (with its product_id),
+// otherwise the full list.
+const findProducts = catchAsync(async (req: Request, res: Response) => {
+    const name = typeof req.query.name === 'string' ? req.query.name.trim() : undefined
+
+    if (name) {
+        const product = await getZohoProductIdByName(name)
+
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: 'Product found',
+            data: product,
+        })
+        return
+    }
+
+    const products = await listAllZohoProducts()
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Products fetched from Zoho',
+        data: products,
+    })
+})
+
+const getProduct = catchAsync(async (req: Request, res: Response) => {
+    const result = await getZohoProduct(req.params.id as string)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Product fetched from Zoho',
+        data: result,
+    })
+})
+
 // Served from the local mirror, so you can see what the webhook stored.
 const listInvoices = catchAsync(async (req: Request, res: Response) => {
     const result = await listMirroredInvoices(
@@ -121,6 +208,10 @@ const listInvoices = catchAsync(async (req: Request, res: Response) => {
 
 export const BillingController = {
     subscribe,
+    findItems,
+    getItem,
+    findProducts,
+    getProduct,
     payInvoice,
     paymentReturn,
     webhook,

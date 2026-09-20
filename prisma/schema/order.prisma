@@ -1,0 +1,60 @@
+// An order priced entirely by this backend. Zoho only collects the money: it is handed a
+// customer, a total and a description, and reports back when the payment succeeds.
+model Order {
+  id String @id @default(uuid(7))
+
+  // Your own identifier, shown to Zoho as the payment description reference.
+  orderNumber String  @unique
+  description String?
+  totalAmount Decimal @db.Decimal(12, 2)
+  currencyCode String?
+
+  status OrderStatus @default(PENDING)
+
+  zohoCustomerId    String
+  zohoPaymentLinkId String? @unique
+  paymentLinkNumber String?
+  paymentUrl        String?
+  zohoPaymentId     String?
+  // Only set when collected through the ad-hoc invoice route instead of a payment link.
+  zohoInvoiceId     String? @unique
+  invoiceNumber     String?
+
+  expiresAt DateTime?
+  paidAt    DateTime?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId], name: "idx_order_userId")
+  @@index([status], name: "idx_order_status")
+  @@index([zohoCustomerId], name: "idx_order_customer")
+  @@map("orders")
+}
+
+// The billing breakdown lives here; Zoho never sees these lines, only the total.
+model OrderItem {
+  id String @id @default(uuid(7))
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  // e.g. MEETING_ROOM, FOOD, PRINT, DAY_PASS — free-form so the app decides.
+  type        String
+  description String
+  // Zoho catalogue product this line was billed against, when one was supplied.
+  zohoProductId String?
+  quantity    Decimal @db.Decimal(12, 2)
+  unitPrice   Decimal @db.Decimal(12, 2)
+  total       Decimal @db.Decimal(12, 2)
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId], name: "idx_order_item_orderId")
+  @@map("order_items")
+}

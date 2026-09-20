@@ -34,25 +34,37 @@ export const listZohoBillingInvoices = async (params: Record<string, string> = {
 
 // A one-off invoice not tied to any subscription, used purely to collect a payment whose
 // amount your backend already worked out.
-export const createAdhocZohoInvoice = async (params: {
+export type TZohoInvoiceItemInput = {
+    name: string
+    description?: string
+    price: number
+    quantity: number
+    // Optional: links the line to a product in Zoho's catalogue. Zoho accepts items
+    // without one, so this is only needed if you keep a product mapping.
+    productId?: string
+}
+
+// A one-time invoice carrying the order's own line items. Prices and quantities are decided
+// by this backend; Zoho only records and collects them.
+export const createZohoInvoiceWithItems = async (params: {
     customerId: string
-    amount: number
-    description: string
+    items: TZohoInvoiceItemInput[]
     referenceNumber?: string
+    notes?: string
 }) => {
     const response = await zohoBillingClient.post<{ invoice: TZohoBillingInvoice }>('/invoices', {
         customer_id: params.customerId,
         date: new Date().toISOString().slice(0, 10),
-        invoice_items: [
-            {
-                // Zoho caps the line item name at 100 characters.
-                name: params.description.slice(0, 100),
-                description: params.description,
-                price: params.amount,
-                quantity: 1,
-            },
-        ],
+        invoice_items: params.items.map((item) => ({
+            // Zoho caps the line item name at 100 characters.
+            name: item.name.slice(0, 100),
+            ...(item.description ? { description: item.description } : {}),
+            price: item.price,
+            quantity: item.quantity,
+            ...(item.productId ? { product_id: item.productId } : {}),
+        })),
         ...(params.referenceNumber ? { reference_number: params.referenceNumber } : {}),
+        ...(params.notes ? { notes: params.notes } : {}),
         ...(config.zoho.billing_place_of_supply
             ? { place_of_supply: config.zoho.billing_place_of_supply }
             : {}),

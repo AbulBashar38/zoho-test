@@ -17,7 +17,7 @@ enum Gender {
   OTHER
 }
 
-enum PaymentRequestStatus {
+enum OrderStatus {
   PENDING
   PAID
   CANCELLED
