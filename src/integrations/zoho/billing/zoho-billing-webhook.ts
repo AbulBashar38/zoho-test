@@ -1,4 +1,8 @@
 import { prisma } from '../../../app/lib/prisma'
+import {
+    markPaymentRequestPaidByInvoice,
+    reconcilePaymentLinksForCustomer,
+} from './payment-request.service'
 import { mirrorInvoice, mirrorPayment, mirrorSubscription } from './zoho-billing.service'
 import { getZohoBillingInvoice, type TZohoBillingInvoice } from './zoho-billing-invoice'
 import type { TZohoSubscription } from './zoho-billing-subscription'
@@ -95,6 +99,33 @@ const handlePaymentThankyou = async (body: TZohoEventBody) => {
         throw new Error('payment_thankyou payload had no payment_id')
     }
 
+    // A payment link settles a locally-priced order rather than a Zoho invoice, so check
+    // the paying customer's pending links first.
+    if (payment.customer_id && !payment.invoices?.length) {
+        const { settled, awaitingStatus } = await reconcilePaymentLinksForCustomer({
+            customerId: payment.customer_id,
+            paymentId: payment.payment_id,
+            amount: payment.amount,
+        })
+
+        // A link payment has no invoice to update, so there is nothing further to do.
+        if (settled.length) return
+
+        // The link is still unpaid in Zoho though the amount matches: fail so Zoho retries
+        // once its status has caught up.
+        if (awaitingStatus.length) {
+            throw new Error(
+                `Payment ${payment.payment_id} matches pending payment link(s) ${awaitingStatus.join(', ')}, but Zoho still reports them unpaid — will retry`,
+            )
+        }
+
+        // Nothing local matches: a payment recorded straight in Zoho, for instance.
+        console.log(
+            `  no local payment request or invoice matches payment ${payment.payment_id}; nothing to update`,
+        )
+        return
+    }
+
     // One payment can settle several invoices; record the applied amount against each.
     const applications = payment.invoices?.length
         ? payment.invoices
@@ -125,6 +156,9 @@ const handlePaymentThankyou = async (body: TZohoEventBody) => {
         console.log(
             `  payment ${payment.payment_id} applied ${application.amount_applied} to invoice ${application.invoice_id}`,
         )
+
+        // The invoice may be standing in for a locally-priced order.
+        await markPaymentRequestPaidByInvoice(application.invoice_id, payment.payment_id)
 
         // Re-read the invoice so the stored status and balance reflect Zoho exactly, which
         // matters when a payment only partly settles it.

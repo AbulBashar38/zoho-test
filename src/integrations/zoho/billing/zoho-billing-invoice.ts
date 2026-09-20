@@ -32,6 +32,35 @@ export const listZohoBillingInvoices = async (params: Record<string, string> = {
     return response.data.invoices ?? []
 }
 
+// A one-off invoice not tied to any subscription, used purely to collect a payment whose
+// amount your backend already worked out.
+export const createAdhocZohoInvoice = async (params: {
+    customerId: string
+    amount: number
+    description: string
+    referenceNumber?: string
+}) => {
+    const response = await zohoBillingClient.post<{ invoice: TZohoBillingInvoice }>('/invoices', {
+        customer_id: params.customerId,
+        date: new Date().toISOString().slice(0, 10),
+        invoice_items: [
+            {
+                // Zoho caps the line item name at 100 characters.
+                name: params.description.slice(0, 100),
+                description: params.description,
+                price: params.amount,
+                quantity: 1,
+            },
+        ],
+        ...(params.referenceNumber ? { reference_number: params.referenceNumber } : {}),
+        ...(config.zoho.billing_place_of_supply
+            ? { place_of_supply: config.zoho.billing_place_of_supply }
+            : {}),
+    })
+
+    return response.data.invoice
+}
+
 // Billing's equivalent of "mark as sent" — a draft invoice is not payable or shareable.
 export const convertInvoiceToOpen = async (invoiceId: string) => {
     await zohoBillingClient.post(`/invoices/${invoiceId}/converttoopen`)

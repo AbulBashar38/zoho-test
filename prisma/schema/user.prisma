@@ -18,6 +18,7 @@ model User {
 
   billingSubscriptions ZohoBillingSubscription[]
   billingInvoices      ZohoBillingInvoice[]
+  paymentRequests      PaymentRequest[]
 
   @@unique([email])
   @@map("users")
