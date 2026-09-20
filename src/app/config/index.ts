@@ -19,6 +19,14 @@ export default {
         client_secret: process.env.ZOHO_CLIENT_SECRET,
         refresh_token: process.env.ZOHO_REFRESH_TOKEN,
         organization_id: process.env.ZOHO_ORGANIZATION_ID,
+        // Zoho Billing runs in its own organization; falls back to the Books one when shared.
+        billing_organization_id:
+            process.env.ZOHO_BILLING_ORGANIZATION_ID || process.env.ZOHO_ORGANIZATION_ID,
+        // India edition requires these on customers and subscriptions.
+        billing_gst_treatment: process.env.ZOHO_BILLING_GST_TREATMENT,
+        billing_place_of_supply: process.env.ZOHO_BILLING_PLACE_OF_SUPPLY,
+        // Shared secret checked on the webhook endpoint, which Zoho does not sign.
+        webhook_secret: process.env.ZOHO_WEBHOOK_SECRET,
         // Only needed if the authorization code was generated with a redirect URI.
         redirect_uri: process.env.ZOHO_REDIRECT_URI,
         api_domain: process.env.ZOHO_API_DOMAIN || 'https://www.zohoapis.com',

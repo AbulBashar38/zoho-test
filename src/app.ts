@@ -10,6 +10,7 @@ import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/module/auth/auth.route";
+import { BillingRoutes } from "./app/module/billing/billing.route";
 import { ZohoRoutes } from "./app/module/zoho/zoho.route";
 
 const app: Application = express();
@@ -31,6 +32,7 @@ app.use(cookieParser());
 app.use("/api/v1/auth", AuthRoutes);
 
 app.use("/api/zoho", ZohoRoutes);
+app.use("/api/billing", BillingRoutes);
 
 // Basic route
 app.get("/", async (_req: Request, res: Response) => {

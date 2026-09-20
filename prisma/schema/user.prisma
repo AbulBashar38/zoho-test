@@ -10,9 +10,14 @@ model User {
   isDeleted          Boolean    @default(false)
   deletedAt          DateTime?
   zohoContactId      String?    @unique
+  // Zoho Billing keeps its own customer records, separate from Books contacts.
+  zohoBillingCustomerId String? @unique
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
   patient            Patient?
+
+  billingSubscriptions ZohoBillingSubscription[]
+  billingInvoices      ZohoBillingInvoice[]
 
   @@unique([email])
   @@map("users")
