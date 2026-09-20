@@ -19,6 +19,8 @@ export default {
         client_secret: process.env.ZOHO_CLIENT_SECRET,
         refresh_token: process.env.ZOHO_REFRESH_TOKEN,
         organization_id: process.env.ZOHO_ORGANIZATION_ID,
+        // Only needed if the authorization code was generated with a redirect URI.
+        redirect_uri: process.env.ZOHO_REDIRECT_URI,
         api_domain: process.env.ZOHO_API_DOMAIN || 'https://www.zohoapis.com',
         accounts_domain: process.env.ZOHO_ACCOUNTS_DOMAIN || 'https://accounts.zoho.com',
     },

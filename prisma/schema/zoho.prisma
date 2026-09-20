@@ -1,0 +1,16 @@
+// Persists the Zoho OAuth refresh token so access tokens can be regenerated after a restart.
+// One row per Zoho client: re-authorizing with a new code replaces the stored refresh token.
+model ZohoIntegration {
+  id String @id @default(uuid(7))
+
+  clientId       String  @unique
+  organizationId String?
+  refreshToken   String
+  scope          String?
+
+  authorizedAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("zoho_integrations")
+}
