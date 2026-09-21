@@ -6,6 +6,7 @@ import {
     createOrderWithPaymentLink,
     getOrder,
     getOrderByNumber,
+    issueInvoiceForExistingOrder,
     listOrders,
     syncOrder,
 } from '../../../integrations/zoho/billing/order.service'
@@ -32,6 +33,18 @@ const createWithInvoice = catchAsync(async (req: Request, res: Response) => {
         statusCode: httpStatus.CREATED,
         success: true,
         message: 'Order created. Send the user to paymentUrl.',
+        data: result,
+    })
+})
+
+// Completes an order whose Zoho invoice failed to be created, or refreshes its checkout page.
+const issueInvoice = catchAsync(async (req: Request, res: Response) => {
+    const result = await issueInvoiceForExistingOrder(req.params.id as string)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Invoice ready. Send the user to paymentUrl.',
         data: result,
     })
 })
@@ -101,6 +114,7 @@ const list = catchAsync(async (req: Request, res: Response) => {
 export const OrderController = {
     createWithLink,
     createWithInvoice,
+    issueInvoice,
     getOne,
     getByNumber,
     sync,

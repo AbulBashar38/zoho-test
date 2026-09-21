@@ -13,6 +13,8 @@ router.post('/links', OrderController.createWithLink)
 router.get('/', OrderController.list)
 router.get('/number/:orderNumber', OrderController.getByNumber)
 router.get('/:id', OrderController.getOne)
+// Retry/refresh the Zoho invoice for an order that already exists.
+router.post('/:id/invoice', OrderController.issueInvoice)
 router.post('/:id/sync', OrderController.sync)
 router.post('/:id/cancel', OrderController.cancel)
 
