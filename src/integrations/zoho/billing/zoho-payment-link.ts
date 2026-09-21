@@ -17,8 +17,25 @@ type TCreatePaymentLinkPayload = {
     customerId: string
     amount: number
     description: string
-    // yyyy-mm-dd, optional
+    // yyyy-mm-dd, optional. Zoho defaults to 15 days when omitted.
     expiryTime?: string
+}
+
+// description is the only free-text field a payment link accepts — there are no line items
+// and no custom fields on create — so Zoho's record of what was bought lives or dies here.
+export const DESCRIPTION_MAX_LENGTH = 200
+
+export const buildPaymentLinkDescription = (description: string | undefined, reference: string) => {
+    const text = description?.trim()
+
+    if (!text) return `Order ${reference}`
+
+    // Always carry the reference, so a link in the Zoho console can be traced to an order.
+    if (text.includes(reference)) return text.slice(0, DESCRIPTION_MAX_LENGTH)
+
+    const suffix = ` (${reference})`
+
+    return `${text.slice(0, DESCRIPTION_MAX_LENGTH - suffix.length)}${suffix}`
 }
 
 // Zoho takes payment_amount as a string.
@@ -49,7 +66,7 @@ export const getZohoPaymentLink = async (paymentLinkId: string) => {
     return response.data.payment_link
 }
 
-export const listZohoPaymentLinks = async (params: Record<string, string> = {}) => {
+export const listZohoPaymentLinks = async (params: Record<string, string | number> = {}) => {
     const response = await zohoBillingClient.get<{ payment_links: TZohoPaymentLink[] }>(
         '/paymentlinks',
         { params },
@@ -57,6 +74,11 @@ export const listZohoPaymentLinks = async (params: Record<string, string> = {}) 
 
     return response.data.payment_links ?? []
 }
+
+// Every link belonging to one customer, in a single call. Used for reconciliation instead
+// of fetching each pending link on its own.
+export const listCustomerPaymentLinks = async (customerId: string) =>
+    listZohoPaymentLinks({ customer_id: customerId, filter_by: 'Status.All', per_page: 200 })
 
 export const cancelZohoPaymentLink = async (paymentLinkId: string) => {
     const response = await zohoBillingClient.post<{ payment_link: TZohoPaymentLink }>(

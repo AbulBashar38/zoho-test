@@ -9,9 +9,11 @@ import {
   getZohoBillingInvoice,
 } from "./zoho-billing-invoice";
 import {
+  buildPaymentLinkDescription,
   cancelZohoPaymentLink,
   createZohoPaymentLink,
   getZohoPaymentLink,
+  listCustomerPaymentLinks,
   readPaymentLinkStatus,
   type TZohoPaymentLink,
 } from "./zoho-payment-link";
@@ -73,6 +75,15 @@ const validate = (payload: Partial<TCreateOrderPayload>) => {
     (typeof orderNumber !== "string" || !orderNumber.trim())
   ) {
     throw new Error("orderNumber must be a non-empty string when provided");
+  }
+
+  // Zoho documents expiry_time as a date, e.g. 2025-11-26.
+  if (
+    expiryTime !== undefined &&
+    (typeof expiryTime !== "string" ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(expiryTime.trim()))
+  ) {
+    throw new Error("expiryTime must be a date in yyyy-mm-dd format");
   }
 
   let validatedItems: TValidatedItem[];
@@ -242,23 +253,38 @@ export const createOrderWithPaymentLink = async (
 
   await assertUniqueOrderNumber(number);
 
+  // Written before the Zoho call so a failure leaves a PENDING order to retry, never a
+  // link with no order behind it.
+  const created = await prisma.order.create({
+    data: buildOrderData({
+      orderNumber: number,
+      description,
+      total,
+      customerId,
+      userId,
+      items,
+    }),
+    include: { items: true },
+  });
+
+  // A payment link has no line items and no custom fields, so the description is the only
+  // place the order number can live on Zoho's side.
   const link = await createZohoPaymentLink({
     customerId,
     amount: total,
-    description: description ?? `Order ${number}`,
+    description: buildPaymentLinkDescription(description, number),
     expiryTime,
   });
 
-  const order = await prisma.order.create({
+  console.log(
+    `order ${number}: Zoho payment link ${link.payment_link_id} (${
+      link.payment_link_number ?? "no number"
+    }) created`,
+  );
+
+  const order = await prisma.order.update({
+    where: { id: created.id },
     data: {
-      ...buildOrderData({
-        orderNumber: number,
-        description,
-        total,
-        customerId,
-        userId,
-        items,
-      }),
       zohoPaymentLinkId: link.payment_link_id,
       paymentLinkNumber: link.payment_link_number,
       paymentUrl: link.url,
@@ -542,13 +568,23 @@ export const reconcileOrdersForCustomer = async (params: {
     orderBy: { createdAt: "desc" },
   });
 
+  if (!pending.length) return { settled: [], awaitingStatus: [] };
+
+  // One call returns every link this customer has, with its status, instead of fetching
+  // each pending link separately.
+  const links = await listCustomerPaymentLinks(params.customerId);
+  const linksById = new Map(links.map((link) => [link.payment_link_id, link]));
+
   const settled: string[] = [];
   // Links Zoho still reports unpaid whose total matches the payment: the status may not
   // have caught up, so the caller can ask Zoho to retry.
   const awaitingStatus: string[] = [];
 
   for (const order of pending) {
-    const link = await getZohoPaymentLink(order.zohoPaymentLinkId as string);
+    const linkId = order.zohoPaymentLinkId as string;
+    // Fall back to a direct read if the list did not include this link, e.g. the customer
+    // has more links than one page holds.
+    const link = linksById.get(linkId) ?? (await getZohoPaymentLink(linkId));
     const status = readPaymentLinkStatus(link.status);
 
     const amountMatches =
