@@ -31,6 +31,8 @@ export default {
         // Only needed if the authorization code was generated with a redirect URI.
         redirect_uri: process.env.ZOHO_REDIRECT_URI,
         api_domain: process.env.ZOHO_API_DOMAIN || 'https://www.zohoapis.com',
+        // Zoho Sign has its own host; use https://sign.zoho.in for the India data centre.
+        sign_domain: process.env.ZOHO_SIGN_DOMAIN || 'https://sign.zoho.com',
         accounts_domain: process.env.ZOHO_ACCOUNTS_DOMAIN || 'https://accounts.zoho.com',
     },
 }

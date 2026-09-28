@@ -14,6 +14,7 @@ import { AuthRoutes } from "./app/module/auth/auth.route";
 import { BillingRoutes } from "./app/module/billing/billing.route";
 import { BooksRoutes } from "./app/module/books/books.route";
 import { OrderRoutes } from "./app/module/order/order.route";
+import { SignRoutes } from "./app/module/sign/sign.route";
 import { ZohoRoutes } from "./app/module/zoho/zoho.route";
 import { openapiSpec } from "./app/docs/openapi";
 
@@ -52,6 +53,7 @@ app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/zoho", ZohoRoutes);
 app.use("/api/billing", BillingRoutes);
 app.use("/api/books", BooksRoutes);
+app.use("/api/sign", SignRoutes);
 app.use("/api/orders", OrderRoutes);
 // Kept so existing /api/payments callers keep working.
 app.use("/api/payments", OrderRoutes);

@@ -139,6 +139,46 @@ const ORDER_EXAMPLE = {
 
 const ORDER_RESPONSE = jsonResponse('The order, with its payment URL', envelope(ORDER, 'Order created. Send the user to paymentUrl.'))
 
+const SIGN_TEMPLATE = {
+    type: 'object',
+    properties: {
+        template_id: { type: 'string', example: '619865000000047066' },
+        template_name: { type: 'string', example: 'HAUS+ Membership Agreement.docx' },
+        description: { type: 'string', nullable: true },
+        is_sequential: { type: 'boolean', description: 'Whether recipients must sign in order.' },
+        owner_email: { type: 'string', format: 'email' },
+        document_ids: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    document_id: { type: 'string' },
+                    document_name: { type: 'string', example: 'HAUS+ Membership Agreement latest' },
+                    total_pages: { type: 'integer', example: 25 },
+                },
+            },
+        },
+        actions: {
+            type: 'array',
+            description: 'Details response only. One entry per recipient of the template.',
+            items: {
+                type: 'object',
+                properties: {
+                    action_id: { type: 'string', example: '619865000000047081' },
+                    action_type: { type: 'string', example: 'SIGN' },
+                    signing_order: { type: 'integer', example: 2 },
+                    recipient_name: {
+                        type: 'string',
+                        description: 'Blank when the template leaves this signer open.',
+                    },
+                    recipient_email: { type: 'string', description: 'Blank when left open.' },
+                    fields: { type: 'array', items: { type: 'object' } },
+                },
+            },
+        },
+    },
+}
+
 const pathParam = (name: string, description: string) => ({
     name,
     in: 'path',
@@ -171,6 +211,8 @@ export const openapiSpec = {
         { name: 'Zoho OAuth', description: 'Token setup and connectivity checks' },
         { name: 'Orders', description: 'Priced locally, collected through Zoho' },
         { name: 'Billing', description: 'Subscriptions, invoices and catalogue lookups' },
+        { name: 'Books', description: 'Accounting records for payments collected elsewhere' },
+        { name: 'Zoho Sign', description: 'Signature templates' },
         { name: 'Webhooks', description: 'Called by Zoho, not by your app' },
     ],
     paths: {
@@ -542,6 +584,177 @@ export const openapiSpec = {
             },
         },
 
+        '/api/books/orders': {
+            post: {
+                tags: ['Books'],
+                summary: 'Record an already-paid order in Zoho Books',
+                description: [
+                    'Call this once your gateway (Razorpay) confirms the payment. No money moves',
+                    'here — Zoho Books only receives the accounting record.',
+                    '',
+                    'In one request: find or create the contact, raise an invoice carrying your',
+                    'line items, issue it, then apply the payment so the invoice settles at a zero',
+                    'balance. Zoho sets the paid status itself once the balance reaches zero.',
+                    '',
+                    '**Idempotent on `orderNumber`** — a repeat call returns 200 with the invoice',
+                    'already recorded instead of invoicing twice, so it is safe to call from a',
+                    'gateway webhook that may fire more than once.',
+                    '',
+                    'The total is calculated from `items[]` and never taken from the caller.',
+                ].join('\n'),
+                requestBody: jsonBody(
+                    {
+                        type: 'object',
+                        required: ['orderNumber', 'items'],
+                        properties: {
+                            orderNumber: {
+                                type: 'string',
+                                description: 'Your reference. Unique; used as the invoice reference_number.',
+                                example: 'HAUS-1001',
+                            },
+                            userId: {
+                                type: 'string',
+                                format: 'uuid',
+                                description: 'Payer as a local user. Alternative to zohoContactId or customer.',
+                            },
+                            zohoContactId: {
+                                type: 'string',
+                                description: 'Existing Books contact id, when you already have it.',
+                            },
+                            customer: {
+                                type: 'object',
+                                description:
+                                    'Details to find or create a contact by email. Use when the payer is not a local user.',
+                                required: ['name', 'email'],
+                                properties: {
+                                    name: { type: 'string' },
+                                    email: { type: 'string', format: 'email' },
+                                    phone: { type: 'string' },
+                                },
+                            },
+                            description: { type: 'string', example: 'Order #1001' },
+                            notes: { type: 'string', description: 'Written onto the invoice.' },
+                            items: {
+                                type: 'array',
+                                minItems: 1,
+                                items: {
+                                    type: 'object',
+                                    required: ['description', 'unitPrice'],
+                                    properties: {
+                                        type: { type: 'string', example: 'MEETING_ROOM' },
+                                        description: { type: 'string', example: 'Meeting Room - 2 hours' },
+                                        quantity: { type: 'number', default: 1, example: 2 },
+                                        unitPrice: { type: 'number', example: 500 },
+                                        itemId: {
+                                            type: 'string',
+                                            description: 'Optional Books catalogue item for this line.',
+                                        },
+                                    },
+                                },
+                            },
+                            payment: {
+                                type: 'object',
+                                description: 'What the gateway already collected.',
+                                properties: {
+                                    reference: {
+                                        type: 'string',
+                                        description: 'Gateway payment id, stored on the Zoho payment.',
+                                        example: 'pay_RzpTest12345',
+                                    },
+                                    mode: {
+                                        type: 'string',
+                                        default: 'others',
+                                        description:
+                                            'A mode the organization accepts: cash, check, creditcard, banktransfer, bankremittance, autotransaction, others, or a custom one.',
+                                        example: 'creditcard',
+                                    },
+                                    date: { type: 'string', example: '2026-09-28', description: 'yyyy-mm-dd. Defaults to the invoice date.' },
+                                    amount: {
+                                        type: 'number',
+                                        description:
+                                            'Defaults to the invoice total, covering any tax Zoho adds. Pass it only to record a part payment, which leaves the invoice partially paid.',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    {
+                        orderNumber: 'HAUS-1001',
+                        userId: '0e50f914-032b-42e3-b061-5998c14885f0',
+                        description: 'Order #1001',
+                        items: [
+                            { type: 'MEETING_ROOM', description: 'Meeting Room - 2 hours', quantity: 2, unitPrice: 500 },
+                            { type: 'PRINT', description: 'Printing - 20 pages', quantity: 20, unitPrice: 5 },
+                            { type: 'FOOD', description: 'Coffee', quantity: 2, unitPrice: 100 },
+                        ],
+                        payment: { reference: 'pay_RzpTest12345', mode: 'creditcard' },
+                    },
+                ),
+                responses: {
+                    201: jsonResponse(
+                        'Recorded and settled in Zoho Books',
+                        envelope(ORDER, 'Order recorded in Zoho Books and marked paid'),
+                    ),
+                    200: jsonResponse(
+                        'This orderNumber was already recorded; nothing was created',
+                        envelope(ORDER, 'Order was already recorded in Zoho Books'),
+                    ),
+                    500: jsonResponse('Validation or Zoho error', ERROR_RESPONSE),
+                },
+            },
+        },
+        '/api/books/orders/{orderNumber}': {
+            get: {
+                tags: ['Books'],
+                summary: 'Fetch a recorded order by your order number',
+                parameters: [pathParam('orderNumber', 'The reference you supplied, e.g. HAUS-1001.')],
+                responses: {
+                    200: jsonResponse('The stored order and its Zoho ids', envelope(ORDER, 'Order fetched')),
+                },
+            },
+        },
+
+        '/api/sign/templates': {
+            get: {
+                tags: ['Zoho Sign'],
+                summary: 'List or find signature templates',
+                description:
+                    '`name` returns the single exact match with full details (actions and fields); `search` matches partially; neither returns the list.',
+                parameters: [
+                    {
+                        name: 'name',
+                        in: 'query',
+                        schema: { type: 'string' },
+                        description: 'Exact template name.',
+                        example: 'HAUS+ Membership Agreement.docx',
+                    },
+                    { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Partial name.' },
+                    { name: 'rowCount', in: 'query', schema: { type: 'integer', default: 100 } },
+                    { name: 'startIndex', in: 'query', schema: { type: 'integer', default: 1 } },
+                ],
+                responses: {
+                    200: jsonResponse(
+                        'Templates, or the single named one',
+                        envelope({ type: 'array', items: SIGN_TEMPLATE }, 'Templates fetched from Zoho Sign'),
+                    ),
+                    500: jsonResponse('No exact match, or a Zoho error', ERROR_RESPONSE),
+                },
+            },
+        },
+        '/api/sign/templates/{id}': {
+            get: {
+                tags: ['Zoho Sign'],
+                summary: 'Template details, including recipient actions and fields',
+                description:
+                    'The actions are what sending needs: each carries an action_id, its signing order, and the recipient to fill in. An action with a blank name and email is an open slot for your signer.',
+                parameters: [pathParam('id', 'Zoho Sign template_id, e.g. 619865000000047066.')],
+                responses: {
+                    200: jsonResponse('The template', envelope(SIGN_TEMPLATE, 'Template fetched from Zoho Sign')),
+                    500: jsonResponse('Invalid template id, or a Zoho error', ERROR_RESPONSE),
+                },
+            },
+        },
+
         '/api/billing/webhook': {
             post: {
                 tags: ['Webhooks'],
@@ -615,6 +828,11 @@ export const openapiSpec = {
         securitySchemes: {
             bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
         },
-        schemas: { Order: ORDER, OrderItem: ORDER_ITEM, Error: ERROR_RESPONSE },
+        schemas: {
+            Order: ORDER,
+            OrderItem: ORDER_ITEM,
+            SignTemplate: SIGN_TEMPLATE,
+            Error: ERROR_RESPONSE,
+        },
     },
 }
