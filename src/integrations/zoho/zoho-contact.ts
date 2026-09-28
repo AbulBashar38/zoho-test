@@ -30,6 +30,30 @@ export const createZohoContact = async ({ name, email, phone }: TCreateZohoConta
     return response.data.contact
 }
 
+// Books filters contacts by the primary contact person's email, so a repeat order for the
+// same customer reuses the existing contact instead of failing on a duplicate name.
+export const findZohoContactByEmail = async (email: string) => {
+    const response = await zohoClient.get<{ contacts: TZohoContact[] }>('/contacts', {
+        params: { email: email.trim() },
+    })
+
+    return response.data.contacts?.[0]
+}
+
+export const getOrCreateZohoContactByDetails = async (params: {
+    name: string
+    email: string
+    phone?: string | null
+}) => {
+    const existing = await findZohoContactByEmail(params.email)
+
+    if (existing) return existing.contact_id
+
+    const contact = await createZohoContact(params)
+
+    return contact.contact_id
+}
+
 export const getOrCreateZohoContact = async (userId: string) => {
     const user = await prisma.user.findUnique({
         where: { id: userId },

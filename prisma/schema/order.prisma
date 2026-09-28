@@ -11,11 +11,16 @@ model Order {
 
   status OrderStatus @default(PENDING)
 
+  // Which Zoho product holds this order: BOOKS (accounting only) or BILLING.
+  zohoService       String? @default("BILLING")
   zohoCustomerId    String
   zohoPaymentLinkId String? @unique
   paymentLinkNumber String?
   paymentUrl        String?
   zohoPaymentId     String?
+  // Gateway reference for the payment already collected, e.g. a Razorpay payment id.
+  paymentReference  String?
+  paymentMode       String?
   // Only set when collected through the ad-hoc invoice route instead of a payment link.
   zohoInvoiceId     String? @unique
   invoiceNumber     String?
