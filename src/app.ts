@@ -6,6 +6,7 @@ import express, {
   type Response,
 } from "express";
 import httpStatus from "http-status";
+import swaggerUi from "swagger-ui-express";
 import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
@@ -13,6 +14,7 @@ import { AuthRoutes } from "./app/module/auth/auth.route";
 import { BillingRoutes } from "./app/module/billing/billing.route";
 import { OrderRoutes } from "./app/module/order/order.route";
 import { ZohoRoutes } from "./app/module/zoho/zoho.route";
+import { openapiSpec } from "./app/docs/openapi";
 
 const app: Application = express();
 
@@ -29,6 +31,20 @@ app.use(express.urlencoded({ extended: true }));
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cookieParser());
+
+// API documentation: Swagger UI at /api/docs, raw spec at /api/docs.json
+app.get("/api/docs.json", (_req: Request, res: Response) => {
+  res.json(openapiSpec);
+});
+
+app.use(
+  "/api/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(openapiSpec, {
+    customSiteTitle: "Zoho Integration API",
+    swaggerOptions: { persistAuthorization: true, docExpansion: "list" },
+  }),
+);
 
 app.use("/api/v1/auth", AuthRoutes);
 
