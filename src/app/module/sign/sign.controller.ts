@@ -1,6 +1,11 @@
 import type { Request, Response } from 'express'
 import httpStatus from 'http-status'
 import {
+    createAgreementFromTemplate,
+    getAgreementStatus,
+    sendAgreement,
+} from '../../../integrations/zoho/sign/sign-agreement.service'
+import {
     getZohoSignTemplate,
     getZohoSignTemplateByName,
     listZohoSignTemplates,
@@ -50,7 +55,48 @@ const getTemplate = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+// Creates one agreement from an existing template: admin values pre-filled, member fields
+// left open, then sent to both signers.
+const createAgreement = catchAsync(async (req: Request, res: Response) => {
+    const result = await createAgreementFromTemplate(req.body)
+
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: result.sent
+            ? 'Agreement created and sent for signature'
+            : 'Agreement created as a draft in Zoho Sign',
+        data: result,
+    })
+})
+
+// Sends a draft. Zoho emails every signatory, so this is not reversible.
+const sendRequest = catchAsync(async (req: Request, res: Response) => {
+    const result = await sendAgreement(req.params.id as string)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Agreement sent for signature',
+        data: result,
+    })
+})
+
+const getRequest = catchAsync(async (req: Request, res: Response) => {
+    const result = await getAgreementStatus(req.params.id as string)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Signature request fetched',
+        data: result,
+    })
+})
+
 export const SignController = {
     listTemplates,
     getTemplate,
+    createAgreement,
+    sendRequest,
+    getRequest,
 }

@@ -11,15 +11,21 @@ export type TZohoSignTemplate = {
     is_sequential?: boolean
     // Present on the details response: who signs and in what order.
     actions?: {
-        action_id?: string
+        action_id: string
         action_type?: string
+        // The template's label for this signer, e.g. "HAUS+ Authorized Signatory".
+        role?: string
         recipient_name?: string
         recipient_email?: string
         signing_order?: number
         verify_recipient?: boolean
+        delivery_mode?: string
         fields?: unknown[]
     }[]
     document_ids?: { document_id: string; document_name?: string; total_pages?: number }[]
+    // Fields the sender pre-fills, rather than a signer. Zoho returns these either as a
+    // flat array or bucketed by field type.
+    document_fields?: { document_id?: string; fields?: unknown }[]
 }
 
 type TListParams = {

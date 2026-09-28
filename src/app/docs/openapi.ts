@@ -117,7 +117,10 @@ const CREATE_ORDER_BODY = {
                 },
             },
         },
-        amount: { type: 'number', description: 'Single-line shorthand, used when items is absent.' },
+        amount: {
+            type: 'number',
+            description: 'Single-line shorthand, used when items is absent.',
+        },
         expiryTime: {
             type: 'string',
             description: 'Payment links only. yyyy-mm-dd. Zoho defaults to 15 days.',
@@ -137,7 +140,10 @@ const ORDER_EXAMPLE = {
     ],
 }
 
-const ORDER_RESPONSE = jsonResponse('The order, with its payment URL', envelope(ORDER, 'Order created. Send the user to paymentUrl.'))
+const ORDER_RESPONSE = jsonResponse(
+    'The order, with its payment URL',
+    envelope(ORDER, 'Order created. Send the user to paymentUrl.'),
+)
 
 const SIGN_TEMPLATE = {
     type: 'object',
@@ -203,9 +209,7 @@ export const openapiSpec = {
             'refresh token. Call `POST /api/zoho/authorize` once with a Self Client code.',
         ].join('\n'),
     },
-    servers: [
-        { url: config.bak_url || 'http://localhost:5050', description: 'This backend' },
-    ],
+    servers: [{ url: config.bak_url || 'http://localhost:5050', description: 'This backend' }],
     tags: [
         { name: 'Auth', description: 'User registration and login' },
         { name: 'Zoho OAuth', description: 'Token setup and connectivity checks' },
@@ -233,7 +237,10 @@ export const openapiSpec = {
                     { name: 'basarTest', email: 'basartest@gmail.com', password: '12345678' },
                 ),
                 responses: {
-                    201: jsonResponse('Created, with tokens and the new user', envelope({ type: 'object' }, 'Patient registered successfully')),
+                    201: jsonResponse(
+                        'Created, with tokens and the new user',
+                        envelope({ type: 'object' }, 'Patient registered successfully'),
+                    ),
                     500: jsonResponse('Validation or server error', ERROR_RESPONSE),
                 },
             },
@@ -251,7 +258,10 @@ export const openapiSpec = {
                     },
                 }),
                 responses: {
-                    200: jsonResponse('Access and refresh tokens', envelope({ type: 'object' }, 'User logged in successfully')),
+                    200: jsonResponse(
+                        'Access and refresh tokens',
+                        envelope({ type: 'object' }, 'User logged in successfully'),
+                    ),
                 },
             },
         },
@@ -261,7 +271,10 @@ export const openapiSpec = {
                 summary: 'Current user profile',
                 security: [{ bearerAuth: [] }],
                 responses: {
-                    200: jsonResponse('The signed-in user', envelope({ type: 'object' }, 'User profile fetched successfully')),
+                    200: jsonResponse(
+                        'The signed-in user',
+                        envelope({ type: 'object' }, 'User profile fetched successfully'),
+                    ),
                 },
             },
         },
@@ -270,7 +283,10 @@ export const openapiSpec = {
                 tags: ['Auth'],
                 summary: 'Exchange the refresh cookie for new tokens',
                 responses: {
-                    200: jsonResponse('New tokens', envelope({ type: 'object' }, 'New tokens generated successfully')),
+                    200: jsonResponse(
+                        'New tokens',
+                        envelope({ type: 'object' }, 'New tokens generated successfully'),
+                    ),
                 },
             },
         },
@@ -313,11 +329,27 @@ export const openapiSpec = {
                 tags: ['Zoho OAuth'],
                 summary: 'Redirect callback for the browser OAuth flow',
                 parameters: [
-                    { name: 'code', in: 'query', schema: { type: 'string' }, description: 'Authorization code from Zoho.' },
-                    { name: 'error', in: 'query', schema: { type: 'string' }, description: 'Set when the user declined, e.g. access_denied.' },
+                    {
+                        name: 'code',
+                        in: 'query',
+                        schema: { type: 'string' },
+                        description: 'Authorization code from Zoho.',
+                    },
+                    {
+                        name: 'error',
+                        in: 'query',
+                        schema: { type: 'string' },
+                        description: 'Set when the user declined, e.g. access_denied.',
+                    },
                 ],
                 responses: {
-                    200: jsonResponse('Authorized', envelope({ type: 'object' }, 'Zoho authorization successful. You can close this tab.')),
+                    200: jsonResponse(
+                        'Authorized',
+                        envelope(
+                            { type: 'object' },
+                            'Zoho authorization successful. You can close this tab.',
+                        ),
+                    ),
                     400: jsonResponse('Missing code, or Zoho reported an error', ERROR_RESPONSE),
                 },
             },
@@ -329,7 +361,10 @@ export const openapiSpec = {
                 description:
                     'Confirms OAuth, domain and token are working. Also the easiest way to find your organization id. Hidden in production.',
                 responses: {
-                    200: jsonResponse('Raw Zoho organizations response', envelope({ type: 'object' }, 'Zoho Books connection is working')),
+                    200: jsonResponse(
+                        'Raw Zoho organizations response',
+                        envelope({ type: 'object' }, 'Zoho Books connection is working'),
+                    ),
                 },
             },
             post: {
@@ -356,7 +391,10 @@ export const openapiSpec = {
                     },
                 ),
                 responses: {
-                    200: jsonResponse('The Zoho ids created', envelope({ type: 'object' }, 'Zoho Books integration test completed')),
+                    200: jsonResponse(
+                        'The Zoho ids created',
+                        envelope({ type: 'object' }, 'Zoho Books integration test completed'),
+                    ),
                 },
             },
         },
@@ -368,7 +406,10 @@ export const openapiSpec = {
                 description:
                     'The default route. Every line item is sent to Zoho, and `paymentUrl` is the hosted checkout page for the resulting invoice. The order row is written before any Zoho call, so a failure leaves a PENDING order you can finish with `POST /api/orders/{id}/invoice`.',
                 requestBody: jsonBody(CREATE_ORDER_BODY, ORDER_EXAMPLE),
-                responses: { 201: ORDER_RESPONSE, 500: jsonResponse('Validation or Zoho error', ERROR_RESPONSE) },
+                responses: {
+                    201: ORDER_RESPONSE,
+                    500: jsonResponse('Validation or Zoho error', ERROR_RESPONSE),
+                },
             },
             get: {
                 tags: ['Orders'],
@@ -378,11 +419,17 @@ export const openapiSpec = {
                     {
                         name: 'status',
                         in: 'query',
-                        schema: { type: 'string', enum: ['PENDING', 'PAID', 'CANCELLED', 'EXPIRED'] },
+                        schema: {
+                            type: 'string',
+                            enum: ['PENDING', 'PAID', 'CANCELLED', 'EXPIRED'],
+                        },
                     },
                 ],
                 responses: {
-                    200: jsonResponse('Orders, newest first', envelope({ type: 'array', items: ORDER }, 'Orders fetched')),
+                    200: jsonResponse(
+                        'Orders, newest first',
+                        envelope({ type: 'array', items: ORDER }, 'Orders fetched'),
+                    ),
                 },
             },
         },
@@ -428,7 +475,9 @@ export const openapiSpec = {
             get: {
                 tags: ['Orders'],
                 summary: 'Fetch one order by your own order number',
-                parameters: [pathParam('orderNumber', 'The reference you supplied, e.g. ORDER-123.')],
+                parameters: [
+                    pathParam('orderNumber', 'The reference you supplied, e.g. ORDER-123.'),
+                ],
                 responses: { 200: ORDER_RESPONSE },
             },
         },
@@ -446,7 +495,8 @@ export const openapiSpec = {
             post: {
                 tags: ['Orders'],
                 summary: 'Re-check the payment status with Zoho',
-                description: 'Useful when a webhook is delayed. Zoho decides; a partial payment stays PENDING.',
+                description:
+                    'Useful when a webhook is delayed. Zoho decides; a partial payment stays PENDING.',
                 parameters: [pathParam('id', 'Local order id.')],
                 responses: { 200: ORDER_RESPONSE },
             },
@@ -481,7 +531,10 @@ export const openapiSpec = {
                             reference: { type: 'string' },
                         },
                     },
-                    { userId: '0e50f914-032b-42e3-b061-5998c14885f0', planCode: 'single-seat-monthly' },
+                    {
+                        userId: '0e50f914-032b-42e3-b061-5998c14885f0',
+                        planCode: 'single-seat-monthly',
+                    },
                 ),
                 responses: {
                     200: jsonResponse(
@@ -510,13 +563,27 @@ export const openapiSpec = {
             get: {
                 tags: ['Billing'],
                 summary: 'Look up Zoho items',
-                description: '`name` returns the single exact match with its item_id; `search` returns partial matches; neither returns everything.',
+                description:
+                    '`name` returns the single exact match with its item_id; `search` returns partial matches; neither returns everything.',
                 parameters: [
-                    { name: 'name', in: 'query', schema: { type: 'string' }, description: 'Exact name.' },
-                    { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Partial text.' },
+                    {
+                        name: 'name',
+                        in: 'query',
+                        schema: { type: 'string' },
+                        description: 'Exact name.',
+                    },
+                    {
+                        name: 'search',
+                        in: 'query',
+                        schema: { type: 'string' },
+                        description: 'Partial text.',
+                    },
                 ],
                 responses: {
-                    200: jsonResponse('One item, or a list', envelope({ type: 'object' }, 'Item found')),
+                    200: jsonResponse(
+                        'One item, or a list',
+                        envelope({ type: 'object' }, 'Item found'),
+                    ),
                 },
             },
         },
@@ -525,17 +592,33 @@ export const openapiSpec = {
                 tags: ['Billing'],
                 summary: 'Fetch one Zoho item by id',
                 parameters: [pathParam('id', 'Zoho item_id.')],
-                responses: { 200: jsonResponse('The item', envelope({ type: 'object' }, 'Item fetched from Zoho')) },
+                responses: {
+                    200: jsonResponse(
+                        'The item',
+                        envelope({ type: 'object' }, 'Item fetched from Zoho'),
+                    ),
+                },
             },
         },
         '/api/billing/products': {
             get: {
                 tags: ['Billing'],
                 summary: 'Look up Zoho products',
-                description: 'Products are the catalogue plans hang off, and are distinct from items.',
-                parameters: [{ name: 'name', in: 'query', schema: { type: 'string' }, description: 'Exact name.' }],
+                description:
+                    'Products are the catalogue plans hang off, and are distinct from items.',
+                parameters: [
+                    {
+                        name: 'name',
+                        in: 'query',
+                        schema: { type: 'string' },
+                        description: 'Exact name.',
+                    },
+                ],
                 responses: {
-                    200: jsonResponse('One product, or the full list', envelope({ type: 'object' }, 'Product found')),
+                    200: jsonResponse(
+                        'One product, or the full list',
+                        envelope({ type: 'object' }, 'Product found'),
+                    ),
                 },
             },
         },
@@ -544,16 +627,29 @@ export const openapiSpec = {
                 tags: ['Billing'],
                 summary: 'Fetch one Zoho product by id',
                 parameters: [pathParam('id', 'Zoho product_id.')],
-                responses: { 200: jsonResponse('The product', envelope({ type: 'object' }, 'Product fetched from Zoho')) },
+                responses: {
+                    200: jsonResponse(
+                        'The product',
+                        envelope({ type: 'object' }, 'Product fetched from Zoho'),
+                    ),
+                },
             },
         },
         '/api/billing/invoices': {
             get: {
                 tags: ['Billing'],
                 summary: 'Mirrored Zoho invoices from the local database',
-                parameters: [{ name: 'userId', in: 'query', schema: { type: 'string', format: 'uuid' } }],
+                parameters: [
+                    { name: 'userId', in: 'query', schema: { type: 'string', format: 'uuid' } },
+                ],
                 responses: {
-                    200: jsonResponse('Invoices with their payments', envelope({ type: 'array', items: { type: 'object' } }, 'Invoices fetched from the local mirror')),
+                    200: jsonResponse(
+                        'Invoices with their payments',
+                        envelope(
+                            { type: 'array', items: { type: 'object' } },
+                            'Invoices fetched from the local mirror',
+                        ),
+                    ),
                 },
             },
         },
@@ -561,7 +657,8 @@ export const openapiSpec = {
             post: {
                 tags: ['Billing'],
                 summary: 'Payment URL for an existing Zoho invoice',
-                description: 'Opens the invoice if it is still a draft, then returns its hosted checkout page.',
+                description:
+                    'Opens the invoice if it is still a draft, then returns its hosted checkout page.',
                 parameters: [pathParam('id', 'Zoho invoice_id.')],
                 responses: {
                     200: jsonResponse(
@@ -609,13 +706,15 @@ export const openapiSpec = {
                         properties: {
                             orderNumber: {
                                 type: 'string',
-                                description: 'Your reference. Unique; used as the invoice reference_number.',
+                                description:
+                                    'Your reference. Unique; used as the invoice reference_number.',
                                 example: 'HAUS-1001',
                             },
                             userId: {
                                 type: 'string',
                                 format: 'uuid',
-                                description: 'Payer as a local user. Alternative to zohoContactId or customer.',
+                                description:
+                                    'Payer as a local user. Alternative to zohoContactId or customer.',
                             },
                             zohoContactId: {
                                 type: 'string',
@@ -642,12 +741,16 @@ export const openapiSpec = {
                                     required: ['description', 'unitPrice'],
                                     properties: {
                                         type: { type: 'string', example: 'MEETING_ROOM' },
-                                        description: { type: 'string', example: 'Meeting Room - 2 hours' },
+                                        description: {
+                                            type: 'string',
+                                            example: 'Meeting Room - 2 hours',
+                                        },
                                         quantity: { type: 'number', default: 1, example: 2 },
                                         unitPrice: { type: 'number', example: 500 },
                                         itemId: {
                                             type: 'string',
-                                            description: 'Optional Books catalogue item for this line.',
+                                            description:
+                                                'Optional Books catalogue item for this line.',
                                         },
                                     },
                                 },
@@ -658,7 +761,8 @@ export const openapiSpec = {
                                 properties: {
                                     reference: {
                                         type: 'string',
-                                        description: 'Gateway payment id, stored on the Zoho payment.',
+                                        description:
+                                            'Gateway payment id, stored on the Zoho payment.',
                                         example: 'pay_RzpTest12345',
                                     },
                                     mode: {
@@ -668,7 +772,11 @@ export const openapiSpec = {
                                             'A mode the organization accepts: cash, check, creditcard, banktransfer, bankremittance, autotransaction, others, or a custom one.',
                                         example: 'creditcard',
                                     },
-                                    date: { type: 'string', example: '2026-09-28', description: 'yyyy-mm-dd. Defaults to the invoice date.' },
+                                    date: {
+                                        type: 'string',
+                                        example: '2026-09-28',
+                                        description: 'yyyy-mm-dd. Defaults to the invoice date.',
+                                    },
                                     amount: {
                                         type: 'number',
                                         description:
@@ -683,8 +791,18 @@ export const openapiSpec = {
                         userId: '0e50f914-032b-42e3-b061-5998c14885f0',
                         description: 'Order #1001',
                         items: [
-                            { type: 'MEETING_ROOM', description: 'Meeting Room - 2 hours', quantity: 2, unitPrice: 500 },
-                            { type: 'PRINT', description: 'Printing - 20 pages', quantity: 20, unitPrice: 5 },
+                            {
+                                type: 'MEETING_ROOM',
+                                description: 'Meeting Room - 2 hours',
+                                quantity: 2,
+                                unitPrice: 500,
+                            },
+                            {
+                                type: 'PRINT',
+                                description: 'Printing - 20 pages',
+                                quantity: 20,
+                                unitPrice: 5,
+                            },
                             { type: 'FOOD', description: 'Coffee', quantity: 2, unitPrice: 100 },
                         ],
                         payment: { reference: 'pay_RzpTest12345', mode: 'creditcard' },
@@ -707,9 +825,14 @@ export const openapiSpec = {
             get: {
                 tags: ['Books'],
                 summary: 'Fetch a recorded order by your order number',
-                parameters: [pathParam('orderNumber', 'The reference you supplied, e.g. HAUS-1001.')],
+                parameters: [
+                    pathParam('orderNumber', 'The reference you supplied, e.g. HAUS-1001.'),
+                ],
                 responses: {
-                    200: jsonResponse('The stored order and its Zoho ids', envelope(ORDER, 'Order fetched')),
+                    200: jsonResponse(
+                        'The stored order and its Zoho ids',
+                        envelope(ORDER, 'Order fetched'),
+                    ),
                 },
             },
         },
@@ -728,14 +851,22 @@ export const openapiSpec = {
                         description: 'Exact template name.',
                         example: 'HAUS+ Membership Agreement.docx',
                     },
-                    { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Partial name.' },
+                    {
+                        name: 'search',
+                        in: 'query',
+                        schema: { type: 'string' },
+                        description: 'Partial name.',
+                    },
                     { name: 'rowCount', in: 'query', schema: { type: 'integer', default: 100 } },
                     { name: 'startIndex', in: 'query', schema: { type: 'integer', default: 1 } },
                 ],
                 responses: {
                     200: jsonResponse(
                         'Templates, or the single named one',
-                        envelope({ type: 'array', items: SIGN_TEMPLATE }, 'Templates fetched from Zoho Sign'),
+                        envelope(
+                            { type: 'array', items: SIGN_TEMPLATE },
+                            'Templates fetched from Zoho Sign',
+                        ),
                     ),
                     500: jsonResponse('No exact match, or a Zoho error', ERROR_RESPONSE),
                 },
@@ -749,8 +880,291 @@ export const openapiSpec = {
                     'The actions are what sending needs: each carries an action_id, its signing order, and the recipient to fill in. An action with a blank name and email is an open slot for your signer.',
                 parameters: [pathParam('id', 'Zoho Sign template_id, e.g. 619865000000047066.')],
                 responses: {
-                    200: jsonResponse('The template', envelope(SIGN_TEMPLATE, 'Template fetched from Zoho Sign')),
+                    200: jsonResponse(
+                        'The template',
+                        envelope(SIGN_TEMPLATE, 'Template fetched from Zoho Sign'),
+                    ),
                     500: jsonResponse('Invalid template id, or a Zoho error', ERROR_RESPONSE),
+                },
+            },
+        },
+        '/api/sign/agreements': {
+            post: {
+                tags: ['Zoho Sign'],
+                summary: 'Create an agreement from a template and send it for signature',
+                description: [
+                    'One call per agreement. The template is read first — action ids, roles and',
+                    'signing order come from Zoho, not from this request — then the document is',
+                    'created and sent. The template itself is never modified.',
+                    '',
+                    '**Who signs what.** Admin values go in `fields` / `dateFields` and are',
+                    'pre-filled. Leave the signature and sign-date fields out: each signatory',
+                    'completes those through the link Zoho emails them.',
+                    '',
+                    '**Every mandatory pre-fill field must have a value.** Zoho rejects the whole',
+                    'request otherwise, so the request is checked first and fails with the list of',
+                    'missing field names before anything is created.',
+                    '',
+                    "**Field keys** accept either the template's `field_name`",
+                    '(e.g. `workspace_address`) or its `field_label`; each value is sent under both,',
+                    'since Zoho matches on the label. A key matching no field is passed through',
+                    'and logged.',
+                    '',
+                    '**Dates** are converted to the format configured on the field, so send plain',
+                    '`yyyy-mm-dd` and `membership_start_date` arrives as `Oct 01 2026`.',
+                    '',
+                    '**Signing order** comes from the template. With `is_sequential: false` both',
+                    'parties are emailed at once, whatever the signing orders say.',
+                ].join('\n'),
+                requestBody: jsonBody(
+                    {
+                        type: 'object',
+                        required: ['templateId'],
+                        properties: {
+                            templateId: { type: 'string', example: '619865000000047066' },
+                            member: {
+                                type: 'object',
+                                description:
+                                    'The member company signatory — the open slot on the template.',
+                                required: ['name', 'email'],
+                                properties: {
+                                    name: { type: 'string', example: 'Member Test' },
+                                    email: { type: 'string', format: 'email' },
+                                },
+                            },
+                            haus: {
+                                type: 'object',
+                                description:
+                                    'Overrides the HAUS+ signatory. Defaults to whoever the template names.',
+                                properties: {
+                                    name: { type: 'string' },
+                                    email: { type: 'string', format: 'email' },
+                                },
+                            },
+                            recipients: {
+                                type: 'array',
+                                description:
+                                    'Target an action precisely, by action id or exact role. Wins over haus/member.',
+                                items: {
+                                    type: 'object',
+                                    required: ['name', 'email'],
+                                    properties: {
+                                        actionId: { type: 'string', example: '619865000000047081' },
+                                        role: {
+                                            type: 'string',
+                                            example: 'Member Company Authorized Signatory',
+                                        },
+                                        name: { type: 'string' },
+                                        email: { type: 'string', format: 'email' },
+                                    },
+                                },
+                            },
+                            fields: {
+                                type: 'object',
+                                description: [
+                                    'Text and dropdown values to pre-fill, keyed by field name or label.',
+                                    'For template 619865000000047066 that is the 43 fields shown in the',
+                                    'example — all of its sender pre-fill fields except',
+                                    '`membership_start_date`, which is a date and belongs in `dateFields`.',
+                                    'The signature and sign-date fields stay with the signatories.',
+                                    '',
+                                    '`dedicated_vlan`, `dedicated_firewall` and `dedicated_bandwidth` are',
+                                    'dropdowns: the value must be exactly "Yes" or "No".',
+                                ].join('\n'),
+                                additionalProperties: { type: 'string' },
+                            },
+                            dateFields: {
+                                type: 'object',
+                                description:
+                                    'Date values to pre-fill. `membership_start_date` belongs here, not in `fields`.',
+                                additionalProperties: { type: 'string' },
+                            },
+                            booleanFields: {
+                                type: 'object',
+                                description: 'Checkbox values to pre-fill.',
+                                additionalProperties: { type: 'boolean' },
+                            },
+                            notes: { type: 'string', description: 'Note shown to the signers.' },
+                            quickSend: {
+                                type: 'boolean',
+                                default: true,
+                                description:
+                                    'Omit it (or send true) to email both signatories immediately — the normal case. Send false only to leave a draft in Zoho Sign while testing, then release it with POST /api/sign/requests/{id}/send.',
+                            },
+                        },
+                    },
+                    {
+                        templateId: '619865000000047066',
+                        member: { name: 'Member Test', email: 'client@company.com' },
+                        fields: {
+                            // HAUS+ signatory (signature and sign date are left to the signer)
+                            haus_signatory_name: 'John Doe',
+                            haus_signatory_title: 'Managing Director',
+                            // Member company
+                            member_company_legal_name: 'ABC Limited',
+                            member_company_corporate_id: 'C-123456',
+                            member_company_trade_name: 'ABC',
+                            member_company_nature_of_business: 'Software development',
+                            member_company_gst_number: 'GST-987654321',
+                            member_company_broker_details: 'N/A',
+                            // Workspace
+                            workspace_address: 'Level 4, Gulshan Avenue, Dhaka',
+                            workspace_suite_no: 'Suite 402',
+                            workspace_capacity: '12',
+                            workspace_billable_work_units: '12 desks',
+                            // Term and fees
+                            commitment_term: '12 months',
+                            notice_period: '60 days',
+                            basic_membership_fee: '25000',
+                            annual_increment_basic_fee: '5% per annum',
+                            service_retainer: '50000',
+                            setup_fee: '10000',
+                            payment_mode: 'Bank transfer',
+                            // Included credits
+                            conference_room_credits: '20 hours',
+                            printing_bw_credits: '500 pages',
+                            printing_color_credits: '100 pages',
+                            overage_conference_room_credit: 'BDT 500 per hour',
+                            overage_printing_credit_bnw: 'BDT 2 per page',
+                            overage_printing_credit_color: 'BDT 10 per page',
+                            // Custom work and services
+                            custom_work_description: 'Additional partitioning',
+                            custom_work_cost: '15000',
+                            hvac_charges: 'At actuals',
+                            it_services_charges: '3000 per month',
+                            security_access_charges: '500 per access card',
+                            // Dedicated IT — dropdowns, exactly "Yes" or "No"
+                            dedicated_vlan: 'Yes',
+                            dedicated_firewall: 'No',
+                            dedicated_bandwidth: 'Yes',
+                            // Miscellaneous
+                            parking_spots: '2',
+                            parking_fees: '3000 per spot',
+                            additional_fees: 'None',
+                            annual_increment_miscellaneous_fees: '5% per annum',
+                            registered_office_permitted: 'Yes',
+                            additional_service_retainer: 'None',
+                            // HAUS+ contact person on the agreement
+                            haus_employee_name: 'Abul Basar',
+                            haus_employee_designation: 'Community Manager',
+                            haus_employee_contact: '+8801700000000',
+                            haus_employee_email: 'abul@hausplus.com',
+                        },
+                        dateFields: { membership_start_date: '2026-10-01' },
+                        notes: 'Membership agreement for Order HAUS-1001',
+                    },
+                ),
+                responses: {
+                    201: jsonResponse(
+                        'Created — sent, or left as a draft',
+                        envelope(
+                            {
+                                type: 'object',
+                                properties: {
+                                    requestId: { type: 'string', example: '619865000000050010' },
+                                    requestName: { type: 'string' },
+                                    requestStatus: { type: 'string', example: 'draft' },
+                                    templateId: { type: 'string' },
+                                    templateName: { type: 'string' },
+                                    sent: { type: 'boolean' },
+                                    prefilledFields: { type: 'integer', example: 6 },
+                                    recipients: {
+                                        type: 'array',
+                                        items: {
+                                            type: 'object',
+                                            properties: {
+                                                actionId: { type: 'string' },
+                                                role: { type: 'string' },
+                                                name: { type: 'string' },
+                                                email: { type: 'string' },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                            'Agreement created and sent for signature',
+                        ),
+                    ),
+                    500: jsonResponse(
+                        'A mandatory pre-fill field has no value, a template role has no recipient, or a Zoho error',
+                        ERROR_RESPONSE,
+                    ),
+                },
+            },
+        },
+        '/api/sign/requests/{id}/send': {
+            post: {
+                tags: ['Zoho Sign'],
+                summary: 'Send a draft agreement for signature',
+                description: [
+                    'Submits a draft created with `quickSend: false`. **Zoho emails every',
+                    'signatory the moment this returns, and that cannot be undone** — recall the',
+                    'request in Zoho Sign if it goes out in error.',
+                    '',
+                    'Only a draft can be sent; anything already in progress is rejected.',
+                    'Passing `quickSend: true` when creating skips this step entirely.',
+                ].join('\n'),
+                parameters: [pathParam('id', 'Zoho Sign request_id, e.g. 619865000000051010.')],
+                responses: {
+                    200: jsonResponse(
+                        'Sent — signatories have been emailed',
+                        envelope(
+                            {
+                                type: 'object',
+                                properties: {
+                                    requestId: { type: 'string' },
+                                    requestName: { type: 'string' },
+                                    requestStatus: { type: 'string', example: 'inprogress' },
+                                    sent: { type: 'boolean', example: true },
+                                    recipients: { type: 'array', items: { type: 'object' } },
+                                },
+                            },
+                            'Agreement sent for signature',
+                        ),
+                    ),
+                    500: jsonResponse('Not a draft, or a Zoho error', ERROR_RESPONSE),
+                },
+            },
+        },
+        '/api/sign/requests/{id}': {
+            get: {
+                tags: ['Zoho Sign'],
+                summary: 'Signature request status, per signatory',
+                description:
+                    'Each recipient reports its own status — NOACTION until that person signs.',
+                parameters: [pathParam('id', 'Zoho Sign request_id from the create call.')],
+                responses: {
+                    200: jsonResponse(
+                        'The request and its signatories',
+                        envelope(
+                            {
+                                type: 'object',
+                                properties: {
+                                    requestId: { type: 'string' },
+                                    requestName: { type: 'string' },
+                                    requestStatus: {
+                                        type: 'string',
+                                        example: 'inprogress',
+                                        description: 'draft, inprogress, completed, declined …',
+                                    },
+                                    recipients: {
+                                        type: 'array',
+                                        items: {
+                                            type: 'object',
+                                            properties: {
+                                                actionId: { type: 'string' },
+                                                role: { type: 'string' },
+                                                name: { type: 'string' },
+                                                email: { type: 'string' },
+                                                status: { type: 'string', example: 'NOACTION' },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                            'Signature request fetched',
+                        ),
+                    ),
                 },
             },
         },
@@ -786,7 +1200,8 @@ export const openapiSpec = {
                 requestBody: jsonBody(
                     {
                         type: 'object',
-                        description: 'Entities may arrive under data, payload, or at the top level.',
+                        description:
+                            'Entities may arrive under data, payload, or at the top level.',
                         properties: {
                             event_id: { type: 'string' },
                             event_type: { type: 'string', example: 'payment_thankyou' },
@@ -801,13 +1216,27 @@ export const openapiSpec = {
                                 payment_id: 'PAY-1',
                                 customer_id: '1344209000000104002',
                                 amount: 1300,
-                                invoices: [{ invoice_id: '1344209000000137021', amount_applied: 1300 }],
+                                invoices: [
+                                    { invoice_id: '1344209000000137021', amount_applied: 1300 },
+                                ],
                             },
                         },
                     },
                 ),
                 responses: {
-                    200: jsonResponse('Processed, or already seen', envelope({ type: 'object', properties: { eventType: { type: 'string' }, duplicate: { type: 'boolean' } } }, 'Webhook processed')),
+                    200: jsonResponse(
+                        'Processed, or already seen',
+                        envelope(
+                            {
+                                type: 'object',
+                                properties: {
+                                    eventType: { type: 'string' },
+                                    duplicate: { type: 'boolean' },
+                                },
+                            },
+                            'Webhook processed',
+                        ),
+                    ),
                     401: jsonResponse('Wrong or missing secret', ERROR_RESPONSE),
                 },
             },
@@ -819,7 +1248,16 @@ export const openapiSpec = {
                 description:
                     'Deliberately neutral: the redirect is never treated as proof of payment. The webhook decides.',
                 responses: {
-                    200: jsonResponse('Checking state', envelope({ type: 'object', properties: { status: { type: 'string', example: 'checking' } } }, 'Checking payment status.')),
+                    200: jsonResponse(
+                        'Checking state',
+                        envelope(
+                            {
+                                type: 'object',
+                                properties: { status: { type: 'string', example: 'checking' } },
+                            },
+                            'Checking payment status.',
+                        ),
+                    ),
                 },
             },
         },
