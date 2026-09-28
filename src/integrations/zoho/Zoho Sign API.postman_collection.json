@@ -1,0 +1,1730 @@
+{
+  "info": {
+    "_postman_id": "3a41928d-2e26-4746-ad15-52c29e464609",
+    "name": "Zoho Sign API",
+    "description": "Zoho Sign APIs provides the option for users to perform document management, and template management operations directly, without accessing Zoho Sign’s web interface using our REST APIs.\n\nYou may also check out our [API Documentation.](https://www.zoho.com/sign/api/)\n\n<video src=\"https://youtube.com/embed/ROwDvB0xRUw\" alt=\"An introduction to Zoho Sign APIs\" width=\"340\" height=\"199\"></video>\n\n<video src=\"https://youtube.com/embed/JeUUg98kap0\" width=\"340\"></video>\n\n<video src=\"https://youtube.com/embed/DG_uCYegCxo\" width=\"340\"></video>\n\n# Getting Started\n\n## Step 1 - Registering a Client and generating code\n\n1) Register on the Zoho Developer Console and generate a client - visit [API Console](https://api-console.zoho.com/)\n\n2) Click Add client and choose Client type as \"Self client\".\n\n3) Click Create and you will get a Client ID and Client secret.\n\n4) Under the \"Generate code\" tab provide the scopes of Zoho Sign - \"ZohoSign.documents.ALL,ZohoSign.templates.ALL\" and click Create.\n\n## Step 2 - Generating Refresh token\n\n1) Generate refresh token by visiting [here](https://sign.zoho.com/zs#/devspace/deployment).\n\n2) Enter your Client Id and Client Secret and the code generated in step 1.\n\n3) Now click generate refresh token and your refresh token would've been generated.\n\n## Step 3 - Generating Access token\n\n1) In Postman, Zoho Sign API collection add Client Id, Client Secret and Refresh Token as a current value in appropriate collection variable.\n\n2) After this, Access token will be generated automatically while invoking any of the API requests in the collection.\n\n3) Access token generated is valid for 1 hour and it gets auto-generated when it gets expired.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42359098",
+    "_collection_link": "https://go.postman.co/collection/42359098-3a41928d-2e26-4746-ad15-52c29e464609?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Document Management",
+      "item": [
+        {
+          "name": "Create document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n    \"requests\" :{\n        \"request_name\" : \"\",\n        \"actions\" : [\n            {\n                \"action_type\" : \"\",\n                \"recipient_email\" : \"\",\n                \"recipient_name\" : \"\",\n                \"signing_order\" : ,\n                \"verify_recipient\": ,\n                \"verification_type\": \"\",\n                \"verification_code\": \"\",\n                \"private_notes\" : \"\"\n            }\n        ],\n        \"expiration_days\" : ,\n        \"is_sequential\" : ,\n        \"email_reminders\" : ,\n        \"reminder_period\" : ,\n        \"folder_id\" : \"\"\n    }\n}",
+                  "description": "Enter values to keys appropriately.",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "description": "Upload file here.",
+                  "type": "file",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ]
+            },
+            "description": "This will create a new document."
+          },
+          "response": [
+            {
+              "name": "Create document",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n    \"requests\" :{\n        \"request_name\" : \"annotations\",\n        \"actions\" : [\n            {\n                \"action_type\" : \"SIGN\",\n                \"recipient_email\" : \"abc@example.com\",\n                \"recipient_name\" : \"Alex James\",\n                \"signing_order\" : 0,\n                \"verify_recipient\": false,\n                \"verification_type\": \"\",\n                \"verification_code\": \"\",\n                \"private_notes\" : \"To be signed\"\n            }\n        ],\n        \"expiration_days\" : 10 ,\n        \"is_sequential\" : true,\n        \"email_reminders\" : true,\n        \"reminder_period\" : 0\n    }\n}",
+                      "description": "Enter values to keys appropriately.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "file",
+                      "description": "Upload file here.",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/requests",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "requests"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Update document",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "{\n\t\"requests\":\n\t{\n\t\t\"request_name\":\"\",\n\t\t\"actions\":[\n\t\t{\n\t\t\t\"action_type\":\"\",\n\t\t\t\"action_id\":\"\",\n\t\t\t\"private_notes\":\"\",\n\t\t\t\"signing_order\":,\n\t\t\t\"verify_recipient\":,\n           \"recipient_name\":\"\",\n\t\t\t\"recipient_email\":\"\"\n\t\t}\n\t\t],\n\t\t\"notes\":\"\",\n\t\t\"expiration_days\": ,\n\t\t\"is_sequential\": ,\n\t\t\"email_reminders\": ,\n\t\t\"reminder_period\": ,\n\t\t\"validity\": \n\t}\n}",
+                  "description": "Enter document values in appropriate key",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "This will help you to update an existing document."
+          },
+          "response": [
+            {
+              "name": "Update document",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n\t\"requests\":\n\t{\n\t\t\t\"request_name\":\"buildsteps\",\n\t\t\t\"actions\":[\n\t\t\t{\n\t\t\t\t\"recipient_name\":\"Alex James\",\n\t\t\t\t\"recipient_email\":\"abc@example.com\",\n\t\t\t\t\"action_type\":\"SIGN\",\n\t\t\t\t\"action_id\":\"238568888765470\",\n\t\t\t\t\"private_notes\":\"Sign the doc\",\n\t\t\t\t\"signing_order\":0,\n\t\t\t\t\"is_bulk\":false,\n\t\t\t\t\n\t\t\t\t\"verify_recipient\":false\n\t\t\t}\n\t\t\t],\n\t\t\t\"notes\":\"Sign this doc\",\n\t\t\t\"expiration_days\":10,\n\t\t\t\"is_sequential\":true,\n\t\t\t\"description\":\"\",\n\t\t\t\"email_reminders\":true,\n\t\t\t\"reminder_period\":4,\n\t\t\t\"validity\":-1,\n\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t",
+                      "description": "Enter document values in appropriate key",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/requests/:Request_Id",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "requests",
+                    ":Request_Id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "Request_Id",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Send document for signature",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"requests\": {\n    \"actions\": [\n     {\n        \"verify_recipient\": ,\n        \"action_id\": \"\",\n        \"action_type\": \"\",\n        \"private_notes\": \"\",\n        \"signing_order\": ,\n        \"fields\": [\n         {\n              \"field_type_name\": \"\",\n              \"text_property\":{\n\t\t\t\"font\":\"\",\n\t\t\t\"font_size\": ,\n\t\t\t\"font_color\":\"\",\n\t\t\t\"max_field_length\": ,\n\t\t\t\"is_bold\": ,\n\t\t\t\"is_italic\":\n\t\t},\n              \"field_category\": \"\",\n              \"field_label\": \"\",\n              \"is_mandatory\": ,\n              \"page_no\": ,\n              \"document_id\": \"\",\n              \"field_name\": \"\",\n              \"y_coord\": ,\n              \"action_id\": \"\",\n              \"abs_width\": ,\n              \"x_coord\": ,\n              \"abs_height\": \n           }\n           ]\n        }\n        ]\n     }\n}",
+                  "description": "It is an Optional field. To use, enable it and enter the values appropriately.",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id/submit",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id",
+                "submit"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": "",
+                  "description": "Request ID of the document to send for signature"
+                }
+              ]
+            },
+            "description": "This will help you to send a document to your recipients for signature."
+          },
+          "response": [
+            {
+              "name": "Send document for signature",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n  \"requests\": {\n    \"actions\": [\n      {\n        \"verify_recipient\": false,\n        \"action_id\": \"238568888765470\",\n        \"action_type\": \"SIGN\",\n        \"private_notes\": \"Sign the doc\",\n        \"signing_order\": 0,\n        \"fields\": [\n        {\n           \"field_type_name\": \"Email\",\n           \"text_property\":{\n\t\t\t\"font\":\"Roboto\",\n\t\t\t\"font_size\":11,\n\t\t\t\"font_color\":\"000000\",\n\t\t\t\"max_field_length\":100,\n\t\t\t\"is_bold\":false,\n\t\t\t\"is_italic\":false\n\t\t},\n              \"field_category\": \"textfield\",\n              \"field_label\": \"Email\",\n              \"is_mandatory\": true,\n              \"page_no\": 0,\n              \"document_id\": \"2385687500987112\",\n              \"field_name\": \"Email\",\n              \"y_coord\": 51,\n              \"action_id\": \"238568888765470\",\n              \"abs_width\": 16,\n              \"x_coord\": 53,\n              \"abs_height\": 2\n            }\n           ]\n          }\n         ]\n        }\n       }",
+                      "description": "It is an Optional field. To use, enable it and enter the values appropriately.",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/requests/:Request_Id/submit",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "requests",
+                    ":Request_Id",
+                    "submit"
+                  ],
+                  "variable": [
+                    {
+                      "key": "Request_Id",
+                      "value": "",
+                      "description": "Request ID of the document to send for signature"
+                    }
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Correct document",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id/markforcorrection",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id",
+                "markforcorrection"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "This will help to alter almost all steps of the document signing process. Apart from editing the document, with the correct document feature, you can:\n\n1. Add new documents to the envelope\n    \n2. Add new recipients and change the signing order\n    \n3. Add or delete document fields\n    \n\n**Note:** You can correct the document only before none of signers have completed signing the document."
+          },
+          "response": []
+        },
+        {
+          "name": "Get details of a particular document",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": "",
+                  "description": "Request ID of the document for which details to be fetched."
+                }
+              ]
+            },
+            "description": "Get the details of a particular document which tells the details of the document including the status of the document. Use the key “request_status” to check for document completion"
+          },
+          "response": []
+        },
+        {
+          "name": "Get documents list",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests?data=%7B%22page_context%22%3A%7B%22row_count%22%3A100%2C%22start_index%22%3A1%2C%22search_columns%22%3A%7B%22recipient_email%22%3A%22abc%40example.com%22%7D%2C%22sort_column%22%3A%22created_time%22%2C%22sort_order%22%3A%22DESC%22%7D%7D",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests"
+              ],
+              "query": [
+                {
+                  "key": "data",
+                  "value": "%7B%22page_context%22%3A%7B%22row_count%22%3A100%2C%22start_index%22%3A1%2C%22search_columns%22%3A%7B%22recipient_email%22%3A%22abc%40example.com%22%7D%2C%22sort_column%22%3A%22created_time%22%2C%22sort_order%22%3A%22DESC%22%7D%7D",
+                  "description": "{\"page_context\":{\"row_count\":100,\"start_index\":1,\"search_columns\":{\"recipient_email\":\"abc@example.com\"},\"sort_column\":\"created_time\",\"sort_order\":\"DESC\"}}\n\nSorting column criteria can either be request_name, folder_name, owner_first_name, recipient_email or created_time"
+                }
+              ]
+            },
+            "description": "This will help you to fetch the list of documents in your account."
+          },
+          "response": [
+            {
+              "name": "Get documents list",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "url": {
+                  "raw": "{{SIGN_URL}}/api/v1/requests",
+                  "host": [
+                    "{{SIGN_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "requests"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Download PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_ID/pdf",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_ID",
+                "pdf"
+              ],
+              "variable": [
+                {
+                  "key": "Request_ID",
+                  "value": "",
+                  "description": "Request ID of the content to be downloaded"
+                }
+              ]
+            },
+            "description": "Retrieves the PDF content that can be downloaded."
+          },
+          "response": []
+        },
+        {
+          "name": "Download particular PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id/documents/:Document_Id/pdf",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id",
+                "documents",
+                ":Document_Id",
+                "pdf"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": "",
+                  "description": "Request ID of the content."
+                },
+                {
+                  "key": "Document_Id",
+                  "value": "",
+                  "description": "Document ID of the file."
+                }
+              ]
+            },
+            "description": "Retrieves the PDF content of a particular file."
+          },
+          "response": []
+        },
+        {
+          "name": "Download completion certificate",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id/completioncertificate",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id",
+                "completioncertificate"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": "",
+                  "description": "Request ID for which the completion certificate to be downloaded."
+                }
+              ]
+            },
+            "description": "Retrieves the completion certificate pdf content."
+          },
+          "response": []
+        },
+        {
+          "name": "Get document form data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id/fielddata",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id",
+                "fielddata"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": "",
+                  "description": "Request ID of the document."
+                }
+              ]
+            },
+            "description": "Retrieves the filled field data for a particular document."
+          },
+          "response": []
+        },
+        {
+          "name": "Recall document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id/recall",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id",
+                "recall"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": "",
+                  "description": "Request ID of the document which to be recalled."
+                }
+              ]
+            },
+            "description": "Recalling a document cancels the signing process. Once you recall a document, recipients can no longer view or sign it. You can recall a document if you send an incorrect document, or if you send it to an incorrect email address."
+          },
+          "response": []
+        },
+        {
+          "name": "Remind recipient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id/remind",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id",
+                "remind"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": "",
+                  "description": "Request ID to which the reminder to be sent."
+                }
+              ]
+            },
+            "description": "A reminder is sent to the person who needs to sign."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete document",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id/delete",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id",
+                "delete"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": "",
+                  "description": "Request ID of document which is to be deleted."
+                }
+              ]
+            },
+            "description": "Deleting a document moves it to trash."
+          },
+          "response": []
+        },
+        {
+          "name": "Create new folder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "{\n    \"folders\" : {\n        \"folder_name\" : \"\"\n    }\n}",
+                  "description": "Enter folder name in appropriate key.",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/folders",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "folders"
+              ]
+            },
+            "description": "This will help you to create a new folder."
+          },
+          "response": [
+            {
+              "name": "Create new folder",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n    \"folders\" : {\n        \"folder_name\" : \"FolderName\"\n    }\n}",
+                      "description": "Enter folder name in appropriate key.",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/folders",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "folders"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Get folder list",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/folders",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "folders"
+              ]
+            },
+            "description": "This will fetch the list of folders in your account."
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieve field type",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/fieldtypes",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "fieldtypes"
+              ]
+            },
+            "description": "This will help you to retrieve field type."
+          },
+          "response": []
+        },
+        {
+          "name": "Get document type",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requesttypes",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requesttypes"
+              ]
+            },
+            "description": "This will help you to find the document type."
+          },
+          "response": []
+        },
+        {
+          "name": "Create new document type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"request_types\": {\n    \"request_type_name\" : \"\" ,\n    \"request_type_description\": \"\"\n  }\n}",
+                  "description": "Enter name and description of doc type in the keys accordingly.",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requesttypes",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requesttypes"
+              ]
+            },
+            "description": "This will help you to create a new document type."
+          },
+          "response": [
+            {
+              "name": "Create new document type",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n  \"request_types\": {\n    \"request_type_name\" : \"New Request\" ,\n    \"request_type_description\": \"Request type to check\"\n  }\n}",
+                      "description": "Enter name and description of doc type in the keys accordingly.",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/requesttypes",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "requesttypes"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Update document type",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"request_types\": {\n    \"request_type_name\" : \"\" ,\n    \"request_type_description\": \"\"\n  }\n}",
+                  "description": "Enter updated name and description of doc type in the keys accordingly.",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requesttypes/:RequestTypeId",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requesttypes",
+                ":RequestTypeId"
+              ],
+              "variable": [
+                {
+                  "key": "RequestTypeId",
+                  "value": "",
+                  "description": "Request Type ID to which type to be updated."
+                }
+              ]
+            },
+            "description": "This will help you to update an existing document type."
+          },
+          "response": [
+            {
+              "name": "Update document type",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n  \"request_types\": {\n    \"request_type_name\" : \"Changed type\" ,\n    \"request_type_description\": \"Newly changed\"\n  }\n}",
+                      "description": "Enter updated name and description of doc type in the keys accordingly.",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/requesttypes/:RequestTypeId",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "requesttypes",
+                    ":RequestTypeId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "RequestTypeId",
+                      "value": "",
+                      "description": "Request Type ID to which type to be updated."
+                    }
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Extend Doc Expiry",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "expire_by",
+                  "value": "",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/requests/:Request_Id/extend",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "requests",
+                ":Request_Id",
+                "extend"
+              ],
+              "variable": [
+                {
+                  "key": "Request_Id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Extend Doc Expiry",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "expire_by",
+                      "value": "30 November 2021",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/requests/:Request_Id/extend",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "requests",
+                    ":Request_Id",
+                    "extend"
+                  ],
+                  "variable": [
+                    {
+                      "key": "Request_Id",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              "_postman_previewlanguage": null,
+              "header": null,
+              "cookie": [],
+              "body": null
+            }
+          ]
+        }
+      ],
+      "description": "Create documents, update documents, send documents out for signatures and get the list of all documents related to your account.\n\n\nCREATING AND SENDING A DOCUMENT INVOLVES THE FOLLOWING STEPS : \n1. Create Document\n2. Get field types\n3. Add fields and send document for signature"
+    },
+    {
+      "name": "Template Management",
+      "item": [
+        {
+          "name": "Create Template",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "description": "Select file to create as template.",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "key": "data",
+                  "value": "{\n    \"templates\":{\n        \"template_name\" : \" \",\n        \"expiration_days\" : ,\n        \"is_sequential\" : ,\n        \"reminder_period\" : ,\n        \"email_reminders\" : ,\n        \"actions\" : [\n            {\n                \"action_type\" : \" \",\n                \"signing_order\" : ,\n                \"role\" : \" \",\n                \"private_notes\" : \" \",\n                \"verify_recipient\" : \n            }\n        ]\n    }\n}",
+                  "description": "Enter the details of template appropriately.",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/templates",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "templates"
+              ]
+            },
+            "description": "This will help you to create a new template."
+          },
+          "response": [
+            {
+              "name": "Create Template",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "description": "Select file to create as template.",
+                      "type": "file",
+                      "src": []
+                    },
+                    {
+                      "key": "data",
+                      "value": "{\n    \"templates\":{\n        \"template_name\" : \"Agreement\" ,\n        \"expiration_days\" : 5,\n        \"is_sequential\" : true,\n        \"reminder_period\" : 2,\n        \"email_reminders\" : true,\n        \"actions\" : [\n            {\n                \"action_type\" : \"SIGN\",\n                \"signing_order\" : 0,\n                \"role\" : \"SIGNER\",\n                \"private_notes\" : \"Sign this doc within 5 days\",\n                \"verify_recipient\" : false\n            }\n        ]\n    }\n}",
+                      "description": "Enter the details of template appropriately.",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/templates",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "templates"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Update Template",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "{\n\t\"templates\":{\n\t\t\"document_fields\":[\n\t{\n\t\t\"fields\":{\n\t\t\t\"image_fields\":[],\n\t\t\t\"date_fields\":[],\n\t\t\t\"check_boxes\":[],\n\t\t\t\"radio_groups\":[],\n\t\t\t\"text_fields\":[\n\t\t\t{\n\t\t\t\t\"field_type_id\":\"\",\n\t\t\t\t\"field_name\":\"\",\n\t\t\t\t\"field_label\":\"\",\n\t\t\t\t\"document_id\":\"\",\n\t\t\t\t\"field_category\":\"\",\n\t\t\t\t\"is_mandatory\":,\n\t\t\t\t\"page_no\":,\n\t\t\t\t\"x_value\":\"\",\n\t\t\t\t\"y_value\":\"\",\n\t\t\t\t\"width\":\"\",\n\t\t\t\t\"height\":\"\",\n\t\t\t\t\"text_property\":{\n\t\t\t\t\t\"font\":\"\",\n\t\t\t\t\t\"font_size\":,\n\t\t\t\t\t\"font_color\":\"\"\n\t\t\t\t}\n\t\t\t}\n\t\t\t],\n\t\t\t\"dropdown_fields\":[]\n\t\t},\n\t\t\"document_id\":\"\",\n\t\t\"deleted_fields\":[]\n\t}\n\t],\n\t\"deleted_actions\":[],\n\t\t\"actions\":[\n\t\t{\n\t\t\t\"action_id\":\"\",\n\t\t\t\"action_type\":\"\",\n\t\t\t\"signing_order\":,\n\t\t\t\"recipient_name\":\"\",\n\t\t\t\"role\":\"\",\n\t\t\t\"recipient_email\":\"\",\n\t\t\t\"recipient_phonenumber\":\"\",\n\t\t\t\"recipient_countrycode\":\"\",\n\t\t\t\"private_notes\":\"\",\n\t\t\t\"verify_recipient\":,\n\t\t\t\"deleted_fields\":[],\n\t\t\t\"deleted_radio_fields\":[],\n\t\t\t\"fields\":{\n\t\t\t\t\"text_fields\":[],\n\t\t\t\t\"image_fields\":[\n\t\t\t\t{\n\t\t\t\t\t\"field_type_id\":\"\",\n\t\t\t\t\t\"field_name\":\"\",\n\t\t\t\t\t\"field_type_name\":\"\",\n\t\t\t\t\t\"document_id\":\"\",\n\t\t\t\t\t\"field_category\":\"\",\n\t\t\t\t\t\"action_id\":\"\",\n\t\t\t\t\t\"is_mandatory\":,\n\t\t\t\t\t\"page_no\":,\n\t\t\t\t\t\"field_label\":\"\",\n\t\t\t\t\t\"x_value\":\"\",\n\t\t\t\t\t\"y_value\":\"\",\n\t\t\t\t\t\"width\":\"\",\n\t\t\t\t\t\"height\":\"\",\n\t\t\t\t\t\"is_resizable\":\n\t\t\t\t}\n\t\t\t\t],\n\t\t\t\t\"date_fields\":[],\n\t\t\t\t\"check_boxes\":[],\n\t\t\t\t\"radio_groups\":[],\n\t\t\t\t\"dropdown_fields\":[],\n\t\t\t\t\"file_fields\":[]\n\t\t\t}\t\n\t\t}\n\t\t]\n\t}\n}",
+                  "description": "Enter template details in appropriate key",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/templates/:Template_Id",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "templates",
+                ":Template_Id"
+              ],
+              "variable": [
+                {
+                  "key": "Template_Id",
+                  "value": "",
+                  "description": "Template Id to which update has to be done."
+                }
+              ]
+            },
+            "description": "This will help you to update an existing template."
+          },
+          "response": [
+            {
+              "name": "Update Template",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n\t\"templates\":{\n\t\t\"document_fields\":[\n\t{\n\t\t\"fields\":{\n\t\t\t\"text_fields\":[\n\t\t\t{\n\t\t\t\t\"field_type_id\" : \"238566000000000155\",\n\t\t\t\t\"field_name\" : \"Company\",\n\t\t\t\t\"field_label\" : \"Company\",\n\t\t\t\t\"document_id\" : \"200102020020378\",\n\t\t\t\t\"field_category\" : \"textfield\",\n\t\t\t\t\"is_mandatory\" : true,\n\t\t\t\t\"page_no\" : 0,\n\t\t\t\t\"x_value\" : \"70\",\n\t\t\t\t\"y_value\":\"6\",\n\t\t\t\t\"width\":\"16\",\n\t\t\t\t\"height\":\"1\",\n\t\t\t\t\"text_property\":{\n\t\t\t\t\t\"font\":\"Roboto\",\n\t\t\t\t\t\"font_size\":11,\n\t\t\t\t\t\"font_color\":\"000000\"\n\t\t\t\t}\n\t\t\t}\n\t\t\t]\n\t\t},\n\t\t\"document_id\":\"200102020020378\"\n\t}\n\t]\n\t\t\"actions\":[\n\t\t{\n\t\t\t\"action_id\":\"2385678905031024\",\n\t\t\t\"action_type\":\"SIGN\",\n\t\t\t\"signing_order\":0,\n\t\t\t\"recipient_name\":\"James\",\n\t\t\t\"role\":\"sign\",\n\t\t\t\"recipient_email\":\"abc@example.com\",\n\t\t\t\"recipient_phonenumber\":\"\",\n\t\t\t\"recipient_countrycode\":\"\",\n\t\t\t\"private_notes\":\"Sign the doc\",\n\t\t\t\"verify_recipient\":false,\n\t\t\t\"fields\":{\n\t\t\t\t\"image_fields\":[\n\t\t\t\t{\n\t\t\t\t\t\"field_type_id\":\"2385678543200041\",\n\t\t\t\t\t\"field_name\":\"Signature\",\n\t\t\t\t\t\"field_type_name\":\"Signature\",\n\t\t\t\t\t\"document_id\":\"200102020020378\",\n\t\t\t\t\t\"field_category\":\"image\",\n\t\t\t\t\t\"action_id\":\"2385678905031024\",\n\t\t\t\t\t\"is_mandatory\":true,\n\t\t\t\t\t\"page_no\":0,\n\t\t\t\t\t\"field_label\":\"Signature\",\n\t\t\t\t\t\"x_value\":\"20\",\n\t\t\t\t\t\"y_value\":\"47\",\n\t\t\t\t\t\"width\":\"22\",\n\t\t\t\t\t\"height\":\"2\",\n\t\t\t\t\t\"is_resizable\":true\n\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\t\n\t\t}\n\t\t]\n\t}\n}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/templates/:Template_Id",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "templates",
+                    ":Template_Id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "Template_Id",
+                      "value": "",
+                      "description": "Template Id to which update has to be done."
+                    }
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Get template list",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "{\n    \"page_context\" : {\n        \"row_count\" : ,\n        \"start_index\" : ,\n        \"search_columns\" : {},\n        \"sort_column\" : \"\",\n        \"sort_order\" : \"\"\n    }\n}",
+                  "description": "Sorting column criteria can either be template_name, owner_first_name or modified_time",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/templates",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "templates"
+              ]
+            },
+            "description": "This will help you to fetch the list of templates in your account."
+          },
+          "response": [
+            {
+              "name": "Get template list",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "url": {
+                  "raw": "{{SIGN_URL}}/api/v1/templates",
+                  "host": [
+                    "{{SIGN_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "templates"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Get template details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/templates/:Template_ID",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "templates",
+                ":Template_ID"
+              ],
+              "variable": [
+                {
+                  "key": "Template_ID",
+                  "value": "",
+                  "description": "Template_Id for which details to be fetched."
+                }
+              ]
+            },
+            "description": "Get the details of a particular template using its id - specifically lists the pre fill fields that need to be sent in order to convert the template into a document."
+          },
+          "response": []
+        },
+        {
+          "name": "Send document out for signature using templates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "{\n    \"templates\": {\n        \"field_data\" : {\n            \"field_text_data\" : {},\n            \"field_boolean_data\" : {},\n            \"field_date_data\" : {}\n        },\n        \"actions\": [\n            {\n                \"action_type\" : \"\" ,\n                \"recipient_email\" : \"\" ,\n                \"recipient_name\" : \"\" ,\n                \"action_id\" : \"\" ,\n                \"verify_recipient\" : \"\" ,\n                \"role\" : \"\"\n            }\n        ],\n        \"notes\" : \"\"\n    }\n}",
+                  "description": "Enter the values to the keys appropriately.",
+                  "type": "text"
+                },
+                {
+                  "key": "is_quicksend",
+                  "value": "",
+                  "description": "Quick send criteria [true/false]",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/templates/:Template_Id/createdocument",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "templates",
+                ":Template_Id",
+                "createdocument"
+              ],
+              "variable": [
+                {
+                  "key": "Template_Id",
+                  "value": "",
+                  "description": "Template_id of which template's document to be sent out for signature"
+                }
+              ]
+            },
+            "description": "In order to use the template, the recipient details need to be given. In previous call the actions array contains number of recipients. It may or may not have an email address. When using the template, the actions need to be sent along with email id and name for all. Number of actions cannot be changed. In case there are document fields to be filled (document_fields array) then the value for those also needs to be filled. If the “is_mandatory” is true for a field then it must have a value. Else value need not be sent."
+          },
+          "response": [
+            {
+              "name": "Send document out for signature using templates",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Zoho-oauthtoken <Oauth Token>",
+                    "description": "If Authorization is set at parent level, this may remain disabled.",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n    \"templates\": {\n        \"actions\": [\n            {\n                \"action_type\" : \"SIGN\" ,\n                \"recipient_email\" : \"abc@example.com\" ,\n                \"recipient_name\" : \"Alex James\" ,\n                \"action_id\" : \"2385678905031024\" ,\n                \"verify_recipient\" : \"false\" ,\n                \"role\" : \"Signer\"\n            }\n        ],\n        \"notes\" : \"Sign this doc\"\n    }\n}",
+                      "description": "Enter the values to the keys appropriately.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "is_quicksend",
+                      "value": "true / false",
+                      "description": "Quick send criteria [true/false]",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "https://sign.zoho.com/api/v1/templates/:Template_Id/createdocument",
+                  "protocol": "https",
+                  "host": [
+                    "sign",
+                    "zoho",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "templates",
+                    ":Template_Id",
+                    "createdocument"
+                  ],
+                  "variable": [
+                    {
+                      "key": "Template_Id",
+                      "value": "",
+                      "description": "Template_id of which template's document to be sent out for signature"
+                    }
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Delete template",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Zoho-oauthtoken <Oauth Token>",
+                "description": "If Authorization is set at parent level, this may remain disabled.",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{SIGN_URL}}/api/v1/templates/:Template_ID/delete",
+              "host": [
+                "{{SIGN_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "templates",
+                ":Template_ID",
+                "delete"
+              ],
+              "variable": [
+                {
+                  "key": "Template_ID",
+                  "value": "",
+                  "description": "Template_Id of the template to be deleted."
+                }
+              ]
+            },
+            "description": "Deleting a template moves it to trash."
+          },
+          "response": []
+        }
+      ],
+      "description": "Create customizable templates based on your needs in Zoho Sign. Templates can be used any number of times."
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "tokenType",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "accessToken",
+        "value": "{{ACCESS_TOKEN}}",
+        "type": "string"
+      },
+      {
+        "key": "headerPrefix",
+        "value": "Zoho-oauthtoken",
+        "type": "string"
+      },
+      {
+        "key": "addTokenTo",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "var tokenDate = 0;",
+          "var tokenTimestamp = pm.collectionVariables.get(\"OAUTH_TIMESTAMP\");",
+          "if(tokenTimestamp){",
+          "  tokenDate = Date.parse(tokenTimestamp);",
+          "}",
+          "var expiresInTime = pm.collectionVariables.get(\"EXPIRES_IN_TIME\");",
+          "if(!expiresInTime){",
+          "    expiresInTime = 3600000; ",
+          "}",
+          "var URL = null;",
+          "if(pm.environment.get(\"ACCOUNTS_URL\"))",
+          "{",
+          "    URL = pm.environment.get(\"ACCOUNTS_URL\")+\"?refresh_token=\"+pm.collectionVariables.get(\"REFRESH_TOKEN\")+\"&client_id=\"+pm.collectionVariables.get(\"CLIENT_ID\")+\"&client_secret=\"+pm.collectionVariables.get(\"CLIENT_SECRET\")+\"&grant_type=refresh_token\";",
+          "}",
+          "else",
+          "{",
+          "    URL = pm.collectionVariables.get(\"ACCOUNT_URL\")+\"?refresh_token=\"+pm.collectionVariables.get(\"REFRESH_TOKEN\")+\"&client_id=\"+pm.collectionVariables.get(\"CLIENT_ID\")+\"&client_secret=\"+pm.collectionVariables.get(\"CLIENT_SECRET\")+\"&grant_type=refresh_token\";",
+          "}",
+          "if(((new Date() - tokenDate) >= expiresInTime) || !(pm.collectionVariables.get(\"ACCESS_TOKEN\"))) ",
+          "{",
+          "   pm.sendRequest({",
+          "       url: URL,",
+          "       method: 'POST',",
+          "       header: {",
+          "        'Accept': 'application/json',",
+          "        'Content-Type': 'application/json;',",
+          "       },",
+          "  }, function (err, res) {",
+          "        pm.collectionVariables.set(\"ACCESS_TOKEN\", res.json().access_token);",
+          "        pm.collectionVariables.set(\"OAUTH_TIMESTAMP\", new Date());",
+          "        ",
+          "        if(res.json().expires_in){",
+          "            expiresInTime = res.json().expires_in * 1000;",
+          "        }",
+          "        pm.collectionVariables.set(\"EXPIRES_IN_TIME\", expiresInTime);",
+          "  });",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "CLIENT_ID",
+      "value": ""
+    },
+    {
+      "key": "CLIENT_SECRET",
+      "value": ""
+    },
+    {
+      "key": "REFRESH_TOKEN",
+      "value": ""
+    },
+    {
+      "key": "ACCOUNT_URL",
+      "value": "https://accounts.zoho.com/oauth/v2/token"
+    },
+    {
+      "key": "SIGN_URL",
+      "value": "https://sign.zoho.com"
+    },
+    {
+      "key": "ACCESS_TOKEN",
+      "value": ""
+    },
+    {
+      "key": "OAUTH_TIMESTAMP",
+      "value": ""
+    },
+    {
+      "key": "EXPIRES_IN_TIME",
+      "value": "3600000"
+    }
+  ]
+}
