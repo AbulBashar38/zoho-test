@@ -6,10 +6,17 @@ import {
     sendAgreement,
 } from '../../../integrations/zoho/sign/sign-agreement.service'
 import {
+    captureAgreement,
+    getStoredAgreement,
+    listStoredAgreements,
+} from '../../../integrations/zoho/sign/sign-capture.service'
+import { handleZohoSignWebhook } from '../../../integrations/zoho/sign/sign-webhook.service'
+import {
     getZohoSignTemplate,
     getZohoSignTemplateByName,
     listZohoSignTemplates,
 } from '../../../integrations/zoho/sign/zoho-sign-template'
+import config from '../../config'
 import { catchAsync } from '../../utils/catchAsync'
 import { sendResponse } from '../../utils/sendResponse'
 
@@ -93,7 +100,82 @@ const getRequest = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+// Zoho calls this when a request changes. The body only identifies which request; the
+// values are then read back from Zoho and stored.
+const webhook = catchAsync(async (req: Request, res: Response) => {
+    if (config.zoho.webhook_secret) {
+        const provided = req.query.secret ?? req.headers['x-zoho-webhook-secret']
+
+        if (provided !== config.zoho.webhook_secret) {
+            sendResponse(res, {
+                statusCode: httpStatus.UNAUTHORIZED,
+                success: false,
+                message: 'Invalid webhook secret',
+                data: null,
+            })
+            return
+        }
+    }
+
+    const result = await handleZohoSignWebhook(
+        req.body,
+        typeof req.query.event_type === 'string' ? req.query.event_type : undefined,
+    )
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Agreement captured',
+        data: result,
+    })
+})
+
+// Pull the agreement from Zoho and store it, without waiting for a webhook.
+const capture = catchAsync(async (req: Request, res: Response) => {
+    const result = await captureAgreement(req.params.id as string, {
+        reference: typeof req.body?.reference === 'string' ? req.body.reference : undefined,
+        userId: typeof req.body?.userId === 'string' ? req.body.userId : undefined,
+    })
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Agreement captured from Zoho',
+        data: result,
+    })
+})
+
+// Read what was stored, including every field the signatories filled.
+const getStored = catchAsync(async (req: Request, res: Response) => {
+    const result = await getStoredAgreement(req.params.id as string)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Agreement fetched from the local database',
+        data: result,
+    })
+})
+
+const listStored = catchAsync(async (req: Request, res: Response) => {
+    const result = await listStoredAgreements({
+        status: typeof req.query.status === 'string' ? req.query.status : undefined,
+        userId: typeof req.query.userId === 'string' ? req.query.userId : undefined,
+    })
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Agreements fetched from the local database',
+        data: result,
+    })
+})
+
 export const SignController = {
+    webhook,
+    capture,
+    getStored,
+    listStored,
     listTemplates,
     getTemplate,
     createAgreement,

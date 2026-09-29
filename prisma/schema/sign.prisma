@@ -1,0 +1,70 @@
+// Local copy of a Zoho Sign agreement and every field value on it — both what this backend
+// pre-filled and what the signatories typed. Zoho stays the system of record; this is the
+// copy the app reads and reports on.
+model SignAgreement {
+  id String @id @default(uuid(7))
+
+  zohoRequestId String  @unique
+  requestName   String?
+  templateId    String?
+  status        String
+  // Your own reference, e.g. the order this agreement belongs to.
+  reference     String?
+
+  sentAt      DateTime?
+  completedAt DateTime?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  recipients SignAgreementRecipient[]
+  fields     SignAgreementField[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status], name: "idx_sign_agreement_status")
+  @@map("sign_agreements")
+}
+
+model SignAgreementRecipient {
+  id String @id @default(uuid(7))
+
+  agreementId String
+  agreement   SignAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  zohoActionId String
+  role         String?
+  name         String?
+  email        String?
+  // NOACTION, VIEWED, SIGNED, DECLINED …
+  status       String?
+  signedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([agreementId, zohoActionId])
+  @@map("sign_agreement_recipients")
+}
+
+model SignAgreementField {
+  id String @id @default(uuid(7))
+
+  agreementId String
+  agreement   SignAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  zohoFieldId String
+  fieldName   String?
+  fieldLabel  String?
+  value       String
+  // PREFILL for values this backend supplied, otherwise the signing role that entered it.
+  filledBy    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([agreementId, zohoFieldId])
+  @@index([fieldName], name: "idx_sign_field_name")
+  @@map("sign_agreement_fields")
+}
